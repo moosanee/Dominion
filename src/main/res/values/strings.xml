@@ -1,0 +1,123 @@
+<resources>
+    <!-- basic card activity strings -->
+    <string name="app_name">Dominion</string>
+    <string name="finished">Finished</string>
+    <string name="zero">0</string>
+    <string name="drawCards">Draw Cards:</string>
+    <string name="extraAction">Extra Action:</string>
+    <string name="extraBuy">Extra Buy:</string>
+    <string name="extraCoin">Extra\u0020\u0020\u0020\u0020\u0020\u0020      :</string>
+    <string name="attacks">Attacks:</string>
+    <string name="trashes">Trashes:</string>
+    <string name="costs2">2-:</string>
+    <string name="costs3">3:</string>
+    <string name="costs4">4:</string>
+    <string name="costs5">5:</string>
+    <string name="costs6">6+:</string>
+    <string name="cost">Cost</string>
+    <string name="cards">Cards:</string>
+    <string name="cellar">cellar card image</string>
+    <string name="chapel">chapel card image</string>
+    <string name="moat">moat card image</string>
+    <string name="chancellor">chancellor card image</string>
+    <string name="village">village card image</string>
+    <string name="woodcutter">woodcutter card image</string>
+    <string name="workshop">workshop card image</string>
+    <string name="bureaucrat">bureaucrat card image</string>
+    <string name="feast">feast card image</string>
+    <string name="gardens">gardens card image</string>
+    <string name="militia">militia card image</string>
+    <string name="moneyLender">money lander card image</string>
+    <string name="remodel">remodel card image</string>
+    <string name="smithy">smithy card image</string>
+    <string name="spy">spy card image</string>
+    <string name="throneRoom">throne room card image</string>
+    <string name="thief">thief card image</string>
+    <string name="councilRoom">council room card image</string>
+    <string name="festival">festival card image</string>
+    <string name="laboratory">laboratory card image</string>
+    <string name="library">library card image</string>
+    <string name="market">market card image</string>
+    <string name="mine">mine card image</string>
+    <string name="witch">witch card image</string>
+    <string name="adventurer">adventurer card image</string>
+    <string name="merchant">merchant card image</string>
+    <string name="vassal">vassal card image</string>
+    <string name="coin">coin image</string>
+
+    <!-- card close up activity strings -->
+    <string name="choose">Choose</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard_button">Discard</string>
+    <string name="trash_button">Trash</string>
+
+    <!-- game board activity strings -->
+    <string name="cardBack">card back image</string>
+    <string name="playerCard1">player A hand card one</string>
+    <string name="playerCard2">player A hand card two</string>
+    <string name="playerCard3">player A hand card three</string>
+    <string name="playerCard4">player A hand card four</string>
+    <string name="playerCard5">player A hand card five</string>
+    <string name="playerDeck">player A deck image, the back of a card</string>
+    <string name="playerDiscard">player A discard pile, whatever card is on top, or the back of a card</string>
+    <string name="chooseCards">Choose Cards</string>
+    <string name="endGame">End Game</string>
+    <string name="deck">Deck</string>
+    <string name="discard">Discard</string>
+    <string name="hand">Hand</string>
+    <string name="playerCHand">a spread of card for player C from the back</string>
+    <string name="playerBHand">a spread of card for player B from the back</string>
+    <string name="playerDHand">a spread of card for player D from the back</string>
+    <string name="playerB">Player B</string>
+    <string name="playerD">Player D</string>
+    <string name="playerC">Player C</string>
+    <string name="curse">curse card image</string>
+    <string name="estate">estate card image</string>
+    <string name="duchy">duchy card image</string>
+    <string name="province">province card image</string>
+    <string name="copper">copper card image</string>
+    <string name="silver">silver card image</string>
+    <string name="gold">gold card image</string>
+    <string name="cost2">action cards that cost 2 or less</string>
+    <string name="cost3">action cards that cost 3</string>
+    <string name="cost4">action cards that cost 4</string>
+    <string name="cost5">action cards that cost 5 or more</string>
+    <string name="trash">trash pile card image</string>
+
+    <!-- main activity strings -->
+    <string name="startGame">Start Game</string>
+
+    <!-- choose cards activity strings -->
+    <string name="basicCards">Basic Set</string>
+    <string name="intrigueCards">Intrigue</string>
+    <string name="return_text">Return</string>
+    <string name="plus1"><u>+1</u></string>
+    <string name="plus2"><u>+2</u></string>
+    <string name="plus3"><u>+3</u></string>
+    <string name="plus4"><u>+4</u></string>
+    <string name="costs1">1:</string>
+    <string name="costs2c">2:</string>
+    <string name="costs6c">6:</string>
+    <string name="costs7">7:</string>
+    <string name="costs8">8:</string>
+    <string name="costs9">9:</string>
+    <string name="costs10">10:</string>
+    <string name="costs11">11:</string>
+    <string name="costs12">12:</string>
+    <string name="costs13">13:</string>
+    <string name="costs14">14:</string>
+    <string name="harbinger">harbinger card image</string>
+    <string name="poacher">poacher card image</string>
+    <string name="bandit">bandit card image</string>
+    <string name="sentry">sentry card image</string>
+    <string name="artisan">artisan</string>
+    <string name="red_star_legend">Cards removed in the second edition</string>
+    <string name="green_star_legend">cards added in the second edition</string>
+    <string name="setUpGame">Set up Game</string>
+    <string name="put_back">Put Back \non Top</string>
+    <string name="add_hand">Add to&#10;Hand</string>
+    <string name="multi_cards">Look at&#10;top x cards</string>
+    <string name="browse_discard">Browse through&#10;Discard Pile</string>
+
+
+</resources>

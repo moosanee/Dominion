@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_opponent_area_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    tools:context=".OpponentAreaDialogActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="@dimen/card_width_med"
+        android:layout_height="@dimen/card_height_med"
+        android:src="@drawable/back60"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/padding">
+
+        <ImageView
+            android:layout_width="@dimen/card_width_med"
+            android:layout_height="@dimen/card_height_med"
+            android:src="@drawable/back60"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp">
+
+            <ImageView
+                android:layout_width="@dimen/card_width_med"
+                android:layout_height="@dimen/card_height_med"
+                android:src="@drawable/back60"
+                app:layout_constraintStart_toStartOf="parent"/>
+            <ImageView
+                android:layout_width="@dimen/card_width_med"
+                android:layout_height="@dimen/card_height_med"
+                android:src="@drawable/back60"
+                android:layout_marginStart="40dp"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <ImageView
+            android:layout_width="@dimen/card_width_med"
+            android:layout_height="@dimen/card_height_med"
+            android:src="@drawable/back60"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>

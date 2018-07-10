@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_choose_game_cards"
+    android:background="@color/colorPrimaryDark"
+    android:padding="@dimen/padding"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChooseGameCardsActivity">
+
+    <android.support.v4.widget.Space
+        android:id="@+id/choose_buttons_top_left_space"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Button
+        android:id="@+id/basic_cards_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/appButton"
+        android:text="@string/basicCards"
+        app:layout_constraintStart_toEndOf="@id/choose_buttons_top_left_space"
+        app:layout_constraintTop_toBottomOf="@id/choose_buttons_top_left_space" />
+    <Button
+        android:id="@+id/intrigue_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/appButton"
+        android:text="@string/intrigueCards"
+        android:layout_marginTop="@dimen/choose_buttons_column2_top"
+        app:layout_constraintStart_toEndOf="@id/choose_buttons_top_left_space"
+        app:layout_constraintTop_toBottomOf="@id/choose_buttons_top_left_space" />
+
+    <Button
+        android:id="@+id/set_up_game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="360dp"
+        android:layout_marginTop="440dp"
+        style="@style/appButton"
+        android:text="@string/setUpGame"
+        app:layout_constraintStart_toEndOf="@id/choose_buttons_top_left_space"
+        app:layout_constraintTop_toTopOf="@id/choose_buttons_top_left_space" />
+
+
+
+    <android.support.v4.widget.Space
+        android:id="@+id/stats_top_left_space"
+        android:layout_width="@dimen/top_left_space_width"
+        android:layout_height="@dimen/top_left_space_height"
+        android:layout_marginBottom="@dimen/choose_cards_actions_stats_top_from_bottom"
+        android:layout_marginStart="@dimen/choose_cards_actions_stats_start_from_start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+        android:id="@+id/plus_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/column_space"
+        android:tag="plus_1"
+        android:text="@string/plus1"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/stats_top_left_space" />
+    <TextView
+        android:id="@+id/plus_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/column_space"
+        android:tag="plus_2"
+        android:text="@string/plus2"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/plus_1" />
+    <TextView
+        android:id="@+id/plus_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/column_space"
+        android:tag="plus_3"
+        android:text="@string/plus3"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/plus_2" />
+    <TextView
+        android:id="@+id/plus_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/column_space"
+        android:tag="plus_4"
+        android:text="@string/plus4"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/plus_3" />
+
+
+
+
+    <TextView
+        android:id="@+id/extra_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="extra_card"
+        android:text="@string/drawCards"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+
+    <TextView
+        android:id="@+id/extra_card1_count"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_card1_count"
+        android:text="@string/zero"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_1" />
+    <TextView
+        android:id="@+id/extra_card2_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_card2_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_2" />
+    <TextView
+        android:id="@+id/extra_card3_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_card3_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_3" />
+    <TextView
+        android:id="@+id/extra_card4_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_card4_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_4" />
+
+
+    <TextView
+        android:id="@+id/extra_action"
+        android:tag="extra_action"
+        android:text="@string/extraAction"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <TextView
+        android:id="@+id/extra_action1_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_action1_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_1" />
+    <TextView
+        android:id="@+id/extra_action2_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_action2_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_2" />
+    <TextView
+        android:id="@+id/extra_action3_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_action3_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_3" />
+    <TextView
+        android:id="@+id/extra_action4_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_action4_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_4"/>
+
+
+
+    <TextView
+        android:id="@+id/extra_buy"
+        android:tag="extra_buy"
+        android:text="@string/extraBuy"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <TextView
+        android:id="@+id/extra_buy1_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_buy1_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_1"/>
+    <TextView
+        android:id="@+id/extra_buy2_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_buy2_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_2"/>
+    <TextView
+        android:id="@+id/extra_buy3_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_buy3_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_3"/>
+    <TextView
+        android:id="@+id/extra_buy4_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_buy4_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_4"/>
+
+
+
+    <TextView
+        android:id="@+id/extra_coin"
+        android:tag="extra_coin"
+        android:text="@string/extraCoin"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <android.support.v4.widget.Space
+        android:id="@+id/spacer"
+        android:layout_width="@dimen/double_padding"
+        android:layout_height="@dimen/double_padding"
+        android:layout_marginTop="@dimen/data_table_coin"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <ImageView
+        android:id="@+id/coin"
+        android:layout_width="@dimen/coin_size"
+        android:layout_height="@dimen/coin_size"
+        android:layout_marginStart="42dp"
+        android:src="@drawable/coin100"
+        android:tag="coin"
+        app:layout_constraintBottom_toBottomOf="@id/spacer"
+        app:layout_constraintStart_toStartOf="@id/spacer"
+        android:contentDescription="@string/coin"/>
+    <TextView
+        android:id="@+id/extra_coin1_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_coin1_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_1"/>
+    <TextView
+        android:id="@+id/extra_coin2_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_coin2_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_2"/>
+    <TextView
+        android:id="@+id/extra_coin3_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_coin3_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_3"/>
+    <TextView
+        android:id="@+id/extra_coin4_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:paddingStart="@dimen/table_entry_padding"
+        android:tag="extra_coin4_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/plus_4"/>
+
+
+    <TextView
+        android:id="@+id/attacks"
+        android:tag="attacks"
+        android:text="@string/attacks"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <TextView
+        android:id="@+id/attacks_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        android:layout_marginStart="@dimen/non_column_space"
+        android:tag="attacks_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space"/>
+
+
+    <TextView
+        android:id="@+id/trashes"
+        android:tag="trashes"
+        android:text="@string/trashes"
+        style="@style/appText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space" />
+    <TextView
+        android:id="@+id/trashes_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zero"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        android:layout_marginStart="@dimen/non_column_space"
+        android:tag="trashes_count"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/stats_top_left_space"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space"/>
+
+
+
+    <android.support.v4.widget.Space
+        android:id="@+id/cost_top_left_space"
+        android:layout_width="@dimen/top_left_space_height"
+        android:layout_height="@dimen/top_left_space_height"
+        android:layout_marginStart="@dimen/choose_cards_cost_stats_start_from_start"
+        app:layout_constraintStart_toStartOf="@id/stats_top_left_space"
+        app:layout_constraintBottom_toBottomOf="@id/stats_top_left_space"/>
+    <TextView
+        android:id="@+id/cost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:tag="cost"
+        android:text="@string/cost"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_title_margin"
+        app:layout_constraintBottom_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1"
+        android:text="@string/costs1"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs1_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:tag="costs2"
+        android:text="@string/costs2c"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs2_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:tag="costs2_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+
+    <TextView
+        android:id="@+id/costs3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:tag="costs3"
+        android:text="@string/costs3"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs3_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:tag="costs3_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+
+    <TextView
+        android:id="@+id/costs4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:tag="costs4"
+        android:text="@string/costs4"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs4_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:tag="costs4_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+
+    <TextView
+        android:id="@+id/costs5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_4"
+        android:tag="costs5"
+        android:text="@string/costs5"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs5_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_4"
+        android:tag="costs5_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+
+    <TextView
+        android:id="@+id/costs6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        android:tag="costs6"
+        android:text="@string/costs6c"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs6_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        android:tag="costs6_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+
+
+    <TextView
+        android:id="@+id/costs7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        android:tag="costs7"
+        android:text="@string/costs7"
+        style="@style/appText"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintEnd_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs7_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        android:tag="costs7_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space1"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs8"
+        android:text="@string/costs8"
+        style="@style/appText"
+        android:paddingStart="@dimen/cost_column_padding"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs8_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs9"
+        android:text="@string/costs9"
+        style="@style/appText"
+        android:paddingStart="@dimen/cost_column_padding"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs9_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_1"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs10"
+        android:text="@string/costs10"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs10_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_2"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs11"
+        android:text="@string/costs11"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs11_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_3"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs12"
+        android:text="@string/costs12"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_4"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs12_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_4"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs13"
+        android:text="@string/costs13"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs13_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_5"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/costs14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs14"
+        android:text="@string/costs14"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        android:layout_marginStart="@dimen/cost_column_space2"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/costs14_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="costs1_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        android:layout_marginTop="@dimen/data_table_row_6"
+        android:layout_marginStart="@dimen/cost_column_space3"
+        app:layout_constraintTop_toBottomOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <TextView
+        android:id="@+id/cards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/total_cards_bottom"
+        android:tag="cards"
+        android:text="@string/cards"
+        style="@style/appText"
+        app:layout_constraintBottom_toTopOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+    <TextView
+        android:id="@+id/card_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/total_cards_bottom"
+        android:layout_marginStart="@dimen/total_cards_count_start"
+        android:tag="card_count"
+        android:text="@string/zero"
+        style="@style/appText"
+        app:layout_constraintBottom_toTopOf="@id/cost_top_left_space"
+        app:layout_constraintStart_toEndOf="@id/cost_top_left_space" />
+
+    <Button
+        android:id="@+id/return_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/return_text"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

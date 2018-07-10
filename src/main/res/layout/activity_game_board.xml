@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_game_board"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    android:orientation="vertical"
+    android:padding="@dimen/padding"
+    tools:context=".GameBoardActivity"
+    tools:layout_editor_absoluteY="25dp">
+
+    <!--ImageView
+        android:id="@+id/player_deck"
+        android:tag="player_deck"
+        android:layout_width="100dp"
+        android:layout_height="154dp"
+        android:src="@drawable/back100"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/playerDeck"/-->
+
+    <!--ImageView
+        android:id="@+id/player_discard"
+        android:tag="player_discard"
+        android:layout_width="100dp"
+        android:layout_height="154dp"
+        android:src="@drawable/back100"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/playerDiscard"/-->
+
+
+    <Button
+        android:id="@+id/end_game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        style="@style/appButton"
+        android:text="@string/endGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--TextView
+        android:id="@+id/deck"
+        android:tag="deck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/deck"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/player_deck"
+        app:layout_constraintStart_toStartOf="@+id/player_deck" /-->
+
+    <!--TextView
+        android:id="@+id/discard"
+        android:tag="discard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/discard"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/player_discard"
+        app:layout_constraintStart_toStartOf="@+id/player_discard" /-->
+
+    <TextView
+        android:id="@+id/hand"
+        android:tag="hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/hand"
+        style="@style/appText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--TextView
+        android:id="@+id/deck_size"
+        style="@style/appPileCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="deck_size"
+        android:text="@string/zero"
+        app:layout_constraintBottom_toBottomOf="@+id/player_deck"
+        app:layout_constraintEnd_toEndOf="@+id/player_deck"
+        app:layout_constraintStart_toStartOf="@+id/player_deck"
+        app:layout_constraintTop_toTopOf="@+id/player_deck" /-->
+
+    <ImageView
+        android:id="@+id/trash"
+        android:tag="trash"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/trash60"
+        android:contentDescription="@string/trash"/>
+
+    <TextView
+        android:id="@+id/trash_size"
+        style="@style/appPileCounterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="trash_size"
+        android:text="@string/zero"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/trash"
+        app:layout_constraintEnd_toEndOf="@+id/trash"
+        app:layout_constraintStart_toStartOf="@+id/trash"
+        app:layout_constraintTop_toTopOf="@+id/trash"
+        app:layout_constraintVertical_bias="0.9"
+        app:layout_constraintHorizontal_bias="0.2" />
+
+    <ImageView
+        android:id="@+id/playerC_hand"
+        android:tag="playerC_hand"
+        android:layout_width="@dimen/hhand_width_med"
+        android:layout_height="@dimen/hhand_height_med"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/horizontal_hand30"
+        android:contentDescription="@string/playerCHand" />
+
+    <ImageView
+        android:id="@+id/playerB_hand"
+        android:tag="playerB_hand"
+        android:layout_width="@dimen/vhand_width_med"
+        android:layout_height="@dimen/vhand_height_med"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3500000"
+        app:srcCompat="@drawable/vertical_hand30"
+        android:contentDescription="@string/playerBHand"/>
+
+    <ImageView
+        android:id="@+id/playerD_hand"
+        android:tag="playerD_hand"
+        android:layout_width="@dimen/vhand_width_med"
+        android:layout_height="@dimen/vhand_height_med"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.35000002"
+        app:srcCompat="@drawable/vertical_hand30"
+        android:contentDescription="@string/playerDHand"/>
+
+    <TextView
+        android:id="@+id/playerB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/playerB"
+        style="@style/appText"
+        app:layout_constraintEnd_toEndOf="@+id/playerB_hand"
+        app:layout_constraintStart_toStartOf="@+id/playerB_hand"
+        app:layout_constraintTop_toBottomOf="@+id/playerB_hand" />
+
+    <TextView
+        android:id="@+id/playerD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/playerD"
+        style="@style/appText"
+        app:layout_constraintEnd_toEndOf="@+id/playerD_hand"
+        app:layout_constraintStart_toStartOf="@+id/playerD_hand"
+        app:layout_constraintTop_toBottomOf="@+id/playerD_hand" />
+
+    <TextView
+        android:id="@+id/playerC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/playerC"
+        style="@style/appText"
+        app:layout_constraintEnd_toEndOf="@+id/playerC_hand"
+        app:layout_constraintStart_toStartOf="@+id/playerC_hand"
+        app:layout_constraintTop_toBottomOf="@+id/playerC_hand" />
+
+
+    <ImageView
+        android:id="@+id/curse"
+        android:tag="curse"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/curse" />
+
+
+
+    <ImageView
+        android:id="@+id/estate"
+        android:tag="estate"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="144dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/estate60"
+        android:contentDescription="@string/estate" />
+    <ImageView
+        android:id="@+id/duchy"
+        android:tag="duchy"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="240dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/duchy60"
+        android:contentDescription="@string/duchy" />
+    <ImageView
+        android:id="@+id/province"
+        android:tag="province"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="336dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/province60"
+        android:contentDescription="@string/province" />
+
+    <ImageView
+        android:id="@+id/copper"
+        android:tag="copper"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="144dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/copper60"
+        android:contentDescription="@string/copper" />
+    <ImageView
+        android:id="@+id/silver"
+        android:tag="silver"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="240dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/silver60"
+        android:contentDescription="@string/silver" />
+    <ImageView
+        android:id="@+id/gold"
+        android:tag="gold"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="336dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gold60"
+        android:contentDescription="@string/gold" />
+
+    <ImageView
+        android:id="@+id/cost2"
+        android:tag="cost2"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:src="@drawable/back60"
+        android:layout_marginStart="248dp"
+        android:layout_marginTop="144dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/cost2" />
+    <ImageView
+        android:id="@+id/cost3"
+        android:tag="cost3"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:src="@drawable/back60"
+        android:layout_marginStart="248dp"
+        android:layout_marginTop="240dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/cost3"/>
+    <ImageView
+        android:id="@+id/cost4"
+        android:tag="cost4"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:src="@drawable/back60"
+        android:layout_marginStart="248dp"
+        android:layout_marginTop="336dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/cost4"/>
+    <ImageView
+        android:id="@+id/cost5"
+        android:tag="cost5"
+        android:layout_width="60dp"
+        android:layout_height="93dp"
+        android:src="@drawable/back60"
+        android:layout_marginStart="248dp"
+        android:layout_marginTop="432dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/cost5"/>
+
+</android.support.constraint.ConstraintLayout>

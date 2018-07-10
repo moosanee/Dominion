@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="button_margin">20dp</dimen>
+
+    <dimen name="padding">8dp</dimen>
+    <dimen name="double_padding">16dp</dimen>
+
+    <dimen name="card_width_small">30dp</dimen>
+    <dimen name="card_height_small">46dp</dimen>
+    <dimen name="card_width_med">60dp</dimen>
+    <dimen name="card_height_med">93dp</dimen>
+    <dimen name="card_width_large">100dp</dimen>
+    <dimen name="card_height_large">154dp</dimen>
+    <dimen name="card_width_xlarge">450dp</dimen>
+    <dimen name="card_height_xlarge">694dp</dimen>
+    <dimen name="hhand_width_small">82dp</dimen>
+    <dimen name="hhand_height_small">46dp</dimen>
+    <dimen name="hhand_width_med">164dp</dimen>
+    <dimen name="hhand_height_med">93dp</dimen>
+    <dimen name="vhand_width_small">30dp</dimen>
+    <dimen name="vhand_height_small">100dp</dimen>
+    <dimen name="vhand_width_med">60dp</dimen>
+    <dimen name="vhand_height_med">200dp</dimen>
+
+    <dimen name="choose_buttons_row2_top">40dp</dimen>
+    <dimen name="choose_buttons_column2_top">80dp</dimen>
+
+    <dimen name="coin_size">50dp</dimen>
+    <dimen name="star">15dp</dimen>
+    <dimen name="star_space">20dp</dimen>
+    <dimen name="star_padding">0dp</dimen>
+    <dimen name="basic_cards_row1">16dp</dimen>
+    <dimen name="basic_cards_row2">132dp</dimen>
+    <dimen name="basic_cards_row3">248dp</dimen>
+    <dimen name="basic_cards_row4">364dp</dimen>
+    <dimen name="basic_cards_row5">480dp</dimen>
+    <dimen name="small_card_width">60dp</dimen>
+    <dimen name="small_card_height">93dp</dimen>
+    <dimen name="legend_height">580dp</dimen>
+    <dimen name="legend_vertical_space">12dp</dimen>
+    <dimen name="legend_start">48dp</dimen>
+
+    <dimen name="top_left_space_height">8dp</dimen>
+    <dimen name="top_left_space_width">122dp</dimen>
+    <dimen name="choose_cards_actions_stats_top_from_bottom">216dp</dimen>
+    <dimen name="choose_cards_actions_stats_start_from_start">64dp</dimen>
+    <dimen name="column_space">10dp</dimen>
+    <dimen name="top_row_space">8dp</dimen>
+    <dimen name="table_entry_padding">4dp</dimen>
+    <dimen name="data_table_row_1">26dp</dimen>
+    <dimen name="data_table_row_2">52dp</dimen>
+    <dimen name="data_table_row_3">78dp</dimen>
+    <dimen name="data_table_row_4">104dp</dimen>
+    <dimen name="data_table_row_5">130dp</dimen>
+    <dimen name="data_table_row_6">156dp</dimen>
+    <dimen name="data_table_row_7">182dp</dimen>
+    <dimen name="data_table_coin">101dp</dimen>
+    <dimen name="non_column_space">100dp</dimen>
+
+    <dimen name="choose_cards_cost_stats_start_from_start">324dp</dimen>
+
+    <dimen name="cost_column_space2">50dp</dimen>
+    <dimen name="cost_column_space3">75dp</dimen>
+    <dimen name="cost_column_space1">10dp</dimen>
+    <dimen name="cost_column_padding">8dp</dimen>
+    <dimen name="cost_title_margin">18dp</dimen>
+
+    <dimen name="total_cards_count_start">80dp</dimen>
+    <dimen name="total_cards_bottom">30dp</dimen>
+
+
+</resources>

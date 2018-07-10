@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    tools:context="com.example.dominion.MainActivity"
+    tools:layout_editor_absoluteY="25dp">
+
+    <Button
+        android:id="@+id/start_game_button"
+        style="@style/appButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/startGame"
+        app:layout_constraintEnd_toEndOf="@+id/choose_cards_button"
+        app:layout_constraintStart_toStartOf="@+id/choose_cards_button"
+        app:layout_constraintTop_toBottomOf="@+id/choose_cards_button" />
+
+    <Button
+        android:id="@+id/choose_cards_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="56dp"
+        android:layout_marginBottom="136dp"
+        style="@style/appButton"
+        android:text="@string/chooseCards"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/players"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="160dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <LinearLayout
+            android:id="@+id/player1"
+            android:tag="player1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/player1_in"
+                android:tag="player1_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/appCheckbox"
+                android:checked="true"
+                android:onClick="onCheckboxClicked"/>
+
+            <EditText
+                android:id="@+id/player1_name"
+                android:tag="player1_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                style="@style/appEditText"
+                android:hint="Player 1 name"/>
+
+            <RadioGroup
+                android:id="@+id/player1_type"
+                android:tag="player1_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/human1"
+                    android:tag="human1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="human"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:checked="true"
+                    android:onClick="onRadioButtonClicked"/>
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/robot1"
+                    android:tag="robot1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="robot"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/player2"
+            android:tag="player2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/player2_in"
+                android:tag="player2_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/appCheckbox"
+                android:checked="false"
+                android:onClick="onCheckboxClicked"/>
+
+            <EditText
+                android:id="@+id/player2_name"
+                android:tag="player2_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                style="@style/appEditText"
+                android:focusableInTouchMode="false"
+                android:hint="Player 2 name"/>
+
+            <RadioGroup
+                android:id="@+id/player2_type"
+                android:tag="player2_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/human2"
+                    android:tag="human2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="human"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:onClick="onRadioButtonClicked"/>
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/robot2"
+                    android:tag="robot2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="robot"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:checked="true"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+
+    </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/player3"
+            android:tag="player3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/player3_in"
+                android:tag="player3_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/appCheckbox"
+                android:checked="false"
+                android:onClick="onCheckboxClicked"/>
+
+            <EditText
+                android:id="@+id/player3_name"
+                android:tag="player3_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                style="@style/appEditText"
+                android:focusableInTouchMode="false"
+                android:hint="Player 3 name" />
+
+            <RadioGroup
+                android:id="@+id/player3_type"
+                android:tag="player3_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/human3"
+                    android:tag="human3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="human"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:onClick="onRadioButtonClicked"/>
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/robot3"
+                    android:tag="robot3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="robot"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:checked="true"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/player4"
+            android:tag="player4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/player4_in"
+                android:tag="player4_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/appCheckbox"
+                android:checked="false"
+                android:onClick="onCheckboxClicked"/>
+
+            <EditText
+                android:id="@+id/player4_name"
+                android:tag="player4_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                style="@style/appEditText"
+                android:hint="Player 4 name"
+                android:focusableInTouchMode="false" />
+
+            <RadioGroup
+                android:id="@+id/player4_type"
+                android:tag="player4_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/human4"
+                    android:tag="human4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="human"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:onClick="onRadioButtonClicked"/>
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/robot4"
+                    android:tag="robot4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="robot"
+                    style="@style/appRadioButton"
+                    android:buttonTint="@color/colorAccent"
+                    android:clickable="false"
+                    android:checked="true"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
