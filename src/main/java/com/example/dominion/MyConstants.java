@@ -51,6 +51,10 @@ public final class MyConstants implements Serializable{
     public static final int TESTER_BUTTON_ID = 474747;
     public static final int CHOOSE_CARDS_ACTIVITY_CODE = 0;
     public static final int START_GAME_ACTIVITY_CODE = 1;
+
+    public static final int BEGIN_TURN = 0;
+
+
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");
     public final static int BACKGROUND_COLOR = Color.parseColor("#45508b");
     public final static int ACCENT_COLOR = Color.parseColor("#ffe9be");

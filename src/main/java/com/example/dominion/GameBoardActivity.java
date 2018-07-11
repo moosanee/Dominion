@@ -44,6 +44,8 @@ public class GameBoardActivity extends AppCompatActivity {
     BasicCards basicCardSet = new BasicCards();
     ArrayList<PlayerInfo> playerInfoList = new ArrayList<>();
     ArrayList<Player> playerList = new ArrayList<>();
+    Turn turn;
+    ArrayList<Turn> turnList = new ArrayList<>();
     boolean doubleTap = false;
 
     private GestureDetectorCompat detector;
@@ -100,7 +102,9 @@ public class GameBoardActivity extends AppCompatActivity {
         layoutActionCards(layout, gameCards);
         playerList.get(0).displayHand(layout, context, activity);
         completeImageViewList(layout);
+        Turn turn = new Turn(playerList.get(0), activity, context);
         setImageListeners();
+        turn.takeTurn();
     }
 
 
@@ -177,7 +181,6 @@ public class GameBoardActivity extends AppCompatActivity {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             boolean detected = detector.onTouchEvent(motionEvent);
-
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                 if (!doubleTap) {
                     ClipData data = ClipData.newPlainText("", "");
@@ -349,7 +352,6 @@ public class GameBoardActivity extends AppCompatActivity {
             CardMultiTag cmt = (CardMultiTag) movingView.getTag();
             String movingViewName = cmt.getCardName();
             String movingViewType = cmt.getCardType();
-            //Card card = ChooseGameCardsActivity.basicCardSet.getCard(movingViewName);
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     // do nothing
@@ -363,7 +365,8 @@ public class GameBoardActivity extends AppCompatActivity {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(0.5f);
                         }
                     }
-                    if (targetType.equals("inPlay")) v.setBackgroundColor(BACKGROUND_COLOR);
+                    if (targetType.equals("inPlay"))
+                            v.setBackgroundColor(BACKGROUND_COLOR);
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                     cmt = (CardMultiTag) v.getTag();
@@ -374,7 +377,8 @@ public class GameBoardActivity extends AppCompatActivity {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(1f);
                         }
                     }
-                    if (targetType.equals("inPlay")) v.setBackgroundColor(BACKGROUND_COLOR_DARK);
+                    if (targetType.equals("inPlay"))
+                            v.setBackgroundColor(BACKGROUND_COLOR_DARK);
                     break;
                 case DragEvent.ACTION_DROP:
                     // Dropped, reassign View to ViewGroup
@@ -595,7 +599,8 @@ public class GameBoardActivity extends AppCompatActivity {
                     v.setAlpha(1f);
                     cmt = (CardMultiTag) v.getTag();
                     targetType = cmt.getCardType();
-                    if (targetType.equals("inPlay")) v.setBackgroundColor(BACKGROUND_COLOR_DARK);
+                    if (targetType.equals("inPlay"))
+                            v.setBackgroundColor(BACKGROUND_COLOR_DARK);
                     if (targetType.equals("hand")) {
                         for (int i = 0; i < playerList.get(0).hand.size(); i++) {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(1f);

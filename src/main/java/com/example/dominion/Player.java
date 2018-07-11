@@ -1,7 +1,6 @@
 package com.example.dominion;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
@@ -553,5 +552,7 @@ public class Player implements Serializable{
         return index;
     }
 
-
+    public String getName() {
+        return Name;
+    }
 }
