@@ -8,21 +8,22 @@ import java.io.Serializable;
 public class CardData implements Serializable{
 
     private Card card;
-    BasicCards basicCardSet = new BasicCards();
+    private BasicCards basicCardSet = new BasicCards();
     private CardMultiTag cardMultiTag;
     private int imageViewId;
+    private GameBoardActivity.MyDragListener dragListener;
     private int position;
     private int number;
     private TextView textView;
-    int textViewId;
-    String group;
-    String cardName;
-    int imageViewLeftMargin;
-    int imageViewRightMargin;
-    int imageViewBottomMargin;
-    int textViewTopMargin;
-    int textViewBottomMargin;
-    int textViewLeftMargin;
+    private int textViewId;
+    private String group;
+    private String cardName;
+    private int imageViewLeftMargin;
+    private int imageViewRightMargin;
+    private int imageViewBottomMargin;
+    private int textViewTopMargin;
+    private int textViewBottomMargin;
+    private int textViewLeftMargin;
     private static final long serialVersionUID = 100L;
 
     public CardData(String imageName, String group, int position, int number){
@@ -37,6 +38,11 @@ public class CardData implements Serializable{
     public void setTextView(TextView textView) {
         this.textView = textView;
         this.textViewId = textView.getId();
+    }
+
+    public void setTextViewId(int textViewId) {
+        this.textViewId = textViewId;
+        this.getTextView().setId(textViewId);
     }
 
     public void setImageViewId(int id){
@@ -82,6 +88,14 @@ public class CardData implements Serializable{
         this.cardMultiTag = cardMultiTag;
         this.position = index;
         this.number = number;
+    }
+
+    public void setDragListener(GameBoardActivity.MyDragListener dragListener) {
+        this.dragListener = dragListener;
+    }
+
+    public GameBoardActivity.MyDragListener getDragListener() {
+        return dragListener;
     }
 
     public void setGroup(String group) {

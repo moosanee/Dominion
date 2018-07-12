@@ -47,7 +47,7 @@ public class GameBoardActivity extends AppCompatActivity {
     Turn turn;
     ArrayList<Turn> turnList = new ArrayList<>();
     boolean doubleTap = false;
-
+    ListenerSwitches listenerSwitches = new ListenerSwitches();
     private GestureDetectorCompat detector;
     ConstraintSet constraintSet;
     ConstraintLayout layout;
@@ -95,6 +95,7 @@ public class GameBoardActivity extends AppCompatActivity {
             curseView.setImageResource(drawableId);
             bankPiles.get(bankPiles.size()-1).setTextView(
                     makePileSizeCounter(192, 96, "curse", "30"));
+            bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
             layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         }
@@ -102,9 +103,9 @@ public class GameBoardActivity extends AppCompatActivity {
         layoutActionCards(layout, gameCards);
         playerList.get(0).displayHand(layout, context, activity);
         completeImageViewList(layout);
-        Turn turn = new Turn(playerList.get(0), activity, context);
+        turn = new Turn(playerList.get(0), activity, context, layout);
         setImageListeners();
-        turn.takeTurn();
+        turn.startTurn(listenerSwitches);
     }
 
 
@@ -118,27 +119,24 @@ public class GameBoardActivity extends AppCompatActivity {
         for (int i = 0; i < playerList.get(0).hand.size(); i++) {
             ImageView view = findViewById(playerList.get(0).hand.get(i).getImageViewId());
             view.setOnTouchListener(handListener);
-            view.setOnDragListener(new MyDragListener());
+            playerList.get(0).hand.get(i).setDragListener(new MyDragListener());
+            view.setOnDragListener(playerList.get(0).hand.get(i).getDragListener());
         }
 //deck view
         View view = findViewById(playerList.get(0).deckPile.getImageViewId());
         view.setOnTouchListener(deckListener);
-        view.setOnDragListener(new MyDragListener());
+        playerList.get(0).deckPile.setDragListener(new MyDragListener());
+        view.setOnDragListener(playerList.get(0).deckPile.getDragListener());
 //discard view
         view = findViewById(playerList.get(0).discardPile.getImageViewId());
         view.setOnTouchListener(discardListener);
-        view.setOnDragListener(new MyDragListener());
+        playerList.get(0).discardPile.setDragListener(new MyDragListener());
+        view.setOnDragListener( playerList.get(0).discardPile.getDragListener());
 //trash view
-        int viewId = getResources().getIdentifier("trash", "id", getPackageName());
-        ImageView imageView = findViewById(viewId);
-        imageView.setId(TRASH_VIEW_ID);
-        trashPile= new CardData("trash", "trash", 0, 0);
-        trashPile.setImageViewId(TRASH_VIEW_ID);
-        imageView.setTag(trashPile.getCardMultiTag());
+        ImageView imageView = findViewById(TRASH_VIEW_ID);
         imageView.setOnTouchListener(trashListener);
-        imageView.setOnDragListener(new MyDragListener());
-        viewId = getResources().getIdentifier("trash_size", "id", getPackageName());
-        trashPile.setTextView((TextView) findViewById(viewId));
+        trashPile.setDragListener(new MyDragListener());
+        imageView.setOnDragListener(trashPile.getDragListener());
 //opponents views
         for (int i = 0; i < opponentImageViews.size(); i++) {
             final int FINALI = i;
@@ -163,16 +161,6 @@ public class GameBoardActivity extends AppCompatActivity {
 
     }//setImageListeners
 
-    private void addHandCardListener(View view) {
-        view.setOnTouchListener(handListener);
-        view.setOnDragListener(new MyDragListener());
-    }//addHandCardListener
-
-    private void addInPlayCardListener(View view) {
-        view.setOnTouchListener(inPlayListener);
-        view.setOnDragListener(new MyDragListener());
-    }//addInPlayCardListener
-
 
 
 
@@ -182,7 +170,7 @@ public class GameBoardActivity extends AppCompatActivity {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             boolean detected = detector.onTouchEvent(motionEvent);
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isBankListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -216,7 +204,7 @@ public class GameBoardActivity extends AppCompatActivity {
             boolean detected = detector.onTouchEvent(motionEvent);
 
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isHandListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -243,7 +231,7 @@ public class GameBoardActivity extends AppCompatActivity {
             boolean detected = detector.onTouchEvent(motionEvent);
 
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isInPlayListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -270,7 +258,7 @@ public class GameBoardActivity extends AppCompatActivity {
             boolean detected = detector.onTouchEvent(motionEvent);
 
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isDeckListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -296,7 +284,7 @@ public class GameBoardActivity extends AppCompatActivity {
             boolean detected = detector.onTouchEvent(motionEvent);
 
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isDiscardListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -322,7 +310,7 @@ public class GameBoardActivity extends AppCompatActivity {
             boolean detected = detector.onTouchEvent(motionEvent);
 
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                if (!doubleTap) {
+                if (!doubleTap && listenerSwitches.isTrashListenerSwitch()) {
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view);
@@ -359,26 +347,50 @@ public class GameBoardActivity extends AppCompatActivity {
                 case DragEvent.ACTION_DRAG_ENTERED:
                     cmt = (CardMultiTag) v.getTag();
                     String targetType = cmt.getCardType();
-                    v.setAlpha(0.5f);
-                    if (targetType.equals("hand")) {
+                    if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(0).hand.size(); i++) {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(0.5f);
                         }
                     }
-                    if (targetType.equals("inPlay"))
-                            v.setBackgroundColor(BACKGROUND_COLOR);
+                    if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
+                        for (int i = 0; i < playerList.get(0).inPlay.size(); i++) {
+                            findViewById(playerList.get(0).inPlay.get(i).getImageViewId()).setAlpha(0.5f);
+                        }
+                        v.setBackgroundColor(BACKGROUND_COLOR);
+                    }
+                    if (targetType.equals("deck") && listenerSwitches.isDeckDragSwitch()) {
+                        v.setAlpha(0.5f);
+                    }
+                    if (targetType.equals("discard") && listenerSwitches.isDiscardDragSwitch()) {
+                        v.setAlpha(0.5f);
+                    }
+                    if (targetType.equals("trash") && listenerSwitches.isTrashDragSwitch()) {
+                        v.setAlpha(0.5f);
+                    }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                     cmt = (CardMultiTag) v.getTag();
                     targetType = cmt.getCardType();
-                    v.setAlpha(1f);
-                    if (targetType.equals("hand")) {
+                    if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(0).hand.size(); i++) {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(1f);
                         }
                     }
-                    if (targetType.equals("inPlay"))
-                            v.setBackgroundColor(BACKGROUND_COLOR_DARK);
+                    if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
+                        for (int i = 0; i < playerList.get(0).inPlay.size(); i++) {
+                            findViewById(playerList.get(0).inPlay.get(i).getImageViewId()).setAlpha(1f);
+                        }
+                        v.setBackgroundColor(BACKGROUND_COLOR_DARK);
+                    }
+                    if (targetType.equals("deck") && listenerSwitches.isDeckDragSwitch()) {
+                        v.setAlpha(1f);
+                    }
+                    if (targetType.equals("discard") && listenerSwitches.isDiscardDragSwitch()) {
+                        v.setAlpha(1f);
+                    }
+                    if (targetType.equals("trash") && listenerSwitches.isTrashDragSwitch()) {
+                        v.setAlpha(1f);
+                    }
                     break;
                 case DragEvent.ACTION_DROP:
                     // Dropped, reassign View to ViewGroup
@@ -389,80 +401,80 @@ public class GameBoardActivity extends AppCompatActivity {
                         int trashId = trashPile.getImageViewId();
                         int discardId = playerList.get(0).discardPile.getImageViewId();
                         int deckId = playerList.get(0).deckPile.getImageViewId();
-                        if (targetId == trashId) {
+                        if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                             removeCardFromBankPile(movingViewName);
                             addCardToTrash(movingViewName);
-                        } else if (targetId == discardId) {
+                        } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                             removeCardFromBankPile(movingViewName);
                             playerList.get(0).addCardToDiscard(movingViewName, activity, context);
-                        } else if (targetId == deckId) {
+                        } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                             removeCardFromBankPile(movingViewName);
                             playerList.get(0).addCardToDeck(movingViewName, activity, context);
-                        } else if (targetType.equals("hand")) {
+                        } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                             removeCardFromBankPile(movingViewName);
-                            playerList.get(0).addCardToHand(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).hand.size()-1;
-                            addHandCardListener(findViewById
-                                    (playerList.get(0).hand.get(topCardIndex).getImageViewId()));
-                        } else if (targetType.equals("inPlay")) {
+                            playerList.get(0).addCardToHand(movingViewName, layout, context,
+                                    activity, handListener);
+                        } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                             removeCardFromBankPile(movingViewName);
-                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).inPlay.size()-1;
-                            addInPlayCardListener(findViewById
-                                    (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
-                        } else { // do nothing
+                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context,
+                                    activity, inPlayListener);
+                            turn.reactToNewCardInPlay(movingViewName, handListener,
+                                    listenerSwitches, bankPiles);
+                        } else {
+                            movingView.setAlpha(1f);
+                            return false;
                         }
                     }
                     if (movingViewType.equals("hand")) {
-                        int trashId = getResources().getIdentifier
-                                ("trash", "id", getPackageName());
+                        int trashId = trashPile.getImageViewId();
                         int discardId = playerList.get(0).discardPile.getImageViewId();
                         int deckId = playerList.get(0).deckPile.getImageViewId();
-                        if (targetId == trashId) {
+                        if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                             playerList.get(0).removeCardFromHand(viewId, activity, layout);
                             addCardToTrash(movingViewName);
-                        } else if (targetId == discardId) {
+                        } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                             playerList.get(0).removeCardFromHand(viewId, activity, layout);
                             playerList.get(0).addCardToDiscard(movingViewName, activity, context);
-                        } else if (targetId == deckId) {
+                        } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                             playerList.get(0).removeCardFromHand(viewId, activity, layout);
                             playerList.get(0).addCardToDeck(movingViewName, activity, context);
-                        } else if (targetType.equals("inPlay")) {
+                        } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                             playerList.get(0).removeCardFromHand(viewId, activity, layout);
-                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).inPlay.size()-1;
-                            addInPlayCardListener(findViewById
-                                    (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
-                        } else if (targetType.equals("hand")) {
+                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context,
+                                    activity, inPlayListener);
+                            turn.reactToNewCardInPlay(movingViewName, handListener,
+                                    listenerSwitches, bankPiles);
+                        } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                             movingView.setAlpha(1f);
                             return false;
-                        } else { // do nothing
+                        } else {
+                            movingView.setAlpha(1f);
+                            return false;
                         }
                     }
                     if (movingViewType.equals("inPlay")) {
-                        int trashId = getResources().getIdentifier
-                                ("trash", "id", getPackageName());
+                        int trashId = trashPile.getImageViewId();
                         int discardId = playerList.get(0).discardPile.getImageViewId();
                         int deckId = playerList.get(0).deckPile.getImageViewId();
-                        if (targetId == trashId) {
+                        if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                             playerList.get(0).removeCardFromInPlay(viewId, activity, layout);
                             addCardToTrash(movingViewName);
-                        } else if (targetId == discardId) {
+                        } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                             playerList.get(0).removeCardFromInPlay(viewId, activity, layout);
                             playerList.get(0).addCardToDiscard(movingViewName, activity, context);
-                        } else if (targetId == deckId) {
+                        } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                             playerList.get(0).removeCardFromInPlay(viewId, activity, layout);
                             playerList.get(0).addCardToDeck(movingViewName, activity, context);
-                        } else if (targetType.equals("hand")) {
+                        } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                             playerList.get(0).removeCardFromInPlay(viewId, activity, layout);
-                            playerList.get(0).addCardToHand(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).hand.size()-1;
-                            addHandCardListener(findViewById
-                                    (playerList.get(0).hand.get(topCardIndex).getImageViewId()));
-                        } else if (targetType.equals("inPlay")) {
+                            playerList.get(0).addCardToHand(movingViewName, layout, context,
+                                    activity, handListener);
+                        } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                             movingView.setAlpha(1f);
                             return false;
-                        } else { // do nothing
+                        } else {
+                            movingView.setAlpha(1f);
+                            return false;
                         }
                     }
                     if (movingViewType.equals("deck")) {
@@ -486,32 +498,31 @@ public class GameBoardActivity extends AppCompatActivity {
                             }
                         }
                         movingViewName = playerList.get(0).deck.get(top).getCardName();
-                        int trashId = getResources().getIdentifier
-                                ("trash", "id", getPackageName());
+                        int trashId = trashPile.getImageViewId();
                         int discardId = playerList.get(0).discardPile.getImageViewId();
                         int deckId = playerList.get(0).deckPile.getImageViewId();
-                        if (targetId == trashId) {
+                        if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                             playerList.get(0).removeCardFromDeck(top, activity);
                             addCardToTrash(movingViewName);
-                        } else if (targetId == discardId) {
+                        } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                             playerList.get(0).removeCardFromDeck(top, activity);
                             playerList.get(0).addCardToDiscard(movingViewName, activity, context);
-                        } else if (targetType.equals("hand")) {
+                        } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                             playerList.get(0).removeCardFromDeck(top, activity);
-                            playerList.get(0).addCardToHand(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).hand.size()-1;
-                            addHandCardListener(findViewById
-                                    (playerList.get(0).hand.get(topCardIndex).getImageViewId()));
-                        } else if (targetType.equals("inPlay")) {
+                            playerList.get(0).addCardToHand(movingViewName, layout, context,
+                                    activity, handListener);
+                        } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                             playerList.get(0).removeCardFromDeck(top, activity);
-                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context, activity);
-                            int topCardIndex = playerList.get(0).inPlay.size()-1;
-                            addInPlayCardListener(findViewById
-                                    (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
-                        } else if (targetId == deckId) {
+                            playerList.get(0).addCardToPlayArea(movingViewName, layout, context,
+                                    activity, inPlayListener);
+                            turn.reactToNewCardInPlay(movingViewName, handListener,
+                                    listenerSwitches, bankPiles);
+                        } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                             movingView.setAlpha(1f);
                             return false;
-                        } else { // do nothing
+                        } else {
+                            movingView.setAlpha(1f);
+                            return false;
                         }
                     }
                     if (movingViewType.equals("discard")) {
@@ -525,32 +536,31 @@ public class GameBoardActivity extends AppCompatActivity {
                             return true;
                         } else {
                             movingViewName = playerList.get(0).discard.get(top).getCardName();
-                            int trashId = getResources().getIdentifier
-                                    ("trash", "id", getPackageName());
+                            int trashId = trashPile.getImageViewId();
                             int discardId = playerList.get(0).discardPile.getImageViewId();
                             int deckId = playerList.get(0).deckPile.getImageViewId();
-                            if (targetId == trashId) {
+                            if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                                 playerList.get(0).removeCardFromDiscard(top, context, activity);
                                 addCardToTrash(movingViewName);
-                            } else if (targetId == deckId) {
+                            } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                                 playerList.get(0).removeCardFromDiscard(top, context, activity);
                                 playerList.get(0).addCardToDeck(movingViewName, activity, context);
-                            } else if (targetType.equals("hand")) {
+                            } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                                 playerList.get(0).removeCardFromDiscard(top, context, activity);
-                                playerList.get(0).addCardToHand(movingViewName, layout, context, activity);
-                                int topCardIndex = playerList.get(0).hand.size()-1;
-                                addHandCardListener(findViewById
-                                        (playerList.get(0).hand.get(topCardIndex).getImageViewId()));
-                            } else if (targetType.equals("inPlay")) {
+                                playerList.get(0).addCardToHand(movingViewName, layout, context,
+                                        activity, handListener);
+                            } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                                 playerList.get(0).removeCardFromDiscard(top, context, activity);
-                                playerList.get(0).addCardToPlayArea(movingViewName, layout, context, activity);
-                                int topCardIndex = playerList.get(0).inPlay.size()-1;
-                                addInPlayCardListener(findViewById
-                                        (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
-                            } else if (targetId == discardId) {
+                                playerList.get(0).addCardToPlayArea(movingViewName, layout, context,
+                                        activity, inPlayListener);
+                                turn.reactToNewCardInPlay(movingViewName, handListener,
+                                        listenerSwitches, bankPiles);
+                            } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                                 movingView.setAlpha(1f);
                                 return false;
-                            } else { // do nothing
+                            } else {
+                                movingView.setAlpha(1f);
+                                return false;
                             }
                         }
                     }
@@ -565,46 +575,57 @@ public class GameBoardActivity extends AppCompatActivity {
                             return true;
                         } else {
                             movingViewName = trash.get(top).getCardName();
-                            int trashId = getResources().getIdentifier
-                                    ("trash", "id", getPackageName());
+                            int trashId = trashPile.getImageViewId();
                             int discardId = playerList.get(0).discardPile.getImageViewId();
                             int deckId = playerList.get(0).deckPile.getImageViewId();
-                            if (targetId == discardId) {
+                            if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                                 removeCardFromTrash(top);
                                 playerList.get(0).addCardToDiscard(movingViewName, activity, context);
-                            } else if (targetId == deckId) {
+                            } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                                 removeCardFromTrash(top);
                                 playerList.get(0).addCardToDeck(movingViewName, activity, context);
-                            } else if (targetType.equals("hand")) {
+                            } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                                 removeCardFromTrash(top);
-                                playerList.get(0).addCardToHand(movingViewName, layout, context, activity);
-                                int topCardIndex = playerList.get(0).hand.size()-1;
-                                addHandCardListener(findViewById
-                                        (playerList.get(0).hand.get(topCardIndex).getImageViewId()));
-                            } else if (targetType.equals("inPlay")) {
+                                playerList.get(0).addCardToHand(movingViewName, layout, context,
+                                        activity, handListener);
+                            } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                                 removeCardFromTrash(top);
-                                playerList.get(0).addCardToPlayArea(movingViewName, layout, context, activity);
-                                int topCardIndex = playerList.get(0).inPlay.size()-1;
-                                addInPlayCardListener(findViewById
-                                        (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
-                            } else if (targetId == trashId) {
+                                playerList.get(0).addCardToPlayArea(movingViewName, layout, context,
+                                        activity, inPlayListener);
+                                turn.reactToNewCardInPlay(movingViewName, handListener,
+                                        listenerSwitches, bankPiles);
+                            } else if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
                                 movingView.setAlpha(1f);
                                 return false;
-                            } else { // do nothing
+                            } else {
+                                movingView.setAlpha(1f);
+                                return false;
                             }
                         }
                     }
                     break;
                 case DragEvent.ACTION_DRAG_ENDED:
-                    v.setAlpha(1f);
                     cmt = (CardMultiTag) v.getTag();
                     targetType = cmt.getCardType();
-                    if (targetType.equals("inPlay"))
-                            v.setBackgroundColor(BACKGROUND_COLOR_DARK);
-                    if (targetType.equals("hand")) {
+                    if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
+                        for (int i = 0; i < playerList.get(0).inPlay.size(); i++) {
+                            findViewById(playerList.get(0).inPlay.get(i).getImageViewId()).setAlpha(1f);
+                        }
+                        v.setBackgroundColor(BACKGROUND_COLOR_DARK);
+                    }
+                    if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(0).hand.size(); i++) {
                             findViewById(playerList.get(0).hand.get(i).getImageViewId()).setAlpha(1f);
                         }
+                    }
+                    if (targetType.equals("deck") && listenerSwitches.isDeckDragSwitch()) {
+                        v.setAlpha(1f);
+                    }
+                    if (targetType.equals("discard") && listenerSwitches.isDiscardDragSwitch()) {
+                        v.setAlpha(1f);
+                    }
+                    if (targetType.equals("trash") && listenerSwitches.isTrashDragSwitch()) {
+                        v.setAlpha(1f);
                     }
                     if (!event.getResult()) {
                         movingView.post(new Runnable() {
@@ -643,10 +664,9 @@ public class GameBoardActivity extends AppCompatActivity {
                     int viewId = playerList.get(0).hand.get(index).getImageViewId();
                     String cardName = playerList.get(0).hand.get(index).getCardName();
                     playerList.get(0).removeCardFromHand(viewId, activity, layout);
-                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity);
-                    int topCardIndex = playerList.get(0).inPlay.size()-1;
-                    addInPlayCardListener(findViewById
-                            (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
+                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity,
+                            inPlayListener);
+                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches, bankPiles);
                 }
             }
         }
@@ -661,10 +681,9 @@ public class GameBoardActivity extends AppCompatActivity {
                 if (cardChosen) {
                     String cardName = playerList.get(0).discard.get(chosenCardIndex).getCardName();
                     playerList.get(0).removeCardFromDiscard(chosenCardIndex, context, activity);
-                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity);
-                    int topCardIndex = playerList.get(0).inPlay.size()-1;
-                    addInPlayCardListener(findViewById
-                            (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
+                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity,
+                            inPlayListener);
+                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches, bankPiles);
                 }
             }
         }
@@ -680,10 +699,9 @@ public class GameBoardActivity extends AppCompatActivity {
                 if (cardChosen) {
                     String cardName = playerList.get(0).deck.get(chosenCardIndex).getCardName();
                     playerList.get(0).removeCardFromDeck(chosenCardIndex, activity);
-                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity);
-                    int topCardIndex = playerList.get(0).inPlay.size()-1;
-                    addInPlayCardListener(findViewById
-                            (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
+                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity,
+                            inPlayListener);
+                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches, bankPiles);
                 }
             }
         }
@@ -698,10 +716,9 @@ public class GameBoardActivity extends AppCompatActivity {
                 if (cardChosen) {
                     String cardName = trash.get(chosenCardIndex).getCardName();
                     removeCardFromTrash(chosenCardIndex);
-                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity);
-                    int topCardIndex = playerList.get(0).inPlay.size()-1;
-                    addInPlayCardListener(findViewById
-                            (playerList.get(0).inPlay.get(topCardIndex).getImageViewId()));
+                    playerList.get(0).addCardToPlayArea(cardName, layout, context, activity,
+                            inPlayListener);
+                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches, bankPiles);
                 }
             }
         }
@@ -756,6 +773,7 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(344, 288, "copper", "60"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         viewId = getResources().getIdentifier("silver", "id", getPackageName());
@@ -767,6 +785,7 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(344, 480, "silver", "40"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         viewId = getResources().getIdentifier("gold", "id", getPackageName());
@@ -778,6 +797,7 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(344, 672, "gold", "30"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         viewId = getResources().getIdentifier("estate", "id", getPackageName());
@@ -789,6 +809,7 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(192, 288, "estate", "12"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         viewId = getResources().getIdentifier("duchy", "id", getPackageName());
@@ -800,6 +821,7 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(192, 480, "duchy", "12"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
 
         viewId = getResources().getIdentifier("province", "id", getPackageName());
@@ -811,7 +833,17 @@ public class GameBoardActivity extends AppCompatActivity {
         view.setTag(bankPiles.get(bankPiles.size()-1).getCardMultiTag());
         bankPiles.get(bankPiles.size()-1).setTextView(
                 makePileSizeCounter(192, 672, "province", "12"));
+        bankPiles.get(bankPiles.size()-1).setTextViewId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
         layout.addView(bankPiles.get(bankPiles.size()-1).getTextView());
+
+        viewId = getResources().getIdentifier("trash", "id", getPackageName());
+        ImageView imageView = findViewById(viewId);
+        imageView.setId(TRASH_VIEW_ID);
+        trashPile= new CardData("trash", "trash", 0, 0);
+        trashPile.setImageViewId(TRASH_VIEW_ID);
+        imageView.setTag(trashPile.getCardMultiTag());
+        viewId = getResources().getIdentifier("trash_size", "id", getPackageName());
+        trashPile.setTextView((TextView) findViewById(viewId));
 
         viewId = getResources().getIdentifier("playerB_hand", "id", getPackageName());
         view = (ImageView) layout.getViewById(viewId);
@@ -850,15 +882,89 @@ public class GameBoardActivity extends AppCompatActivity {
         cmt = new CardMultiTag(0, 0, "inPlayZone", "inPlay");
         inPlayView.setTag(cmt);
         inPlayView.setBackgroundColor(BACKGROUND_COLOR_DARK);
-        margin = buffer + handBuffer;
         bottomMargin = cardHeight + 4 * buffer;
-        width = screenWidth - 2 * margin;
-        params = new ConstraintLayout.LayoutParams(width, cardHeight);
+        params = new ConstraintLayout.LayoutParams(inPlayZoneWidth, cardHeight);
         params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
         params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.setMargins(margin, 0, 0, bottomMargin);
+        params.setMargins(inPlayMargin, 0, 0, bottomMargin);
         inPlayView.setLayoutParams(params);
         layout.addView(inPlayView);
+
+        //create in play info zone
+    //button
+        Button button = new Button(this);
+        button.setId(PHASE_BUTTON_ID);
+        Typeface typeface = ResourcesCompat.getFont(this, R.font.alegreya_sc);
+        button.setTypeface(typeface);
+        button.setLineSpacing(0f,0.7f);
+        button.setText("play all\ntreasures");
+        params = new ConstraintLayout.LayoutParams(cardWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        bottomMargin = cardHeight + 4 * buffer;
+        int leftmargin = inPlayZoneWidth+inPlayMargin+2*buffer;
+        params.setMargins(leftmargin, 0, 0, bottomMargin);
+        button.setLayoutParams(params);
+        button.setPadding(8,0,8,0);
+        layout.addView(button);
+    //action stats
+        TextView actionView = new TextView(this);
+        actionView.setId(ACTIONS_LEFT_ID);
+        actionView.setTextSize(17f);
+        actionView.setTypeface(typeface);
+        actionView.setTextColor(ACCENT_COLOR);
+        actionView.setText("1 action left");
+        params = new ConstraintLayout.LayoutParams
+                (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        bottomMargin = 2* cardHeight;
+        params.setMargins(leftmargin, 0, 0, bottomMargin);
+        actionView.setLayoutParams(params);
+        layout.addView(actionView);
+    //coins collected
+        TextView coinView = new TextView(this);
+        coinView.setId(COINS_COLLECTED_ID);
+        coinView.setTextSize(17f);
+        coinView.setTypeface(typeface);
+        coinView.setTextColor(ACCENT_COLOR);
+        coinView.setText("0        saved");
+        params = new ConstraintLayout.LayoutParams
+                (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        bottomMargin = 2* cardHeight - 40;
+        params.setMargins(leftmargin, 0, 0, bottomMargin);
+        coinView.setLayoutParams(params);
+        layout.addView(coinView);
+    //coin image
+        ImageView coinImage = new ImageView(this);
+        int imageResource = getResources().getIdentifier("coin30", "drawable", getPackageName());
+        coinImage.setImageResource(imageResource);
+        params = new ConstraintLayout.LayoutParams
+                (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        bottomMargin = 2* cardHeight - 62;
+        int coinMargin = leftmargin + 12;
+        params.setMargins(coinMargin, 0, 0, bottomMargin);
+        coinImage.setLayoutParams(params);
+        layout.addView(coinImage);
+    //buys left
+        TextView buyView = new TextView(this);
+        buyView.setId(BUYS_LEFT_ID);
+        buyView.setTextSize(17f);
+        buyView.setTypeface(typeface);
+        buyView.setTextColor(ACCENT_COLOR);
+        buyView.setText("1 buy left");
+        params = new ConstraintLayout.LayoutParams
+                (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        bottomMargin = 2* cardHeight - 80;
+        params.setMargins(leftmargin, 0, 0, bottomMargin);
+        buyView.setLayoutParams(params);
+        layout.addView(buyView);
 }
 
 
@@ -887,6 +993,7 @@ public class GameBoardActivity extends AppCompatActivity {
             int cost2CardLocStart = 248*2; //pixels
             int cost2CardLocTop = 144*2; //pixels
             counterView = makePileSizeCounter(cost2CardLocStart, cost2CardLocTop, pileName, "10");
+            counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
             bankPiles.get(bankPiles.size()-1).setTextView(counterView);
             layout.addView(counterView);
             if (cost12 <= 3) displacement = smallCardWidth + 2 * buffer;
@@ -917,6 +1024,7 @@ public class GameBoardActivity extends AppCompatActivity {
                         pileName = String.valueOf(bankPiles.size()-1);
                         layout.addView(newView);
                         counterView = makePileSizeCounter(totalDispX, cost2CardLocTop, pileName, "10");
+                        counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
                         bankPiles.get(bankPiles.size()-1).setTextView(counterView);
                         layout.addView(counterView);
                     }
@@ -937,6 +1045,7 @@ public class GameBoardActivity extends AppCompatActivity {
             int cost3CardLocStart = 248*2; //pixels
             int cost3CardLocTop = 240*2; //pixels
             counterView = makePileSizeCounter(cost3CardLocStart, cost3CardLocTop, pileName, "10");
+            counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
             bankPiles.get(bankPiles.size()-1).setTextView(counterView);
             layout.addView(counterView);
             if (cost3 <= 3) displacement = smallCardWidth + 2 * buffer;
@@ -967,6 +1076,7 @@ public class GameBoardActivity extends AppCompatActivity {
                     pileName = String.valueOf(bankPiles.size()-1);
                     layout.addView(newView);
                     counterView = makePileSizeCounter(totalDispX, cost3CardLocTop, pileName, "10");
+                    counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
                     bankPiles.get(bankPiles.size()-1).setTextView(counterView);
                     layout.addView(counterView);
 
@@ -987,6 +1097,7 @@ public class GameBoardActivity extends AppCompatActivity {
             int cost4CardLocStart = 248*2; //pixels
             int cost4CardLocTop = 336*2; //pixels
             counterView = makePileSizeCounter(cost4CardLocStart, cost4CardLocTop, pileName, "10");
+            counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
             bankPiles.get(bankPiles.size()-1).setTextView(counterView);
             layout.addView(counterView);
             if (cost4 <= 3) displacement = smallCardWidth + 2 * buffer;
@@ -1017,6 +1128,7 @@ public class GameBoardActivity extends AppCompatActivity {
                     pileName = String.valueOf(bankPiles.size()-1);
                     layout.addView(newView);
                     counterView = makePileSizeCounter(totalDispX, cost4CardLocTop, pileName, "10");
+                    counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
                     bankPiles.get(bankPiles.size()-1).setTextView(counterView);
                     layout.addView(counterView);
                 }
@@ -1037,6 +1149,7 @@ public class GameBoardActivity extends AppCompatActivity {
             int cost5CardLocStart = 248*2; // pixels
             int cost5CardLocTop = 432*2; //pixels
             counterView = makePileSizeCounter(cost5CardLocStart, cost5CardLocTop, pileName, "10");
+            counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
             bankPiles.get(bankPiles.size()-1).setTextView(counterView);
             layout.addView(counterView);
             if (cost567 <= 3) displacement = smallCardWidth + 2 * buffer;
@@ -1068,6 +1181,7 @@ public class GameBoardActivity extends AppCompatActivity {
                         pileName = String.valueOf(bankPiles.size()-1);
                         layout.addView(newView);
                         counterView = makePileSizeCounter(totalDispX, cost5CardLocTop, pileName, "10");
+                        counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
                         bankPiles.get(bankPiles.size()-1).setTextView(counterView);
                         layout.addView(counterView);
                     }

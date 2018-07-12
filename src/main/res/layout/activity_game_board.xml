@@ -11,31 +11,6 @@
     tools:context=".GameBoardActivity"
     tools:layout_editor_absoluteY="25dp">
 
-    <!--ImageView
-        android:id="@+id/player_deck"
-        android:tag="player_deck"
-        android:layout_width="100dp"
-        android:layout_height="154dp"
-        android:src="@drawable/back100"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:contentDescription="@string/playerDeck"/-->
-
-    <!--ImageView
-        android:id="@+id/player_discard"
-        android:tag="player_discard"
-        android:layout_width="100dp"
-        android:layout_height="154dp"
-        android:src="@drawable/back100"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:contentDescription="@string/playerDiscard"/-->
-
-
     <Button
         android:id="@+id/end_game_button"
         android:layout_width="wrap_content"
@@ -46,36 +21,6 @@
         android:text="@string/endGame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!--TextView
-        android:id="@+id/deck"
-        android:tag="deck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/deck"
-        style="@style/appText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/player_deck"
-        app:layout_constraintStart_toStartOf="@+id/player_deck" /-->
-
-    <!--TextView
-        android:id="@+id/discard"
-        android:tag="discard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/discard"
-        style="@style/appText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/player_discard"
-        app:layout_constraintStart_toStartOf="@+id/player_discard" /-->
 
     <TextView
         android:id="@+id/hand"
@@ -91,18 +36,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!--TextView
-        android:id="@+id/deck_size"
-        style="@style/appPileCounter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:tag="deck_size"
-        android:text="@string/zero"
-        app:layout_constraintBottom_toBottomOf="@+id/player_deck"
-        app:layout_constraintEnd_toEndOf="@+id/player_deck"
-        app:layout_constraintStart_toStartOf="@+id/player_deck"
-        app:layout_constraintTop_toTopOf="@+id/player_deck" /-->
 
     <ImageView
         android:id="@+id/trash"

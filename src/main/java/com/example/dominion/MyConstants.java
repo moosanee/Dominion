@@ -21,7 +21,7 @@ public final class MyConstants implements Serializable{
     public final static int handZoneWidth = screenWidth - 2 * handMargin - 2 * buffer; // adjustment to screen width for unknown reason
     public final static int inPlayMargin = buffer + handBuffer;
     public final static int inPlayBottomMargin = cardHeight + buffer * 4;
-    public final static int inPlayZoneWidth = screenWidth - 2 * inPlayMargin - 2 * buffer; // adjustment to screen width for unknown reason
+    public final static int inPlayZoneWidth = screenWidth - 2 * inPlayMargin - 2 * buffer - cardWidth; // adjustment to screen width for unknown reason
     public final static int browseSideMargin = 20; // pixels
     public final static int browseBottomMargin = 40; // pixels
     public final static int textSize = 20; //sp units
@@ -38,10 +38,15 @@ public final class MyConstants implements Serializable{
     public static final int DISCARD_PILE_ID = 363636;
     public static final int DISCARD_CARD_ID = 363637;
     public static final int BANK_VIEW_ID = 727272;
+    public static final int BANK_COUNTER_VIEW_ID = 737373;
     public static final int DISCARD_BROWSE_LISTENER = 492;
     public static final int DECK_BROWSE_LISTENER = 496;
     public static final int HAND_BROWSE_LISTENER = 498;
     public static final int INPLAY_BROWSE_LISTENER = 500;
+    public static final int PHASE_BUTTON_ID = 604;
+    public static final int ACTIONS_LEFT_ID = 600;
+    public static final int COINS_COLLECTED_ID = 601;
+    public static final int BUYS_LEFT_ID = 602;
     public static final int INPLAY_VIEW_ID = 502;
     public static final int HAND_AREA_VIEW_ID = 504;
     public static final int CARD_CLOSEUP_ACTIVITY_CODE = 1003;
@@ -53,6 +58,10 @@ public final class MyConstants implements Serializable{
     public static final int START_GAME_ACTIVITY_CODE = 1;
 
     public static final int BEGIN_TURN = 0;
+    public static final int ACTION_PHASE = 1;
+    public static final int BUYING_PHASE = 2;
+    public static final int CLEAN_UP_PHASE = 3;
+    public static final int OPEN_BANK = 4;
 
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -189,7 +190,8 @@ public class Player implements Serializable{
 
     }
 
-    public void addCardToHand(String cardName, ConstraintLayout layout, Context context, Activity activity) {
+    public void addCardToHand(String cardName, ConstraintLayout layout, Context context,
+                              Activity activity, View.OnTouchListener handListener) {
         int numberOfCards = hand.size()+1;
         int handWidth = ((cardWidth - minOverlap) * (numberOfCards - 1) + cardWidth);
         int overlap;
@@ -237,9 +239,9 @@ public class Player implements Serializable{
         imageView.bringToFront();
         layout.addView(imageView);
         hand.add(cardData);
-
-        //addHandCardListener(cardData.getImageView());
-    }
+        imageView.setOnTouchListener(handListener);
+        imageView.setOnDragListener(hand.get(i).getDragListener());
+    }//add card to hand
 
     public void removeCardFromHand(int viewId, Activity activity, ConstraintLayout layout) {
         int index = this.findHandImageView(viewId);
@@ -278,7 +280,7 @@ public class Player implements Serializable{
         }
     }// RemoveCardFromHand
 
-    public void addCardToPlayArea(String cardName, ConstraintLayout layout, Context context, Activity activity) {
+    public void addCardToPlayArea(String cardName, ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener inPlayListener) {
         int numberOfCards = inPlay.size() + 1;
         int pileWidth = ((cardWidth - minOverlap) * (numberOfCards - 1) + cardWidth);
         int overlap;
@@ -325,6 +327,8 @@ public class Player implements Serializable{
         imageView.bringToFront();
         layout.addView(imageView);
         inPlay.add(cardData);
+        imageView.setOnTouchListener(inPlayListener);
+        imageView.setOnDragListener(inPlay.get(i).getDragListener());
     }
 
 
