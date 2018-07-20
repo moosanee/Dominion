@@ -275,4 +275,63 @@
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/cost5"/>
 
+    <Button
+        android:id="@+id/phase_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        style="@style/appButton"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:lineSpacingMultiplier="0.7"
+        android:layout_marginBottom="186dp"
+        android:layout_marginStart="476dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/appText"
+        android:textSize="17sp"
+        android:text="1 action left"
+        android:layout_marginStart="476dp"
+        android:layout_marginBottom="308dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/coin_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/appText"
+        android:textSize="17sp"
+        android:text="0        left"
+        android:layout_marginStart="476dp"
+        android:layout_marginBottom="288dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/coin_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/coin30"
+        android:layout_marginStart="488dp"
+        android:layout_marginBottom="277dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/buy_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/appText"
+        android:textSize="17sp"
+        android:text="1 buy left"
+        android:layout_marginStart="476dp"
+        android:layout_marginBottom="268dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </android.support.constraint.ConstraintLayout>

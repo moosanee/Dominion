@@ -62,6 +62,10 @@ public final class MyConstants implements Serializable{
     public static final int BUYING_PHASE = 2;
     public static final int CLEAN_UP_PHASE = 3;
     public static final int OPEN_BANK = 4;
+    public static final int CHAPEL = 10;
+    public static final int POACHER = 11;
+    public static final int ARTISAN1 = 12;
+    public static final int ARTISAN2 = 13;
 
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");

@@ -53,7 +53,7 @@ public class Player implements Serializable{
 
 
     }
-    public void displayHand(ConstraintLayout layout, Context context, Activity activity) {
+    /*public void displayHand(ConstraintLayout layout, Context context, Activity activity) {
 
         //calculate placement to center group of overlapped cards within hand zone
         int numberOfCards = this.hand.size();
@@ -90,7 +90,7 @@ public class Player implements Serializable{
             layout.addView(imageView);
         }
 
-    }//display hand
+    }//display hand*/
 
 //layout deck
     public void layoutDeck(ConstraintLayout layout, Context context, Activity activity){
@@ -280,7 +280,8 @@ public class Player implements Serializable{
         }
     }// RemoveCardFromHand
 
-    public void addCardToPlayArea(String cardName, ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener inPlayListener) {
+    public void addCardToPlayArea(String cardName, ConstraintLayout layout, Context context,
+                                  Activity activity, View.OnTouchListener inPlayListener) {
         int numberOfCards = inPlay.size() + 1;
         int pileWidth = ((cardWidth - minOverlap) * (numberOfCards - 1) + cardWidth);
         int overlap;
@@ -383,7 +384,8 @@ public class Player implements Serializable{
 
     public void removeCardFromDeck(int index, Activity activity) {
         this.deck.remove(index);
-        this.deckPile.getTextView().setText(String.valueOf(this.deck.size()));
+        if (this.deckPile != null)
+            this.deckPile.getTextView().setText(String.valueOf(this.deck.size()));
         for (int i = index; i < this.deck.size(); i++) {
             this.deck.get(i).decreasePosition(1);
             ImageView imageView1 = ((Activity) activity).findViewById(deck.get(i).getImageViewId());
@@ -442,83 +444,83 @@ public class Player implements Serializable{
     public void shuffleDeck() {
         CardData temp;
         int length = deck.size(); //number of cards in the deck
-        Random rand = new Random();
-        for (int j = 0; j < length; j++) {
-            int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
-            temp = deck.get(n);
-            deck.remove(n);
-            for (int i = n; i < deck.size(); i++) deck.get(i).decreasePosition(1);
-            deck.add(j,temp);
-            deck.get(j).setPosition(j);
-            for (int i = j+1; i < deck.size(); i++)deck.get(i).increasePosition(1);
+        if (length > 1) {
+            Random rand = new Random();
+            if (length > 2) {
+                for (int j = 0; j < length; j++) {
+                    int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
+                    temp = deck.get(n);
+                    deck.remove(n);
+                    for (int i = n; i < deck.size(); i++) deck.get(i).decreasePosition(1);
+                    deck.add(j, temp);
+                    deck.get(j).setPosition(j);
+                    for (int i = j + 1; i < deck.size(); i++) deck.get(i).increasePosition(1);
+                }
+            } else {
+                int n = rand.nextInt(length);
+                if (n == 1) {
+                    temp = deck.get(1);
+                    deck.remove(1);
+                    deck.add(0, temp);
+                }
+            }
         }
     }
 
-    public void drawHand() {
+    public int drawHand(ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener handListener) {
         int deckSize = deck.size();
         int discardSize = discard.size();
         int cardsStillNeeded;
         int newDeckSize;
         int index = hand.size();
-        if (deckSize > 5) {  //more than 5 cards in deck
+        if (deckSize >= 5) {  //5 or more cards in deck
             for (int i = deckSize - 1; i > deckSize - 6; i--) { // add last 5 cards in deck to hand
-                hand.add(deck.get(i));
-                hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index,handTally,"hand");
-                handTally += 1;
-                index += 1;
-                deck.remove(i);
+                String cardName = deck.get(i).getCardName();
+                removeCardFromDeck(i, activity);
+                addCardToHand(cardName, layout, context, activity, handListener);
             }
         } else if (deckSize > 0) { //less than 5 cards in deck, some in discard
             cardsStillNeeded = 5-deckSize;
             for (int i = deckSize - 1; i >= 0; i--) {
-                hand.add(deck.get(i));
-                hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index,handTally,"hand");
-                handTally += 1;
-                index += 1;
-                deck.remove(i);
+                String cardName = deck.get(i).getCardName();
+                removeCardFromDeck(i, activity);
+                addCardToHand(cardName, layout, context, activity, handListener);
             }
-            putDiscardInDeck();
+            putDiscardInDeck(activity);
             if (discardSize > cardsStillNeeded){
                 for (int i = discardSize - 1; i > discardSize - cardsStillNeeded-1; i--) { // add last needed cards in deck to hand
-                    hand.add(deck.get(i));
-                    hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index,handTally,"hand");
-                    handTally += 1;
-                    index += 1;
-                    deck.remove(i);
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromDeck(i, activity);
+                    addCardToHand(cardName, layout, context, activity, handListener);
                 }
             } else{
                 for (int i = discardSize - 1; i >= 0; i--) { // add remaining cards in shuffled deck to hand
-                    hand.add(deck.get(i));
-                    hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index,handTally,"hand");
-                    handTally += 1;
-                    index += 1;
-                    deck.remove(i);
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromDeck(i, activity);
+                    addCardToHand(cardName, layout, context, activity, handListener);
                 }
             }
         } else{                 //no cards in deck, some in discard
-            putDiscardInDeck();
+            putDiscardInDeck(activity);
             newDeckSize = deck.size();
-            if (newDeckSize>5){ // more than 5 cards in shuffled deck
-                for (int i = newDeckSize - 1; i > deckSize - 6; i--) { // add last 5 cards in deck to hand
-                    hand.add(deck.get(i));
-                    hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index,handTally,"hand");
-                    handTally += 1;
-                    index += 1;
-                    deck.remove(i);
+            if (newDeckSize >= 5){ // 5  or more cards in shuffled deck
+                for (int i = newDeckSize - 1; i > newDeckSize - 6; i--) { // add last 5 cards in deck to hand
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromDeck(i, activity);
+                    addCardToHand(cardName, layout, context, activity, handListener);
                 }
-            } else{ // less than 5 cards in shuffled deck
+            } else { // less than 5 cards in shuffled deck
                 for (int i = newDeckSize - 1; i >=0; i--) { // add remaining cards in deck to hand
-                    hand.add(deck.get(i));
-                    hand.get(index).setCardMultiTagOnMoveToNewPile(hand.get(index),index, handTally,"hand");
-                    handTally += 1;
-                    index += 1;
-                    deck.remove(i);
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromDeck(i, activity);
+                    addCardToHand(cardName, layout, context, activity, handListener);
                 }
             }
         }
+        return this.deck.size();
     }
 
-    public void putDiscardInDeck() {
+    public void putDiscardInDeck(Activity activity) {
         if (deck.size() == 0) deckTally = 0;
         for (int i = 0; i < discard.size(); i++) {
             deck.add(discard.get(i));
@@ -528,6 +530,9 @@ public class Player implements Serializable{
         }
         discard.clear();
         discardTally = 0;
+        ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
+        Drawable drawable = getImageDps(activity, "back", cardWidth / 2);
+        imageView.setImageDrawable(drawable);
         shuffleDeck();
     }
     public void setDiscardToDeckView(Activity activity, Context context){
@@ -556,7 +561,70 @@ public class Player implements Serializable{
         return index;
     }
 
+    public String checkForReaction(String attackName){
+        String reactionName = "null";
+        for (int i = 0; i < hand.size(); i++){
+            if (hand.get(i).getCard().getType().equals("action - reaction")){
+               /* switch (attackName){
+                    case "bandit":
+                        break;
+                    case "bureaucrat":
+                        break;
+                    case "militia":
+                        break;
+                    case "spy":
+                        break;
+                    case "theif":
+                        break;
+                    case "witch":
+                        break;
+                }*/
+               reactionName = hand.get(i).getCardName();
+            }
+        }
+        return reactionName;
+    }
+
+    public void addCard(String pileName, String cardName){
+        int position;
+        int itemNumber;
+        switch (pileName){
+            case "hand":
+                itemNumber = handTally;
+                handTally +=1;
+                position = hand.size();
+                CardData cardData = new CardData(cardName, "hand", position, itemNumber);
+                hand.add(cardData);
+                break;
+            case "deck":
+                itemNumber = deckTally;
+                deckTally += 1;
+                position = deck.size();
+                cardData = new CardData(cardName, "hand", position, itemNumber);
+                deck.add(cardData);
+                break;
+            case "discard":
+                itemNumber = discardTally;
+                discardTally += 1;
+                position = discard.size();
+                cardData = new CardData(cardName, "hand", position, itemNumber);
+                discard.add(cardData);
+                break;
+            case "inPlay":
+                itemNumber = inPlayTally;
+                inPlayTally += 1;
+                position = inPlay.size();
+                cardData = new CardData(cardName, "hand", position, itemNumber);
+                inPlay.add(cardData);
+                break;
+        }
+    }
+
     public String getName() {
         return Name;
+    }
+
+    public boolean isHuman() {
+        return human;
     }
 }

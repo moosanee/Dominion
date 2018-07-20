@@ -18,7 +18,7 @@ public class BasicCardsActivity extends AppCompatActivity {
 
     ArrayList<ImageView> viewList;
     ArrayList<String> cardList = new ArrayList<>();
-    ArrayList<Card> basicCardSet = new ArrayList<>();
+    BasicCards basicCardSet = new BasicCards();
     ArrayList<Integer> costList = new ArrayList<>();
     boolean[] buttonVisibility = {false, true, true, false};
     int extraCards = 0;
@@ -34,7 +34,6 @@ public class BasicCardsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         this.cardList = getIntent().getStringArrayListExtra("gameCardListKey");
-        this.basicCardSet = (ArrayList<Card>) getIntent().getSerializableExtra("basicCardSetKey");
         Bundle statBundle = this.getIntent().getBundleExtra("statBundleKey");
         GameCardStats gameCardStats = (GameCardStats) statBundle.getSerializable("cardStatKey");
 
@@ -146,7 +145,7 @@ public class BasicCardsActivity extends AppCompatActivity {
                         }
                     }
                     // if chosen for the first time
-                    Card card = basicCardSet.get(atIndex);
+                    Card card = basicCardSet.getCard(cardName);
                     if (chosen == 1) {
                         if (!alreadyListed) {
                             cardList.add(cardName);

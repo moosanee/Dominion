@@ -43,25 +43,8 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
     }
 
     private void addTesterButton(ConstraintLayout layout) {
-        Button testerButton = new Button(this);
+        Button testerButton = findViewById(R.id.tester_button);
         testerButton.setId(TESTER_BUTTON_ID);
-        testerButton.setText("Test Cards");
-        testerButton.setTextSize(textSize);
-        testerButton.setTextColor(BACKGROUND_COLOR_DARK);
-        testerButton.setBackgroundResource(R.drawable.text120);
-        testerButton.setTypeface(ResourcesCompat.getFont(context, R.font.alegreya_sc));
-        LinearLayout.LayoutParams params = new LinearLayout
-                .LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        testerButton.setLayoutParams(params);
-        layout.addView(testerButton);
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(constraintLayout);
-        constraintSet.connect(TESTER_BUTTON_ID, ConstraintSet.TOP,
-                constraintLayout.getId(), constraintSet.TOP);
-        constraintSet.connect(TESTER_BUTTON_ID, ConstraintSet.END,
-                constraintLayout.getViewById(R.id.set_up_game_button).getId(), constraintSet.END);
-        constraintSet.setMargin(TESTER_BUTTON_ID, ConstraintSet.TOP, 800);
-        constraintSet.applyTo(constraintLayout);
     }
 
     private void addButtonListeners() {

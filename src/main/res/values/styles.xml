@@ -23,7 +23,7 @@
     </style>
 
     <style name="appButton">
-        <item name="android:background">@drawable/text80</item>
+        <item name="android:background">@drawable/button</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">20sp</item>
         <item name="android:paddingLeft">5dp</item>

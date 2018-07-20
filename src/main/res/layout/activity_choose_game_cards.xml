@@ -751,9 +751,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/return_text"
+        style="@style/appButton"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/tester_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Cards"
+        style="@style/appButton"
+        android:layout_marginTop="400dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/set_up_game_button" />
 
 </android.support.constraint.ConstraintLayout>
