@@ -417,14 +417,14 @@ public class Player implements Serializable{
             drawable = getImageDps(activity, "back", cardWidth / 2);
             discardTally = 0;
         } else {
-            String topCardName = discard.get(index - 1).getCardName();
+            String topCardName = discard.get(discard.size() - 1).getCardName();
             drawable = getImageDps(activity, topCardName, cardWidth / 2);
         }
         ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
         imageView.setImageDrawable(drawable);
     }
 
-    private Drawable getImageDps(Activity activity, String imageName, int size){
+    public Drawable getImageDps(Activity activity, String imageName, int size){
         Drawable drawable;
         String drawableString = "";
         String[] parsedName = imageName.split("(?=\\p{Upper})");
@@ -441,29 +441,59 @@ public class Player implements Serializable{
     }
 
 
-    public void shuffleDeck() {
+    public void shufflePile(String pile) {
         CardData temp;
-        int length = deck.size(); //number of cards in the deck
-        if (length > 1) {
-            Random rand = new Random();
-            if (length > 2) {
-                for (int j = 0; j < length; j++) {
-                    int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
-                    temp = deck.get(n);
-                    deck.remove(n);
-                    for (int i = n; i < deck.size(); i++) deck.get(i).decreasePosition(1);
-                    deck.add(j, temp);
-                    deck.get(j).setPosition(j);
-                    for (int i = j + 1; i < deck.size(); i++) deck.get(i).increasePosition(1);
+        switch (pile) {
+            case "deck":
+                int length = deck.size(); //number of cards in the deck
+                if (length > 1) {
+                    Random rand = new Random();
+                    if (length > 2) {
+                        for (int j = 0; j < length; j++) {
+                            int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
+                            temp = deck.get(n);
+                            deck.remove(n);
+                            for (int i = n; i < deck.size(); i++) deck.get(i).decreasePosition(1);
+                            deck.add(j, temp);
+                            deck.get(j).setPosition(j);
+                            for (int i = j + 1; i < deck.size(); i++)
+                                deck.get(i).increasePosition(1);
+                        }
+                    } else {
+                        int n = rand.nextInt(length);
+                        if (n == 1) {
+                            temp = deck.get(1);
+                            deck.remove(1);
+                            deck.add(0, temp);
+                        }
+                    }
                 }
-            } else {
-                int n = rand.nextInt(length);
-                if (n == 1) {
-                    temp = deck.get(1);
-                    deck.remove(1);
-                    deck.add(0, temp);
+                break;
+            case "discard":
+                length = discard.size(); //number of cards in the deck
+                if (length > 1) {
+                    Random rand = new Random();
+                    if (length > 2) {
+                        for (int j = 0; j < length; j++) {
+                            int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
+                            temp = discard.get(n);
+                            discard.remove(n);
+                            for (int i = n; i < discard.size(); i++) discard.get(i).decreasePosition(1);
+                            discard.add(j, temp);
+                            discard.get(j).setPosition(j);
+                            for (int i = j + 1; i < discard.size(); i++)
+                                discard.get(i).increasePosition(1);
+                        }
+                    } else {
+                        int n = rand.nextInt(length);
+                        if (n == 1) {
+                            temp = discard.get(1);
+                            discard.remove(1);
+                            discard.add(0, temp);
+                        }
+                    }
                 }
-            }
+                break;
         }
     }
 
@@ -533,7 +563,7 @@ public class Player implements Serializable{
         ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
         Drawable drawable = getImageDps(activity, "back", cardWidth / 2);
         imageView.setImageDrawable(drawable);
-        shuffleDeck();
+        shufflePile("deck");
     }
     public void setDiscardToDeckView(Activity activity, Context context){
         ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());

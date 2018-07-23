@@ -76,7 +76,7 @@ public class GameBoardActivity extends AppCompatActivity {
         layoutHandAndInPlayAreas();
         for (int i = 0; i < playerInfoList.size(); i++){
             playerList.add( new Player(playerInfoList.get(i)));
-            playerList.get(i).shuffleDeck();
+            playerList.get(i).shufflePile("deck");
             playerList.get(i).drawHand(layout, context, activity, handListener);
         }
         playerList.get(0).layoutDeck(layout, context, activity);
@@ -200,6 +200,11 @@ public class GameBoardActivity extends AppCompatActivity {
                     case ARTISAN2: // "card to deck"
                         Toast.makeText(context,"put a card from your hand onto your deck",
                                 Toast.LENGTH_SHORT).show();
+                        break;
+                    case ADVENTURER: //"apply adventurer"
+                        Toast.makeText(context, "putting revealed treasures in hand." +
+                                "\ndiscarding other revealed cards", Toast.LENGTH_SHORT).show();
+                        turn.finishAdventurer(listenerSwitches, handListener);
                         break;
                 }
             }

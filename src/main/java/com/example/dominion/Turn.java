@@ -2,9 +2,12 @@ package com.example.dominion;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +39,7 @@ public class Turn {
     ArrayList<Card> treasuresPlayed = new ArrayList<>();
     ArrayList<Card> cardsGained = new ArrayList<>();
     ArrayList<Card> cardsTrashed = new ArrayList<>();
+    ArrayList<String> revealedCards = new ArrayList<>();
 
 
 
@@ -107,6 +111,12 @@ public class Turn {
                 listenerSwitches.setHandDragSwitch(true);
                 listenerSwitches.setDeckDragSwitch(true);
                 break;
+            case ADVENTURER:
+                listenerSwitches.setAllFalse();
+                listenerSwitches.setDeckListenerSwitch(true);
+                listenerSwitches.setInPlayDragSwitch(true);
+                listenerSwitches.setDeckDragSwitch(true);
+                break;
         }
     }
 
@@ -129,12 +139,12 @@ public class Turn {
         }
         if (numberOfActionsInHand > 0) {
             String message = player.getName() + ", it's your turn.\nTake an action";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             startActionPhase(listenerSwitches);
         } else {
             String message = player.getName() + ", it's your turn.\n" +
                     "You have no actions.\nCount your coins and make a purchase.";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             startBuyingPhase(listenerSwitches);
         }
     }
@@ -183,7 +193,7 @@ public class Turn {
                 player.addCardToHand(cardName, layout, context, activity, handListener);
             } else if (actions == 0){
                 String message = "You are out of actions.\nCount your coins and make a purchase.";
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                 startBuyingPhase(listenerSwitches);
             } else {
                 actionsPlayed.add(card);
@@ -214,17 +224,26 @@ public class Turn {
                     draws -= 1;
                 }
                 switch (cardName) {
+                    case "adventurer":
+                        Toast.makeText(context, "Reveal cards from your deck until you reveal 2 treasure cards.",
+                                Toast.LENGTH_SHORT).show();
+                        Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                        button.setText("apply\nadventurer");
+                        button.setTag(ADVENTURER);
+                        setListeners(ADVENTURER, listenerSwitches);
+                        phase = ADVENTURER;
+                        break;
                     case "artisan":
                         Toast.makeText(context, "gain a card to your hand costing up to 5 coins",
                                 Toast.LENGTH_SHORT).show();
-                        Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                        button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("gain\ncard");
                         button.setTag(ARTISAN1);
                         setListeners(ARTISAN1, listenerSwitches);
                         phase = ARTISAN1;
                         break;
                     case "chapel":
-                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("finished\ntrashing");
                         button.setTag(CHAPEL);
@@ -232,7 +251,7 @@ public class Turn {
                         phase = CHAPEL;
                         break;
                     case "merchant":
-                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         firstSilverInPlayFlag = true;
                         break;
                     case "poacher":
@@ -240,11 +259,11 @@ public class Turn {
                             if (player.hand.size() > 0) {
                                 if (emptyBankPiles == 1) {
                                     String toast = "there is 1 empty supply pile.\ndiscard 1 card";
-                                    Toast.makeText(context, toast, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
                                 } else {
                                     String toast = "there are " + emptyBankPiles + " empty supply piles."
                                             + "\ndiscard " + emptyBankPiles + " cards";
-                                    Toast.makeText(context, toast, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
                                 }
                                 button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                                 button.setText("discard\ncard");
@@ -288,6 +307,43 @@ public class Turn {
             if (numberOfTreasuresInHand == 0) {
                 startOpenBankPhase(listenerSwitches);
             }
+        }
+        if (phase == ADVENTURER){
+            int treasureFlag = 0;
+            revealedCards = new ArrayList<>();
+            int deckSize = player.deck.size();
+            int discardSize = player.discard.size();
+            boolean shuffled = false;
+            while (treasureFlag < 2){
+                if (deckSize > 0) {
+                    CardData cardData = player.deck.get(deckSize - 1);
+                    if (cardData.getCard().getType().equals("treasure")) {
+                        treasureFlag += 1;
+                        revealedCards.add(cardData.getCardName());
+                    } else {
+                        revealedCards.add(cardData.getCardName());
+                    }
+                    deckSize -= 1;
+                } else if (!shuffled) {
+                    player.shufflePile("discard");
+                    shuffled = true;
+                } else if (discardSize > 0) {
+                    CardData cardData = player.discard.get(discardSize - 1);
+                    if (cardData.getCard().getType().equals("treasure")){
+                        treasureFlag +=1;
+                        revealedCards.add(cardData.getCardName());
+                    } else {
+                        revealedCards.add(cardData.getCardName());
+                    }
+                    discardSize -= 1;
+                } else
+                    break;
+            }
+            //popup reveal of cards with buttons
+            Intent intent = new Intent(context, RevealDialogActivity.class);
+            intent.putStringArrayListExtra("revealedCardsKey", revealedCards);
+            intent.putExtra("phaseKey", phase);
+            activity.startActivityForResult(intent, REVEAL_DIALOG_KEY);
         }
         ((GameBoardActivity) activity).refreshInPlay();
     }
@@ -441,29 +497,120 @@ public class Turn {
             player.removeCardFromDeck(player.deck.size() - 1, activity);
             player.addCardToHand(cardName, layout, context, activity, handListener);
         } else
-            Toast.makeText(context, "no cards left to draw", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "no cards left to draw", Toast.LENGTH_SHORT).show();
         return cardName;
     }
 
-    public void finishChapel(ListenerSwitches listenerSwitches){
+    public void finishAdventurer(ListenerSwitches listenerSwitches, View.OnTouchListener handListener) {
+        int deckSize = player.deck.size();
+        int discardSize = player.discard.size();
+        int movedToDiscard = 0;
+        if (deckSize >= revealedCards.size()) {
+            for (int i = 0; i < revealedCards.size(); i++) {
+                Card card = basicCardSet.getCard(revealedCards.get(i));
+                /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
+                if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 1");*/
+                if (card.getType().equals("treasure")) {
+                    player.removeCardFromDeck(player.deck.size() - 1, activity);
+                    player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
+                    numberOfTreasuresInHand += 1;
+                } else {
+                    player.removeCardFromDeck(player.deck.size() - 1, activity);
+                    player.addCardToDiscard(revealedCards.get(i), activity, context);
+                    movedToDiscard +=1;
+                }
+            }
+        } else {
+            for (int i = 0; i < deckSize; i++) {
+                Card card = basicCardSet.getCard(revealedCards.get(i));
+                /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
+                if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 2");*/
+                if (card.getType().equals("treasure")) {
+                    player.removeCardFromDeck(player.deck.size() - 1, activity);
+                    player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
+                    numberOfTreasuresInHand += 1;
+                } else {
+                    player.removeCardFromDeck(player.deck.size() - 1, activity);
+                    player.addCardToDiscard(revealedCards.get(i), activity, context);
+                    movedToDiscard +=1;
+                }
+            }
+            //put old discard on deck unshuffled
+            if (player.deck.size() != 0) System.out.println("deck not empty!");
+            int newDiscardSize = player.discard.size();
+            for (int i = 0; i < newDiscardSize-movedToDiscard; i++) {
+                player.deck.add(player.discard.get(0));
+                player.deck.get(player.deck.size() - 1).setCardMultiTagOnMoveToNewPile(player.deck.get(player.deck.size() - 1),
+                        (player.deck.size() - 1), player.deckTally, "deck");
+                player.deckTally += 1;
+                player.removeCardFromDiscard(0, context, activity);
+            }
+
+            if ((revealedCards.size() - deckSize) <= discardSize) {
+                for (int i = deckSize; i < revealedCards.size(); i++) {
+                    Card card = basicCardSet.getCard(revealedCards.get(i));
+                    /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
+                    if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 3");*/
+                    if (card.getType().equals("treasure")) {
+                        player.removeCardFromDeck(player.deck.size() - 1, activity);
+                        player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
+                        numberOfTreasuresInHand +=1;
+                    } else {
+                        player.removeCardFromDeck(player.deck.size() - 1, activity);
+                        player.addCardToDiscard(revealedCards.get(i), activity, context);
+                    }
+                }
+            } else {
+                for (int i = deckSize; i < discardSize + deckSize; i++) {
+                    Card card = basicCardSet.getCard(revealedCards.get(i));
+                    /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
+                    if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 4");*/
+                    if (card.getType().equals("treasure")) {
+                        player.removeCardFromDeck(player.deck.size() - 1, activity);
+                        player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
+                        numberOfTreasuresInHand += 1;
+                    } else {
+                        player.removeCardFromDeck(player.deck.size() - 1, activity);
+                        player.addCardToDiscard(revealedCards.get(i), activity, context);
+                    }
+                }
+            }
+        }
         if (actions > 0 && numberOfActionsInHand > 0) {
-            Toast.makeText(context, "Take an action", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
             startActionPhase(listenerSwitches);
         }
         else if (numberOfTreasuresInHand > 0){
             String message = "You are out of actions.\nCount your coins and make a purchase.";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             startBuyingPhase(listenerSwitches);
         } else {
-            String message = "You have no treasures.\nBegin clean up.";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-            startCleanUpPhase(listenerSwitches);
+            String message = "You have no more treasures.";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            startOpenBankPhase(listenerSwitches);
+        }
+    }
+
+
+    public void finishChapel(ListenerSwitches listenerSwitches){
+        if (actions > 0 && numberOfActionsInHand > 0) {
+            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
+            startActionPhase(listenerSwitches);
+        }
+        else if (numberOfTreasuresInHand > 0){
+            String message = "You are out of actions.\nCount your coins and make a purchase.";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            startBuyingPhase(listenerSwitches);
+        } else {
+            String message = "You have no more treasures.";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            startOpenBankPhase(listenerSwitches);
         }
     }
 
     public int findBankViewId(String cardName, ArrayList<CardData> bankPiles){
         int textViewId = -1;
-        for (int i=0; i < bankPiles.size()-1; i++){
+        for (int i=0; i < bankPiles.size(); i++){
             if (bankPiles.get(i).getCardName().equals(cardName)){
                 textViewId = bankPiles.get(i).getTextViewId();
             }

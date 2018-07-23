@@ -33,6 +33,9 @@
         <activity android:name=".DiscardBrowseActivity" />
         <activity android:name=".DeckBrowseActivity" />
         <activity android:name=".HandBrowseActivity" />
+        <activity
+            android:name=".RevealDialogActivity"
+            android:theme="@style/MyDialogTheme" />
     </application>
 
 </manifest>

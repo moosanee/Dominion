@@ -43,6 +43,10 @@ public final class MyConstants implements Serializable{
     public static final int DECK_BROWSE_LISTENER = 496;
     public static final int HAND_BROWSE_LISTENER = 498;
     public static final int INPLAY_BROWSE_LISTENER = 500;
+    public static final int REVEAL_DIALOG_KEY = 300;
+    public static final int REVEAL_LAYOUT_ID = 305;
+    public static final int REVEALED_CARD_ID = 310;
+    public static final int DRAW_BUTTON_ID = 330;
     public static final int PHASE_BUTTON_ID = 604;
     public static final int ACTIONS_LEFT_ID = 600;
     public static final int COINS_COLLECTED_ID = 601;
@@ -66,7 +70,8 @@ public final class MyConstants implements Serializable{
     public static final int POACHER = 11;
     public static final int ARTISAN1 = 12;
     public static final int ARTISAN2 = 13;
-
+    public static final int ADVENTURER = 14;
+    //public static final int
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");
     public final static int BACKGROUND_COLOR = Color.parseColor("#45508b");

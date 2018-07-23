@@ -88,6 +88,7 @@ public class CardData implements Serializable{
         this.cardMultiTag = cardMultiTag;
         this.position = index;
         this.number = number;
+        this.group = newGroup;
     }
 
     public void setDragListener(GameBoardActivity.MyDragListener dragListener) {
