@@ -3,11 +3,9 @@ package com.example.dominion;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -508,8 +506,6 @@ public class Turn {
         if (deckSize >= revealedCards.size()) {
             for (int i = 0; i < revealedCards.size(); i++) {
                 Card card = basicCardSet.getCard(revealedCards.get(i));
-                /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
-                if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 1");*/
                 if (card.getType().equals("treasure")) {
                     player.removeCardFromDeck(player.deck.size() - 1, activity);
                     player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
@@ -523,8 +519,6 @@ public class Turn {
         } else {
             for (int i = 0; i < deckSize; i++) {
                 Card card = basicCardSet.getCard(revealedCards.get(i));
-                /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
-                if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 2");*/
                 if (card.getType().equals("treasure")) {
                     player.removeCardFromDeck(player.deck.size() - 1, activity);
                     player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
@@ -536,7 +530,6 @@ public class Turn {
                 }
             }
             //put old discard on deck unshuffled
-            if (player.deck.size() != 0) System.out.println("deck not empty!");
             int newDiscardSize = player.discard.size();
             for (int i = 0; i < newDiscardSize-movedToDiscard; i++) {
                 player.deck.add(player.discard.get(0));
@@ -549,8 +542,6 @@ public class Turn {
             if ((revealedCards.size() - deckSize) <= discardSize) {
                 for (int i = deckSize; i < revealedCards.size(); i++) {
                     Card card = basicCardSet.getCard(revealedCards.get(i));
-                    /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
-                    if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 3");*/
                     if (card.getType().equals("treasure")) {
                         player.removeCardFromDeck(player.deck.size() - 1, activity);
                         player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
@@ -563,8 +554,6 @@ public class Turn {
             } else {
                 for (int i = deckSize; i < discardSize + deckSize; i++) {
                     Card card = basicCardSet.getCard(revealedCards.get(i));
-                    /*Card card1 = player.deck.get(player.deck.size()-1).getCard();
-                    if (!(card.getName() == card1.getName())) System.out.println("NOT EQUAL in part 4");*/
                     if (card.getType().equals("treasure")) {
                         player.removeCardFromDeck(player.deck.size() - 1, activity);
                         player.addCardToHand(revealedCards.get(i), layout, context, activity, handListener);
