@@ -28,6 +28,13 @@ public final class MyConstants implements Serializable{
     public final static int emptyPileTextSize = 40; //sp units
     public final static int counterTextSize = 50; //sp units
 
+    public static final int FOCUS_HAND_ID = 585858;
+    public static final int POSITION_B_NAME_ID = 585859;
+    public static final int POSITION_C_NAME_ID = 585860;
+    public static final int POSITION_D_NAME_ID = 585861;
+    public static final int POSITION_B_IMAGE_ID = 585862;
+    public static final int POSITION_C_IMAGE_ID = 585863;
+    public static final int POSITION_D_IMAGE_ID = 585864;
     public static final int OPPONENT_LISTENERS = 470;
     public static final int TRASH_LISTENER = 480;
     public static final int TRASH_VIEW_ID = 989898;

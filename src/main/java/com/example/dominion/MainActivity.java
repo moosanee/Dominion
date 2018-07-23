@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> gameCardList = new ArrayList<>();
     ArrayList<PlayerInfo> playerList = new ArrayList<>();
-    private boolean[] players = {true, false, false, false};
+    private boolean[] players = {true, true, false, false};
     private boolean[] human = {true, false, false, false};
 
     @Override

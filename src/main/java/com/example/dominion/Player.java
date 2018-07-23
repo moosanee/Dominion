@@ -50,11 +50,12 @@ public class Player implements Serializable{
         this.hand = new ArrayList<>();
         this.discard = new ArrayList<>();
         this.inPlay = new ArrayList<>();
-
-
     }
-    /*public void displayHand(ConstraintLayout layout, Context context, Activity activity) {
 
+
+
+     public void displayHand(ConstraintLayout layout, Context context, Activity activity,
+                             View.OnTouchListener handListener) {
         //calculate placement to center group of overlapped cards within hand zone
         int numberOfCards = this.hand.size();
         int handWidth = ((cardWidth-minOverlap)*(numberOfCards-1)+cardWidth);
@@ -88,12 +89,14 @@ public class Player implements Serializable{
             params.setMargins(leftMargin, 0, 0,bottomMargin);
             imageView.setLayoutParams(params);
             layout.addView(imageView);
+            imageView.setOnTouchListener(handListener);
+            imageView.setOnDragListener(hand.get(i).getDragListener());
         }
+    }//display hand
 
-    }//display hand*/
 
-//layout deck
-    public void layoutDeck(ConstraintLayout layout, Context context, Activity activity){
+//initialize deck
+    public void initializeDeck(ConstraintLayout layout, Context context, Activity activity){
         deckPile = new CardData("back", "deck", 0,0);
         deckPile.setImageViewId(DECK_PILE_ID);
         ImageView imageView = new ImageView(context);
@@ -147,12 +150,10 @@ public class Player implements Serializable{
         params.setMargins(0, 0, 0,0);
         deckLabel.setLayoutParams(params);
         layout.addView(deckLabel);
-
-        //return deckPile.getImageView();
     }
 
-//layout discard
-    public void layoutDiscard(ConstraintLayout layout, Context context, Activity activity){
+//initialize discard
+    public void initializeDiscard(ConstraintLayout layout, Context context, Activity activity){
         discardPile = new CardData("back", "discard", 0,0);
         ImageView imageView = new ImageView(context);
         discardPile.setImageViewId(DISCARD_PILE_ID);
@@ -187,11 +188,11 @@ public class Player implements Serializable{
         params.setMargins(0, 0, 0,0);
         discardLabel.setLayoutParams(params);
         layout.addView(discardLabel);
-
     }
 
+
     public void addCardToHand(String cardName, ConstraintLayout layout, Context context,
-                              Activity activity, View.OnTouchListener handListener) {
+    Activity activity, View.OnTouchListener handListener) {
         int numberOfCards = hand.size()+1;
         int handWidth = ((cardWidth - minOverlap) * (numberOfCards - 1) + cardWidth);
         int overlap;
@@ -241,6 +242,13 @@ public class Player implements Serializable{
         hand.add(cardData);
         imageView.setOnTouchListener(handListener);
         imageView.setOnDragListener(hand.get(i).getDragListener());
+    }//add card to hand
+
+    public void addCardToAIHand(String cardName) {
+        int i = hand.size();
+        CardData cardData = new CardData(cardName, "hand", i, handTally);
+        handTally += 1;
+        hand.add(cardData);
     }//add card to hand
 
     public void removeCardFromHand(int viewId, Activity activity, ConstraintLayout layout) {
@@ -393,6 +401,13 @@ public class Player implements Serializable{
         }
         if (deck.size() <= 0) deckTally = 0;
     }
+    public void removeCardFromAIDeck(int index) {
+        this.deck.remove(index);
+        for (int i = index; i < this.deck.size(); i++) {
+            this.deck.get(i).decreasePosition(1);
+        }
+        if (deck.size() <= 0) deckTally = 0;
+    }
 
     public void addCardToDiscard(String cardName, Activity  activity, Context context) {
         discard.add(new CardData(cardName, "discard", this.discard.size(), this.discardTally));
@@ -497,7 +512,7 @@ public class Player implements Serializable{
         }
     }
 
-    public int drawHand(ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener handListener) {
+    public void drawHand(ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener handListener) {
         int deckSize = deck.size();
         int discardSize = discard.size();
         int cardsStillNeeded;
@@ -547,7 +562,60 @@ public class Player implements Serializable{
                 }
             }
         }
-        return this.deck.size();
+        //return this.deck.size();
+    }
+
+    public void drawAIHand() {
+        int deckSize = deck.size();
+        int discardSize = discard.size();
+        int cardsStillNeeded;
+        int newDeckSize;
+        int index = hand.size();
+        if (deckSize >= 5) {  //5 or more cards in deck
+            for (int i = deckSize - 1; i > deckSize - 6; i--) { // add last 5 cards in deck to hand
+                String cardName = deck.get(i).getCardName();
+                removeCardFromAIDeck(i);
+                addCardToAIHand(cardName);
+            }
+        } else if (deckSize > 0) { //less than 5 cards in deck, some in discard
+            cardsStillNeeded = 5-deckSize;
+            for (int i = deckSize - 1; i >= 0; i--) {
+                String cardName = deck.get(i).getCardName();
+                removeCardFromAIDeck(i);
+                addCardToAIHand(cardName);
+            }
+            putAIDiscardInDeck();
+            if (discardSize > cardsStillNeeded){
+                for (int i = discardSize - 1; i > discardSize - cardsStillNeeded-1; i--) { // add last needed cards in deck to hand
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromAIDeck(i);
+                    addCardToAIHand(cardName);
+                }
+            } else{
+                for (int i = discardSize - 1; i >= 0; i--) { // add remaining cards in shuffled deck to hand
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromAIDeck(i);
+                    addCardToAIHand(cardName);
+                }
+            }
+        } else {                 //no cards in deck, some in discard
+            putAIDiscardInDeck();
+            newDeckSize = deck.size();
+            if (newDeckSize >= 5){ // 5  or more cards in shuffled deck
+                for (int i = newDeckSize - 1; i > newDeckSize - 6; i--) { // add last 5 cards in deck to hand
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromAIDeck(i);
+                    addCardToAIHand(cardName);
+                }
+            } else { // less than 5 cards in shuffled deck
+                for (int i = newDeckSize - 1; i >=0; i--) { // add remaining cards in deck to hand
+                    String cardName = deck.get(i).getCardName();
+                    removeCardFromAIDeck(i);
+                    addCardToAIHand(cardName);
+                }
+            }
+        }
+        //return this.deck.size();
     }
 
     public void putDiscardInDeck(Activity activity) {
@@ -565,11 +633,26 @@ public class Player implements Serializable{
         imageView.setImageDrawable(drawable);
         shufflePile("deck");
     }
+
+    public void putAIDiscardInDeck() {
+        if (deck.size() == 0) deckTally = 0;
+        for (int i = 0; i < discard.size(); i++) {
+            deck.add(discard.get(i));
+            deck.get(deck.size() - 1).setCardMultiTagOnMoveToNewPile(deck.get(deck.size() - 1),
+                    (deck.size() - 1), deckTally, "deck");
+            deckTally += 1;
+        }
+        discard.clear();
+        discardTally = 0;
+        shufflePile("deck");
+    }
+
     public void setDiscardToDeckView(Activity activity, Context context){
         ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
         imageView.setImageDrawable(getImageDps(activity, "back", cardWidth/2));
         deckPile.getTextView().setText(String.valueOf(this.deck.size()));
     }
+
 
     public int findHandImageView(int viewId){
         int index = -1;
@@ -580,6 +663,7 @@ public class Player implements Serializable{
         }
         return index;
     }
+
 
     public int findInPlayImageView(int viewId){
         int index = -1;

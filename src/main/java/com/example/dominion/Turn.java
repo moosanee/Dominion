@@ -240,6 +240,26 @@ public class Turn {
                         setListeners(ARTISAN1, listenerSwitches);
                         phase = ARTISAN1;
                         break;
+                    case "bandit":
+                        player.addCardToDiscard("gold", activity, context);
+                        Toast.makeText(context, "You gained a gold", Toast.LENGTH_SHORT).show();
+                        ArrayList<BanditAttack> banditAttackResult = ((GameBoardActivity)activity)
+                                .reactToBanditAttack(player.getName());
+                        for (int i = 0; i < banditAttackResult.size(); i++){
+                            String toast = banditAttackResult.get(i).getPlayerName() + " revealed "
+                                    + banditAttackResult.get(i).getCard1() + " and " +
+                                    banditAttackResult.get(i).getCard2() + ".";
+                            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                            if (banditAttackResult.get(i).getTrashed() == 1) {
+                                toast = banditAttackResult.get(i).getPlayerName() + " trashed "
+                                        + banditAttackResult.get(i).getCard2() + ".";
+                            } else if (banditAttackResult.get(i).getTrashed() == 0) {
+                                toast = banditAttackResult.get(i).getPlayerName() + " trashed "
+                                        + banditAttackResult.get(i).getCard1() + ".";
+                            }
+                            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                            }
+                        break;
                     case "chapel":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
@@ -642,8 +662,7 @@ public class Turn {
             player.addCardToDiscard(cardName, activity, context);
             player.removeCardFromHand(viewId, activity, layout);
         }
-        int deckSize = player.drawHand(layout, context, activity, handListener);
-        player.deckPile.getTextView().setText(String.valueOf(deckSize));
+        player.drawAIHand();
         ((GameBoardActivity) activity).startNextTurn();
     }
 }
