@@ -36,6 +36,9 @@
         <activity
             android:name=".RevealDialogActivity"
             android:theme="@style/MyDialogTheme" />
+        <activity
+            android:name=".NotificationActivity"
+            android:theme="@style/MyDialogTheme" />
     </application>
 
 </manifest>

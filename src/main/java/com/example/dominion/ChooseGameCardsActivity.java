@@ -28,12 +28,14 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
     GameCardStats gameCardStats = new GameCardStats();
     Context context = this;
     ConstraintLayout constraintLayout;
+    int numberOfEmptyPilesToEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_game_cards);
         this.playerList = (ArrayList<PlayerInfo>) getIntent().getSerializableExtra("playerListKey");
+        numberOfEmptyPilesToEnd = getIntent().getIntExtra("emptyPilesKey", 3);
         constraintLayout = findViewById(R.id.activity_choose_game_cards);
 
         addTesterButton(constraintLayout);
@@ -110,6 +112,7 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(view.getContext(), GameBoardActivity.class);
+                    intent.putExtra("emptyPilesKey", numberOfEmptyPilesToEnd);
                     intent.putStringArrayListExtra("gameCardListKey", gameCardList);
                     intent.putExtra("playerListKey", playerList);
                     startActivityForResult(intent, GAME_BOARD_ACTIVITY_CODE);

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
@@ -21,13 +22,17 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> gameCardList = new ArrayList<>();
     ArrayList<PlayerInfo> playerList = new ArrayList<>();
-    private boolean[] players = {true, true, false, false};
+    private boolean[] players = {true, false, false, false};
     private boolean[] human = {true, false, false, false};
+    EditText emptyPiles;
+    int numberOfEmptyPilesToEnd = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        emptyPiles = findViewById(R.id.empty_piles);
 
         addButtonListeners();
     }
@@ -37,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
         chooseCards.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View view){
                 boolean complete = setPlayers();
+                numberOfEmptyPilesToEnd = Integer.parseInt(emptyPiles.getText().toString());
                 if(complete) {
                     Intent intent = new Intent(view.getContext(), ChooseGameCardsActivity.class);
+                    intent.putExtra("emptyPilesKey", numberOfEmptyPilesToEnd);
                     intent.putExtra("playerListKey", playerList);
                     startActivityForResult(intent, CHOOSE_CARDS_ACTIVITY_CODE);
                 } else {
@@ -52,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
         startGame.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View view){
                 boolean complete = setPlayers();
+                numberOfEmptyPilesToEnd = Integer.parseInt(emptyPiles.getText().toString());
                 if(complete) {
                     Intent intent = new Intent(view.getContext(), GameBoardActivity.class);
+                    intent.putExtra("emptyPilesKey", numberOfEmptyPilesToEnd);
                     intent.putStringArrayListExtra("gameCardListKey", gameCardList);
                     intent.putExtra("playerListKey", playerList);
                     startActivityForResult(intent, START_GAME_ACTIVITY_CODE);
@@ -66,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean setPlayers() {
+        for (int i = 0; i < 4; i++){
+            String idName = "player"+(i+1)+"_in";
+            int viewId = getResources().getIdentifier(idName, "id", this.getPackageName());
+            CheckBox checkBox = findViewById(viewId);
+            players[i] = checkBox.isChecked();
+        }
         for (int i = 0; i < 4; i++){
             if (players[i]){
                 String idName = "player"+(i+1)+"_name";

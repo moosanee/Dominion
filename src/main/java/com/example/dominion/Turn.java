@@ -510,7 +510,6 @@ public class Turn {
             player.addCardToHand(cardName, layout, context, activity, handListener);
         } else if (player.discard.size() > 0) {
             player.putDiscardInDeck(activity);
-            CardData cardData = player.deck.get(player.deck.size() - 1);
             cardName = player.deck.get(player.deck.size() - 1).getCardName();
             player.removeCardFromDeck(player.deck.size() - 1, activity);
             player.addCardToHand(cardName, layout, context, activity, handListener);
@@ -649,7 +648,7 @@ public class Turn {
         }
     }
 
-    public void cleanUp(ListenerSwitches listenerSwitches, View.OnTouchListener handListener){
+    public void cleanUp(){
         for (int i = player.inPlay.size()-1; i >= 0; i --){
             String cardName = player.inPlay.get(i).getCardName();
             int viewId = player.inPlay.get(i).getImageViewId();
@@ -662,7 +661,7 @@ public class Turn {
             player.addCardToDiscard(cardName, activity, context);
             player.removeCardFromHand(viewId, activity, layout);
         }
-        player.drawAIHand();
+        player.drawOffTurnHand();
         ((GameBoardActivity) activity).startNextTurn();
     }
 }

@@ -48,6 +48,7 @@ public class GameBoardActivity extends AppCompatActivity {
     int turnMarker = 0;
     int roundNumber = 0;
     int emptyBankPiles = 0;
+    int emptyPilesToEnd = 3;
     ArrayList<TurnArchive> turnList = new ArrayList<>();
     boolean doubleTap = false;
     ListenerSwitches listenerSwitches = new ListenerSwitches();
@@ -66,6 +67,7 @@ public class GameBoardActivity extends AppCompatActivity {
         gameCardList = getIntent().getStringArrayListExtra("gameCardListKey");
         this.playerInfoList = (ArrayList<PlayerInfo>) getIntent()
                 .getSerializableExtra("playerListKey");
+        emptyPilesToEnd = getIntent().getIntExtra("emptyPilesKey", 3);
 
         layout = findViewById(R.id.activity_game_board);
         constraintSet = new ConstraintSet();
@@ -80,7 +82,7 @@ public class GameBoardActivity extends AppCompatActivity {
             if (i == 0) {
                 playerList.get(0).drawHand(layout, context, activity, handListener);
             } else {
-                playerList.get(i).drawAIHand();
+                playerList.get(i).drawOffTurnHand();
             }
         }
 
@@ -230,7 +232,7 @@ public class GameBoardActivity extends AppCompatActivity {
                         turn.startCleanUpPhase(listenerSwitches);
                         break;
                     case CLEAN_UP_PHASE: // "clean up"
-                        turn.cleanUp(listenerSwitches, handListener);
+                        turn.cleanUp();
                         break;
                     case CHAPEL: // "finished trashing"
                         turn.finishChapel(listenerSwitches);
@@ -495,6 +497,7 @@ public class GameBoardActivity extends AppCompatActivity {
                     break;
                 case DragEvent.ACTION_DROP:
                     // Dropped, reassign View to ViewGroup
+                    boolean cardsLeft = true;
                     targetId = v.getId();
                     cmt = (CardMultiTag) v.getTag();
                     targetType = cmt.getCardType();
@@ -505,23 +508,23 @@ public class GameBoardActivity extends AppCompatActivity {
                             int discardId = playerList.get(turnMarker).discardPile.getImageViewId();
                             int deckId = playerList.get(turnMarker).deckPile.getImageViewId();
                             if (targetId == trashId && listenerSwitches.isTrashDragSwitch()) {
-                                removeCardFromBankPile(movingViewName);
-                                addCardToTrash(movingViewName);
+                                cardsLeft = removeCardFromBankPile(movingViewName);
+                                if (cardsLeft) addCardToTrash(movingViewName);
                             } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
-                                removeCardFromBankPile(movingViewName);
-                                playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
+                                cardsLeft = removeCardFromBankPile(movingViewName);
+                                if (cardsLeft) playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
                                 turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
                             } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
-                                removeCardFromBankPile(movingViewName);
-                                playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
+                                cardsLeft = removeCardFromBankPile(movingViewName);
+                                if (cardsLeft) playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
                             } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
-                                removeCardFromBankPile(movingViewName);
-                                playerList.get(turnMarker).addCardToHand(movingViewName, layout, context,
+                                cardsLeft = removeCardFromBankPile(movingViewName);
+                                if (cardsLeft) playerList.get(turnMarker).addCardToHand(movingViewName, layout, context,
                                         activity, handListener);
                                 turn.reactToNewCardInHand(movingViewName, listenerSwitches);
                             } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
-                                removeCardFromBankPile(movingViewName);
-                                playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
+                                cardsLeft = removeCardFromBankPile(movingViewName);
+                                if (cardsLeft) playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
                                         activity, inPlayListener);
                                 turn.reactToNewCardInPlay(movingViewName, handListener, listenerSwitches);
                             } else {
@@ -853,7 +856,8 @@ public class GameBoardActivity extends AppCompatActivity {
     }
 
 
-    private void removeCardFromBankPile(String cardName) {
+    private boolean removeCardFromBankPile(String cardName) {
+        boolean empty = false;
         int index = 0;
         for (int i = 0; i < bankPiles.size(); i++) {
             String viewName = bankPiles.get(i).getCardName();
@@ -861,14 +865,25 @@ public class GameBoardActivity extends AppCompatActivity {
         }
         ImageView imageView = findViewById(bankPiles.get(index).getImageViewId());
         String text = (String) bankPiles.get(index).getTextView().getText();
-        int counter = Integer.parseInt(text) - 1;
+        int counter = Integer.parseInt(text);
         if (counter == 0) {
-            imageView.setVisibility(View.INVISIBLE);
-            imageView.setClickable(false);
-            emptyBankPiles +=1;
+            empty = true;
+        } else {
+            counter -= 1;
+
+            if (counter == 0) {
+                if (cardName.equals("province")) endGame();
+                else {
+                    imageView.setVisibility(View.INVISIBLE);
+                    imageView.setClickable(false);
+                    emptyBankPiles += 1;
+                    if (emptyBankPiles == emptyPilesToEnd) endGame();
+                }
+            }
         }
         text = String.valueOf(counter);
         bankPiles.get(index).getTextView().setText(text);
+        return !empty;
     }//removeCardFromBankPile
 
 
@@ -1361,21 +1376,30 @@ public class GameBoardActivity extends AppCompatActivity {
 
     public void startNextTurn(){
         turnList.add(new TurnArchive(playerList.get(turnMarker), turn, roundNumber));
-        int previousPlayer = turnMarker;
         turnMarker +=1;
         if (turnMarker >= playerList.size()) {
             turnMarker = 0;
             roundNumber +=1;
         }
         turn = new Turn(playerList.get(turnMarker), emptyBankPiles, bankPiles, activity, context, layout);
-        turnTable(playerList.get(turnMarker), playerList.get(previousPlayer));
+        turnTable(playerList.get(turnMarker));
         turn.startTurn(listenerSwitches);
 
     }
 
-    private void turnTable(Player newPlayer, Player oldPlayer){
+    private void turnTable(Player newPlayer){
+        Drawable drawable;
         newPlayer.displayHand(layout, context, activity, handListener);
         newPlayer.deckPile.getTextView().setText(String.valueOf(newPlayer.deck.size()));
+        int discardSize = newPlayer.discard.size();
+        if (discardSize == 0) {
+            drawable = getImageDps(activity, "back", cardWidth/2);
+        } else {
+            String topCard = newPlayer.discard.get(discardSize - 1).getCardName();
+            drawable = getImageDps(activity, topCard, cardWidth/2);
+        }
+        ImageView discardView = findViewById(newPlayer.discardPile.getImageViewId());
+        discardView.setImageDrawable(drawable);
         switch (playerList.size()){
             case 1:
                 break;
@@ -1417,21 +1441,23 @@ public class GameBoardActivity extends AppCompatActivity {
 
 
     public void reactToWitch(String playerName){
+        boolean cardsLeft = true;
+        ArrayList<String> postList = new ArrayList<>();
         for (int i = 0; i < playerList.size(); i++){
             if (!playerList.get(i).getName().equals(playerName)){
                 String reaction = playerList.get(i).checkForReaction("witch");
                 if (!reaction.equals("moat")) {
-                    if (i == 0) {
-                        playerList.get(i).addCardToHand("curse", layout, context, activity, handListener);
-                        Toast.makeText(context, "you gained a curse card", Toast.LENGTH_SHORT).show();
-                    } else {
-                        String toast = playerList.get(i).getName() + "gained a curse";
-                        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                        playerList.get(i).addCard("hand", "curse");
-                    }
+                    postList.add(playerList.get(i).getName() + " gained a curse.");
+                    cardsLeft = removeCardFromBankPile("curse");
+                    if (cardsLeft) playerList.get(i).addOffTurnCard("curse", "discard");
+                } else {
+                    postList.add(playerList.get(i).getName() + " has a moat.");
                 }
             }
         }
+        Intent intent = new Intent(context, NotificationActivity.class);
+        intent.putStringArrayListExtra("postListKey", postList);
+        startActivity(intent);
     }
 
     public ArrayList<BanditAttack> reactToBanditAttack(String playerName){
@@ -1480,5 +1506,89 @@ public class GameBoardActivity extends AppCompatActivity {
             }
         }
         return banditAttackResults;
+    }
+
+    public void endGame(){
+        String winningPlayerName = "";
+        ArrayList<String> postList = new ArrayList<>();
+
+        for (int i = 0; i < playerList.size(); i ++){
+            Player player = playerList.get(i);
+            int totalDeckSize = player.deck.size() + player.hand.size() + player.discard.size();
+            for (int j = 0; j < player.deck.size(); j++){
+                Card card = player.deck.get(j).getCard();
+                if (card.getName().equals("garden")){
+                    player.setScore(player.getScore() + totalDeckSize/4 );
+                } else if (card.getType().equals("victory")){
+                    player.setScore(player.getScore() + card.getVictoryPoints() );
+                } else if (card.getName().equals("curse")){
+                    player.setScore(player.getScore() - 1 );
+                }
+            }
+            for (int j = 0; j < player.hand.size(); j++){
+                Card card = player.hand.get(j).getCard();
+                if (card.getName().equals("garden")){
+                    player.setScore(player.getScore() + totalDeckSize/4 );
+                } else if (card.getType().equals("victory")){
+                    player.setScore(player.getScore() + card.getVictoryPoints() );
+                } else if (card.getName().equals("curse")){
+                    player.setScore(player.getScore() - 1 );
+                }
+            }
+            for (int j = 0; j < player.discard.size(); j++){
+                Card card = player.discard.get(j).getCard();
+                if (card.getName().equals("garden")){
+                    player.setScore(player.getScore() + totalDeckSize/4 );
+                } else if (card.getType().equals("victory")){
+                    player.setScore(player.getScore() + card.getVictoryPoints() );
+                } else if (card.getName().equals("curse")){
+                    player.setScore(player.getScore() - 1 );
+                }
+            }
+        }
+        int[] turns = new int[4];
+        for (int i = 0; i < turnMarker+1; i++) turns[i] = roundNumber+1;
+        for (int i = turnMarker; i < 4; i++) turns[i] = roundNumber;
+        int n;
+        Player tempi;
+        Player tempj;
+        for (int i = 0; i < playerList.size(); i ++){
+            for (int j = i+1; j < playerList.size(); j++){
+                if (playerList.get(i).getScore() < playerList.get(j).getScore()) {
+                    tempi = playerList.get(i);
+                    tempj = playerList.get(j);
+                    n = turns[i];
+                    playerList.remove(i);
+                    playerList.add(i, tempj);
+                    playerList.remove(j);
+                    turns[i] = turns[j];
+                    playerList.add(j, tempi);
+                    turns[j] = n;
+                }
+            }
+        }
+        String post;
+        if (playerList.get(0).getScore() > playerList.get(1).getScore()) {
+            post = playerList.get(0).getName() + " won!";
+        } else {
+            if (turns[0] > turns[1]) {
+                tempi = playerList.get(0);
+                playerList.remove(0);
+                playerList.add(1, tempi);
+                post = playerList.get(0).getName() + " won!";
+            } else{
+                post = playerList.get(0) + " and " + playerList.get(1) + " tied";
+            }
+        }
+        postList.add(post);
+        postList.add("");
+        for (int i = 0; i < playerList.size(); i++){
+            post = playerList.get(i).getName() + " scored " + playerList.get(i).getScore() + " victory points.";
+            postList.add(post);
+        }
+
+        Intent intent = new Intent(this, NotificationActivity.class);
+        intent.putExtra("postListKey", postList);
+        startActivity(intent);
     }
 }

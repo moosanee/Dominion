@@ -767,4 +767,5 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@id/set_up_game_button" />
 
+
 </android.support.constraint.ConstraintLayout>

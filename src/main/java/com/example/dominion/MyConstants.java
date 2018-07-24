@@ -65,6 +65,7 @@ public final class MyConstants implements Serializable{
     public static final int INTRIGUE_CARDS_ACTIVITY_CODE = 7;
     public static final int GAME_BOARD_ACTIVITY_CODE = 8;
     public static final int TESTER_BUTTON_ID = 474747;
+    public static final int NOTIFICATION_ACTIVITY_CODE = 9;
     public static final int CHOOSE_CARDS_ACTIVITY_CODE = 0;
     public static final int START_GAME_ACTIVITY_CODE = 1;
 

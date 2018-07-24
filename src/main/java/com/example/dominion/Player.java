@@ -22,6 +22,7 @@ public class Player implements Serializable{
     String Name;
     int number;
     boolean human;
+    int score;
     ArrayList<CardData> deck;
     ArrayList<CardData> hand;
     ArrayList<CardData> discard;
@@ -244,12 +245,6 @@ public class Player implements Serializable{
         imageView.setOnDragListener(hand.get(i).getDragListener());
     }//add card to hand
 
-    public void addCardToAIHand(String cardName) {
-        int i = hand.size();
-        CardData cardData = new CardData(cardName, "hand", i, handTally);
-        handTally += 1;
-        hand.add(cardData);
-    }//add card to hand
 
     public void removeCardFromHand(int viewId, Activity activity, ConstraintLayout layout) {
         int index = this.findHandImageView(viewId);
@@ -287,6 +282,7 @@ public class Player implements Serializable{
             imageView.setLayoutParams(params);
         }
     }// RemoveCardFromHand
+
 
     public void addCardToPlayArea(String cardName, ConstraintLayout layout, Context context,
                                   Activity activity, View.OnTouchListener inPlayListener) {
@@ -401,13 +397,7 @@ public class Player implements Serializable{
         }
         if (deck.size() <= 0) deckTally = 0;
     }
-    public void removeCardFromAIDeck(int index) {
-        this.deck.remove(index);
-        for (int i = index; i < this.deck.size(); i++) {
-            this.deck.get(i).decreasePosition(1);
-        }
-        if (deck.size() <= 0) deckTally = 0;
-    }
+
 
     public void addCardToDiscard(String cardName, Activity  activity, Context context) {
         discard.add(new CardData(cardName, "discard", this.discard.size(), this.discardTally));
@@ -565,7 +555,7 @@ public class Player implements Serializable{
         //return this.deck.size();
     }
 
-    public void drawAIHand() {
+    public void drawOffTurnHand() {
         int deckSize = deck.size();
         int discardSize = discard.size();
         int cardsStillNeeded;
@@ -574,44 +564,44 @@ public class Player implements Serializable{
         if (deckSize >= 5) {  //5 or more cards in deck
             for (int i = deckSize - 1; i > deckSize - 6; i--) { // add last 5 cards in deck to hand
                 String cardName = deck.get(i).getCardName();
-                removeCardFromAIDeck(i);
-                addCardToAIHand(cardName);
+                removeOffTurnCard(i,"deck");
+                addOffTurnCard(cardName, "hand");
             }
         } else if (deckSize > 0) { //less than 5 cards in deck, some in discard
             cardsStillNeeded = 5-deckSize;
             for (int i = deckSize - 1; i >= 0; i--) {
                 String cardName = deck.get(i).getCardName();
-                removeCardFromAIDeck(i);
-                addCardToAIHand(cardName);
+                removeOffTurnCard(i,"deck");
+                addOffTurnCard(cardName, "hand");
             }
-            putAIDiscardInDeck();
+            putOffTurnDiscardInDeck();
             if (discardSize > cardsStillNeeded){
                 for (int i = discardSize - 1; i > discardSize - cardsStillNeeded-1; i--) { // add last needed cards in deck to hand
                     String cardName = deck.get(i).getCardName();
-                    removeCardFromAIDeck(i);
-                    addCardToAIHand(cardName);
+                    removeOffTurnCard(i,"deck");
+                    addOffTurnCard(cardName, "hand");
                 }
             } else{
                 for (int i = discardSize - 1; i >= 0; i--) { // add remaining cards in shuffled deck to hand
                     String cardName = deck.get(i).getCardName();
-                    removeCardFromAIDeck(i);
-                    addCardToAIHand(cardName);
+                    removeOffTurnCard(i,"deck");
+                    addOffTurnCard(cardName, "hand");
                 }
             }
         } else {                 //no cards in deck, some in discard
-            putAIDiscardInDeck();
+            putOffTurnDiscardInDeck();
             newDeckSize = deck.size();
             if (newDeckSize >= 5){ // 5  or more cards in shuffled deck
                 for (int i = newDeckSize - 1; i > newDeckSize - 6; i--) { // add last 5 cards in deck to hand
                     String cardName = deck.get(i).getCardName();
-                    removeCardFromAIDeck(i);
-                    addCardToAIHand(cardName);
+                    removeOffTurnCard(i,"deck");
+                    addOffTurnCard(cardName, "hand");
                 }
             } else { // less than 5 cards in shuffled deck
                 for (int i = newDeckSize - 1; i >=0; i--) { // add remaining cards in deck to hand
                     String cardName = deck.get(i).getCardName();
-                    removeCardFromAIDeck(i);
-                    addCardToAIHand(cardName);
+                    removeOffTurnCard(i,"deck");
+                    addOffTurnCard(cardName, "hand");
                 }
             }
         }
@@ -634,7 +624,7 @@ public class Player implements Serializable{
         shufflePile("deck");
     }
 
-    public void putAIDiscardInDeck() {
+    public void putOffTurnDiscardInDeck() {
         if (deck.size() == 0) deckTally = 0;
         for (int i = 0; i < discard.size(); i++) {
             deck.add(discard.get(i));
@@ -699,7 +689,7 @@ public class Player implements Serializable{
         return reactionName;
     }
 
-    public void addCard(String pileName, String cardName){
+    public void addOffTurnCard(String cardName, String pileName){
         int position;
         int itemNumber;
         switch (pileName){
@@ -724,12 +714,31 @@ public class Player implements Serializable{
                 cardData = new CardData(cardName, "hand", position, itemNumber);
                 discard.add(cardData);
                 break;
-            case "inPlay":
-                itemNumber = inPlayTally;
-                inPlayTally += 1;
-                position = inPlay.size();
-                cardData = new CardData(cardName, "hand", position, itemNumber);
-                inPlay.add(cardData);
+        }
+    }
+
+    public void removeOffTurnCard(int index, String pileName) {
+        switch (pileName){
+            case "hand":
+                hand.remove(index);
+                for (int i = index; i < hand.size(); i++) {
+                    hand.get(i).decreasePosition(1);
+                }
+                if (hand.size() <= 0) handTally = 0;
+                break;
+            case "deck":
+                deck.remove(index);
+                for (int i = index; i < deck.size(); i++) {
+                    deck.get(i).decreasePosition(1);
+                }
+                if (deck.size() <= 0) deckTally = 0;
+                break;
+            case "discard":
+                discard.remove(index);
+                for (int i = index; i < discard.size(); i++) {
+                    discard.get(i).decreasePosition(1);
+                }
+                if (discard.size() <= 0) discardTally = 0;
                 break;
         }
     }
@@ -740,5 +749,13 @@ public class Player implements Serializable{
 
     public boolean isHuman() {
         return human;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
