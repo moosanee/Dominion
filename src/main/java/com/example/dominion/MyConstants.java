@@ -36,6 +36,9 @@ public final class MyConstants implements Serializable{
     public static final int POSITION_C_IMAGE_ID = 585863;
     public static final int POSITION_D_IMAGE_ID = 585864;
     public static final int OPPONENT_LISTENERS = 470;
+    public static final int OPPONENT_DECK_LISTENER = 472;
+    public static final int OPPONENT_HAND_LISTENER = 473;
+    public static final int OPPONENT_DISCARD_LISTENER = 474;
     public static final int TRASH_LISTENER = 480;
     public static final int TRASH_VIEW_ID = 989898;
     public static final int PLAYER_HAND_VIEW_ID = 232323;

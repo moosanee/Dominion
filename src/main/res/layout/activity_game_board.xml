@@ -116,9 +116,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/playerB"
+        android:layout_marginStart="@dimen/padding"
         style="@style/appText"
-        app:layout_constraintEnd_toEndOf="@+id/playerB_hand"
-        app:layout_constraintStart_toStartOf="@+id/playerB_hand"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playerB_hand" />
 
     <TextView
@@ -129,8 +129,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/playerD"
         style="@style/appText"
-        app:layout_constraintEnd_toEndOf="@+id/playerD_hand"
-        app:layout_constraintStart_toStartOf="@+id/playerD_hand"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playerD_hand" />
 
     <TextView

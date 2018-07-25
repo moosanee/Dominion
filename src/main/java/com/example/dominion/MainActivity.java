@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<PlayerInfo> playerList = new ArrayList<>();
     private boolean[] players = {true, false, false, false};
     private boolean[] human = {true, false, false, false};
+    int numberOfPlayers;
     EditText emptyPiles;
     int numberOfEmptyPilesToEnd = 3;
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             CheckBox checkBox = findViewById(viewId);
             players[i] = checkBox.isChecked();
         }
+        numberOfPlayers = 0;
         for (int i = 0; i < 4; i++){
             if (players[i]){
                 String idName = "player"+(i+1)+"_name";
@@ -88,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 EditText editText = findViewById(viewId);
                 String name = editText.getText().toString();
                 if (name.equals("")) name = "Player"+(i+1);
-                PlayerInfo playerInfo = new PlayerInfo(i+1, name, human[i]);
+                PlayerInfo playerInfo = new PlayerInfo(numberOfPlayers+1, name, human[i]);
+                numberOfPlayers +=1;
                 playerList.add(playerInfo);
             }
         }

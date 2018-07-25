@@ -39,6 +39,7 @@
         <activity
             android:name=".NotificationActivity"
             android:theme="@style/MyDialogTheme" />
+        <activity android:name=".OpponentPileBrowseActivity"></activity>
     </application>
 
 </manifest>

@@ -116,17 +116,29 @@ public class GameBoardActivity extends AppCompatActivity {
                 layout.removeView(textViewB);
                 layout.removeView(textViewD);
                 textViewC.setText(playerList.get(1).getName());
+                imageViewC.setTag(playerList.get(1));
+                opponentImageViews.add(imageViewC);
                 break;
             case 3:
                 layout.removeView(imageViewB);
                 layout.removeView(textViewB);
                 textViewC.setText(playerList.get(1).getName());
                 textViewD.setText(playerList.get(2).getName());
+                imageViewC.setTag(playerList.get(1));
+                imageViewD.setTag(playerList.get(2));
+                opponentImageViews.add(imageViewC);
+                opponentImageViews.add(imageViewD);
                 break;
             case 4:
                 textViewB.setText(playerList.get(1).getName());
                 textViewC.setText(playerList.get(2).getName());
                 textViewD.setText(playerList.get(3).getName());
+                imageViewB.setTag(playerList.get(1));
+                imageViewC.setTag(playerList.get(2));
+                imageViewD.setTag(playerList.get(3));
+                opponentImageViews.add(imageViewB);
+                opponentImageViews.add(imageViewC);
+                opponentImageViews.add(imageViewD);
                 break;
         }
         playerList.get(0).initializeDeck(layout, context, activity);
@@ -197,14 +209,37 @@ public class GameBoardActivity extends AppCompatActivity {
             view = opponentImageViews.get(i);
             view.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View view) {
-                    String opponent = String.valueOf(opponentImageViews.get(FINALI).getTag());
+                    Player player = (Player) opponentImageViews.get(FINALI).getTag();
+                    String opponentName = player.getName();
+                    ArrayList<CardData> deckCardList = new ArrayList<>();
+                    for (int j = 0; j < player.deck.size(); j++) {
+                        deckCardList.add(player.deck.get(j));
+                    }
+                    ArrayList<CardData> handCardList = new ArrayList<>();
+                    for (int j = 0; j < player.hand.size(); j++) {
+                        handCardList.add(player.hand.get(j));
+                    }
+                    ArrayList<CardData> discardCardList = new ArrayList<>();
+                    for (int j = 0; j < player.discard.size(); j++) {
+                        discardCardList.add(player.discard.get(j));
+                    }
                     Intent intent = new Intent(view.getContext(), OpponentAreaDialogActivity.class);
-                    intent.putExtra("opponentKey", opponent);
-                    intent.putExtra("viewIdKey", view.getId());
-                    startActivityForResult(intent, OPPONENT_LISTENERS + FINALI);
+                    intent.putExtra("deckPileListKey", deckCardList);
+                    intent.putExtra("handPileListKey", handCardList);
+                    intent.putExtra("discardPileListKey", discardCardList);
+                    intent.putExtra("opponentKey", opponentName);
+                    startActivity(intent);
                 }
             });
         }
+
+        Button button = findViewById(R.id.end_game_button);
+        button.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
 //hand area view
         ImageView handView = findViewById(HAND_AREA_VIEW_ID);
         handView.setOnDragListener(new MyDragListener());
@@ -990,16 +1025,16 @@ public class GameBoardActivity extends AppCompatActivity {
         viewId = getResources().getIdentifier("trash_size", "id", getPackageName());
         trashPile.setTextView((TextView) findViewById(viewId));
 
-        viewId = getResources().getIdentifier("playerB_hand", "id", getPackageName());
+        /*viewId = getResources().getIdentifier("playerB_hand", "id", getPackageName());
         view = (ImageView) layout.getViewById(viewId);
+        view.setTag(playerName);
         opponentImageViews.add(view);
         viewId = getResources().getIdentifier("playerC_hand", "id", getPackageName());
         view = (ImageView) layout.getViewById(viewId);
         opponentImageViews.add(view);
         viewId = getResources().getIdentifier("playerD_hand", "id", getPackageName());
         view = (ImageView) layout.getViewById(viewId);
-        opponentImageViews.add(view);
-
+        opponentImageViews.add(view);*/
     }
 
 
@@ -1405,36 +1440,48 @@ public class GameBoardActivity extends AppCompatActivity {
                 break;
             case 2:
                 TextView textViewC = findViewById(POSITION_C_NAME_ID);
+                ImageView imageViewC = findViewById(POSITION_C_IMAGE_ID);
                 TextView textViewFocus = findViewById(FOCUS_HAND_ID);
                 int next = turnMarker;
                 textViewFocus.setText(playerList.get(next).getName() + " hand");
                 next = (turnMarker+1)%2;
                 textViewC.setText(playerList.get(next).getName());
+                imageViewC.setTag(playerList.get(next));
                 break;
             case 3:
                 textViewC = findViewById(POSITION_C_NAME_ID);
                 TextView textViewD = findViewById(POSITION_D_NAME_ID);
+                imageViewC = findViewById(POSITION_C_IMAGE_ID);
+                ImageView imageViewD = findViewById(POSITION_D_IMAGE_ID);
                 textViewFocus = findViewById(FOCUS_HAND_ID);
                 next = turnMarker;
                 textViewFocus.setText(playerList.get(next).getName() + " hand");
                 next = (turnMarker+1)%3;
                 textViewC.setText(playerList.get(next).getName());
+                imageViewC.setTag(playerList.get(next));
                 next = (turnMarker+2)%3;
                 textViewD.setText(playerList.get(next).getName());
+                imageViewD.setTag(playerList.get(next));
                 break;
             case 4:
                 TextView textViewB = findViewById(POSITION_B_NAME_ID);
                 textViewC = findViewById(POSITION_C_NAME_ID);
                 textViewD = findViewById(POSITION_D_NAME_ID);
+                ImageView imageViewB = findViewById(POSITION_B_IMAGE_ID);
+                imageViewC = findViewById(POSITION_C_IMAGE_ID);
+                imageViewD = findViewById(POSITION_D_IMAGE_ID);
                 textViewFocus = findViewById(FOCUS_HAND_ID);
                 next = turnMarker;
                 textViewFocus.setText(playerList.get(next).getName() + " hand");
                 next = (turnMarker+1)%4;
                 textViewB.setText(playerList.get(next).getName());
+                imageViewB.setTag(playerList.get(next));
                 next = (turnMarker+2)%4;
                 textViewC.setText(playerList.get(next).getName());
+                imageViewC.setTag(playerList.get(next));
                 next = (turnMarker+3)%4;
                 textViewD.setText(playerList.get(next).getName());
+                imageViewD.setTag(playerList.get(next));
                 break;
         }
     }
@@ -1509,15 +1556,15 @@ public class GameBoardActivity extends AppCompatActivity {
     }
 
     public void endGame(){
-        String winningPlayerName = "";
         ArrayList<String> postList = new ArrayList<>();
 
         for (int i = 0; i < playerList.size(); i ++){
             Player player = playerList.get(i);
-            int totalDeckSize = player.deck.size() + player.hand.size() + player.discard.size();
+            int totalDeckSize = player.deck.size() + player.hand.size() + player.discard.size()
+                    + player.inPlay.size();
             for (int j = 0; j < player.deck.size(); j++){
                 Card card = player.deck.get(j).getCard();
-                if (card.getName().equals("garden")){
+                if (card.getName().equals("gardens")){
                     player.setScore(player.getScore() + totalDeckSize/4 );
                 } else if (card.getType().equals("victory")){
                     player.setScore(player.getScore() + card.getVictoryPoints() );
@@ -1527,7 +1574,7 @@ public class GameBoardActivity extends AppCompatActivity {
             }
             for (int j = 0; j < player.hand.size(); j++){
                 Card card = player.hand.get(j).getCard();
-                if (card.getName().equals("garden")){
+                if (card.getName().equals("gardens")){
                     player.setScore(player.getScore() + totalDeckSize/4 );
                 } else if (card.getType().equals("victory")){
                     player.setScore(player.getScore() + card.getVictoryPoints() );
@@ -1537,7 +1584,17 @@ public class GameBoardActivity extends AppCompatActivity {
             }
             for (int j = 0; j < player.discard.size(); j++){
                 Card card = player.discard.get(j).getCard();
-                if (card.getName().equals("garden")){
+                if (card.getName().equals("gardens")){
+                    player.setScore(player.getScore() + totalDeckSize/4 );
+                } else if (card.getType().equals("victory")){
+                    player.setScore(player.getScore() + card.getVictoryPoints() );
+                } else if (card.getName().equals("curse")){
+                    player.setScore(player.getScore() - 1 );
+                }
+            }
+            for (int j = 0; j < player.inPlay.size(); j++){
+                Card card = player.inPlay.get(j).getCard();
+                if (card.getName().equals("gardens")){
                     player.setScore(player.getScore() + totalDeckSize/4 );
                 } else if (card.getType().equals("victory")){
                     player.setScore(player.getScore() + card.getVictoryPoints() );
@@ -1548,7 +1605,7 @@ public class GameBoardActivity extends AppCompatActivity {
         }
         int[] turns = new int[4];
         for (int i = 0; i < turnMarker+1; i++) turns[i] = roundNumber+1;
-        for (int i = turnMarker; i < 4; i++) turns[i] = roundNumber;
+        for (int i = turnMarker+1; i < 4; i++) turns[i] = roundNumber;
         int n;
         Player tempi;
         Player tempj;
