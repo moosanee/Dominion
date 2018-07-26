@@ -60,6 +60,8 @@ public class Turn {
         textView.setText("0        saved");
         textView = ((Activity)activity).findViewById(BUYS_LEFT_ID);
         textView.setText("1 buy left");
+        ((GameBoardActivity)activity).undoButton.setClickable(false);
+        ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
         promptTurn(listenerSwitches);
     }
 
@@ -330,10 +332,12 @@ public class Turn {
             }
         }
         if (phase == ADVENTURER){
-            ((GameBoardActivity) activity).undoList.add(new Undo(player, "moved adventurer to inPlay",
-                    this, phase, handListener, listenerSwitches));
+            ((GameBoardActivity) activity).undo = new Undo(player, "moved adventurer to inPlay",
+                    this, phase, handListener, listenerSwitches);
+            ((GameBoardActivity) activity).undoButton.setClickable(true);
+            ((GameBoardActivity) activity).undoButton.setAlpha(1f);
             int treasureFlag = 0;
-            revealedCards = new ArrayList<>();
+            revealedCards.clear();
             int deckSize = player.deck.size();
             int discardSize = player.discard.size();
             while (treasureFlag < 2){
@@ -387,8 +391,6 @@ public class Turn {
                 startActionPhase(listenerSwitches);
                 break;
         }
-
-
     }
 
 

@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         style="@style/appButton"
+        android:alpha="0.5"
         android:text="undo"
         app:layout_constraintEnd_toEndOf="@id/end_game_button"
         app:layout_constraintStart_toStartOf="@id/end_game_button"
