@@ -44,6 +44,7 @@ public class GameBoardActivity extends AppCompatActivity {
     BasicCards basicCardSet = new BasicCards();
     ArrayList<PlayerInfo> playerInfoList = new ArrayList<>();
     ArrayList<Player> playerList = new ArrayList<>();
+    ArrayList<Undo> undoList = new ArrayList<>();
     Turn turn;
     int turnMarker = 0;
     int roundNumber = 0;
@@ -254,23 +255,29 @@ public class GameBoardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 int mode = (int) view.getTag();
                 switch (mode){
-                    case BEGIN_TURN: //"finished actions"
-                        turn.startBuyingPhase(listenerSwitches);
-                        break;
                     case ACTION_PHASE: //"finished actions"
                         turn.startBuyingPhase(listenerSwitches);
+                        undoList.add(new Undo(playerList.get(turnMarker),
+                                "start buying phase", turn, listenerSwitches));
                         break;
                     case BUYING_PHASE: //"play all treasures"
-                        turn.playAllTreasures(inPlayListener, handListener, listenerSwitches);
+                        ArrayList<CardData> treasureList =
+                                turn.playAllTreasures(inPlayListener, handListener, listenerSwitches);
+                        undoList.add(new Undo(playerList.get(turnMarker), "play all treasures",
+                                turn, treasureList, inPlayListener, listenerSwitches));
                         break;
                     case OPEN_BANK://"finished buying"
                         turn.startCleanUpPhase(listenerSwitches);
+                        undoList.add(new Undo(playerList.get(turnMarker),
+                                "start clean up phase", turn, listenerSwitches));
                         break;
                     case CLEAN_UP_PHASE: // "clean up"
                         turn.cleanUp();
                         break;
                     case CHAPEL: // "finished trashing"
-                        turn.finishChapel(listenerSwitches);
+                        int trashed = turn.finishChapel(listenerSwitches);
+                        undoList.add(new Undo(playerList.get(turnMarker),
+                                "finish chapel", turn, trashed, listenerSwitches));
                         break;
                     case POACHER: // "discard card"
                         if (playerList.get(turnMarker).hand.size() == 0) {
@@ -297,6 +304,16 @@ public class GameBoardActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Button undoButton = findViewById(R.id.undo_button);
+        undoButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View view) {
+                Undo undo = undoList.get(undoList.size()-1);
+                undo.undoAction();
+                undoList.remove(undo);
+            }
+        });
+
     }//setImageListeners
 
 
@@ -547,19 +564,27 @@ public class GameBoardActivity extends AppCompatActivity {
                                 if (cardsLeft) addCardToTrash(movingViewName);
                             } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                                 cardsLeft = removeCardFromBankPile(movingViewName);
-                                if (cardsLeft) playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
+                                if (cardsLeft) playerList.get(turnMarker)
+                                        .addCardToDiscard(movingViewName, activity, context);
+                                String fromTo = "moved " + movingViewName + " to discard";
+                                undoList.add(new Undo(playerList.get(turnMarker), fromTo, turn,
+                                        turn.phase, bankPiles, listenerSwitches));
                                 turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
                             } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                                 cardsLeft = removeCardFromBankPile(movingViewName);
-                                if (cardsLeft) playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
+                                if (cardsLeft) playerList.get(turnMarker).addCardToDeck(movingViewName,
+                                        activity, context);
                             } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                                 cardsLeft = removeCardFromBankPile(movingViewName);
-                                if (cardsLeft) playerList.get(turnMarker).addCardToHand(movingViewName, layout, context,
+                                if (cardsLeft) playerList.get(turnMarker).addCardToHand(movingViewName,
+                                        layout, context,
                                         activity, handListener);
                                 turn.reactToNewCardInHand(movingViewName, listenerSwitches);
-                            } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
+                            } else if (targetType.equals("inPlay") &&
+                                    listenerSwitches.isInPlayDragSwitch()) {
                                 cardsLeft = removeCardFromBankPile(movingViewName);
-                                if (cardsLeft) playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
+                                if (cardsLeft) playerList.get(turnMarker).addCardToPlayArea
+                                        (movingViewName, layout, context,
                                         activity, inPlayListener);
                                 turn.reactToNewCardInPlay(movingViewName, handListener, listenerSwitches);
                             } else {
@@ -582,6 +607,9 @@ public class GameBoardActivity extends AppCompatActivity {
                         } else if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                             playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
                             playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
+                            String fromTo = "moved " + movingViewName + " to discard";
+                            undoList.add(new Undo(playerList.get(turnMarker), fromTo, turn, turn.phase,
+                                    handListener, listenerSwitches));
                             turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
                         } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                             playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
@@ -1025,16 +1053,6 @@ public class GameBoardActivity extends AppCompatActivity {
         viewId = getResources().getIdentifier("trash_size", "id", getPackageName());
         trashPile.setTextView((TextView) findViewById(viewId));
 
-        /*viewId = getResources().getIdentifier("playerB_hand", "id", getPackageName());
-        view = (ImageView) layout.getViewById(viewId);
-        view.setTag(playerName);
-        opponentImageViews.add(view);
-        viewId = getResources().getIdentifier("playerC_hand", "id", getPackageName());
-        view = (ImageView) layout.getViewById(viewId);
-        opponentImageViews.add(view);
-        viewId = getResources().getIdentifier("playerD_hand", "id", getPackageName());
-        view = (ImageView) layout.getViewById(viewId);
-        opponentImageViews.add(view);*/
     }
 
 

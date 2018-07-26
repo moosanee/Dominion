@@ -22,6 +22,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/undo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        style="@style/appButton"
+        android:text="undo"
+        app:layout_constraintEnd_toEndOf="@id/end_game_button"
+        app:layout_constraintStart_toStartOf="@id/end_game_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/hand"
         android:tag="hand"

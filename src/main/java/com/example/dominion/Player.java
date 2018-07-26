@@ -407,7 +407,7 @@ public class Player implements Serializable{
         discard.get(discard.size()-1).setImageViewId(DISCARD_CARD_ID + NUMBER);
         imageView.setId(DISCARD_CARD_ID + NUMBER);
         Drawable drawable = getImageDps(activity, cardName, (cardWidth / 2));
-        imageView.setImageDrawable(drawable);
+        //imageView.setImageDrawable(drawable);
         ImageView imageView1 = ((Activity) activity).findViewById(discardPile.getImageViewId());
         imageView1.setImageDrawable(drawable);
     }
