@@ -80,6 +80,9 @@ public class Undo {
             case "moved to discard":
                 turn.undoNewCardInDiscard(source, undoPhase, onTouchListener, listenerSwitches);
                 break;
+            case "moved to inPlay":
+                turn.undoNewCardInPlay(source, undoPhase, onTouchListener, listenerSwitches);
+                break;
         }
     }
 

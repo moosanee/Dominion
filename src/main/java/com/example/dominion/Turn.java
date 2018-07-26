@@ -31,6 +31,7 @@ public class Turn {
     boolean firstSilverInPlayFlag = false;
     int emptyBankPiles;
     int poacherCompliance = 0;
+    boolean adventurerShuffle = false;
     ArrayList<String> reactions = new ArrayList<>();
     BasicCards basicCardSet = new BasicCards();
     ArrayList<CardData> bankPiles; // = new ArrayList<>();
@@ -329,11 +330,12 @@ public class Turn {
             }
         }
         if (phase == ADVENTURER){
+            ((GameBoardActivity) activity).undoList.add(new Undo(player, "moved adventurer to inPlay",
+                    this, phase, handListener, listenerSwitches));
             int treasureFlag = 0;
             revealedCards = new ArrayList<>();
             int deckSize = player.deck.size();
             int discardSize = player.discard.size();
-            boolean shuffled = false;
             while (treasureFlag < 2){
                 if (deckSize > 0) {
                     CardData cardData = player.deck.get(deckSize - 1);
@@ -344,9 +346,9 @@ public class Turn {
                         revealedCards.add(cardData.getCardName());
                     }
                     deckSize -= 1;
-                } else if (!shuffled) {
+                } else if (!adventurerShuffle) {
                     player.shufflePile("discard");
-                    shuffled = true;
+                    adventurerShuffle = true;
                 } else if (discardSize > 0) {
                     CardData cardData = player.discard.get(discardSize - 1);
                     if (cardData.getCard().getType().equals("treasure")){
@@ -366,6 +368,27 @@ public class Turn {
             activity.startActivityForResult(intent, REVEAL_DIALOG_KEY);
         }
         ((GameBoardActivity) activity).refreshInPlay();
+    }
+
+
+    public void undoNewCardInPlay(String source, int undoPhase, View.OnTouchListener onTouchListener,
+                                  ListenerSwitches listenerSwitches){
+        switch (undoPhase){
+            case ADVENTURER:
+                if (revealedCards.size() > player.deck.size()) adventurerShuffle = true;
+                revealedCards.clear();
+                int viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
+                player.removeCardFromInPlay(viewId, activity, layout);
+                player.addCardToHand(source, layout, context, activity, onTouchListener);
+                numberOfActionsInHand += 1;
+                actions += 1;
+                TextView textView = ((Activity)activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions+" actions left");
+                startActionPhase(listenerSwitches);
+                break;
+        }
+
+
     }
 
 
@@ -575,6 +598,7 @@ public class Turn {
         int deckSize = player.deck.size();
         int discardSize = player.discard.size();
         int movedToDiscard = 0;
+        adventurerShuffle = false;
         if (deckSize >= revealedCards.size()) {
             for (int i = 0; i < revealedCards.size(); i++) {
                 Card card = basicCardSet.getCard(revealedCards.get(i));

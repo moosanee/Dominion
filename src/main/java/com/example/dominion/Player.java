@@ -454,15 +454,13 @@ public class Player implements Serializable{
                 if (length > 1) {
                     Random rand = new Random();
                     if (length > 2) {
-                        for (int j = 0; j < length; j++) {
-                            int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
+                        for (int j = length-1; j > 0; j--) {
+                            int n = rand.nextInt(j); //a random index of the deck
                             temp = deck.get(n);
                             deck.remove(n);
                             for (int i = n; i < deck.size(); i++) deck.get(i).decreasePosition(1);
-                            deck.add(j, temp);
-                            deck.get(j).setPosition(j);
-                            for (int i = j + 1; i < deck.size(); i++)
-                                deck.get(i).increasePosition(1);
+                            deck.add(temp);
+                            deck.get(deck.size()-1).setPosition(deck.size()-1);
                         }
                     } else {
                         int n = rand.nextInt(length);
@@ -475,19 +473,18 @@ public class Player implements Serializable{
                 }
                 break;
             case "discard":
-                length = discard.size(); //number of cards in the deck
+                length = discard.size(); //number of cards in the discard
                 if (length > 1) {
                     Random rand = new Random();
                     if (length > 2) {
-                        for (int j = 0; j < length; j++) {
-                            int n = rand.nextInt(length - 2); //a random index of the deck, not including the last card
+                        for (int j = length - 1; j > 0; j--) {
+                            int n = rand.nextInt(j); //a random index of the discard
                             temp = discard.get(n);
                             discard.remove(n);
-                            for (int i = n; i < discard.size(); i++) discard.get(i).decreasePosition(1);
-                            discard.add(j, temp);
-                            discard.get(j).setPosition(j);
-                            for (int i = j + 1; i < discard.size(); i++)
-                                discard.get(i).increasePosition(1);
+                            for (int i = n; i < discard.size(); i++)
+                                discard.get(i).decreasePosition(1);
+                            discard.add(temp);
+                            discard.get(discard.size() - 1).setPosition(discard.size() - 1);
                         }
                     } else {
                         int n = rand.nextInt(length);
