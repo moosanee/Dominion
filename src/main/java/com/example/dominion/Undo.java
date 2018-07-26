@@ -71,7 +71,7 @@ public class Undo {
                 turn.startOpenBankPhase(listenerSwitches);
                 break;
             case "play all treasures":
-                turn.unplayTreasures(cardDataList, onTouchListener);
+                turn.unplayTreasures(cardDataList, onTouchListener, listenerSwitches);
                 turn.startBuyingPhase(listenerSwitches);
                 break;
             case "finish chapel":

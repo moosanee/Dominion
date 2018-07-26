@@ -264,7 +264,7 @@ public class GameBoardActivity extends AppCompatActivity {
                         ArrayList<CardData> treasureList =
                                 turn.playAllTreasures(inPlayListener, handListener, listenerSwitches);
                         undoList.add(new Undo(playerList.get(turnMarker), "play all treasures",
-                                turn, treasureList, inPlayListener, listenerSwitches));
+                                turn, treasureList, handListener, listenerSwitches));
                         break;
                     case OPEN_BANK://"finished buying"
                         turn.startCleanUpPhase(listenerSwitches);

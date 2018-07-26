@@ -718,7 +718,8 @@ public class Turn {
         return treasureList;
     }
 
-    public void unplayTreasures(ArrayList<CardData> treasureList, View.OnTouchListener handListener){
+    public void unplayTreasures(ArrayList<CardData> treasureList, View.OnTouchListener handListener,
+                                ListenerSwitches listenerSwitches){
         for (int i = 0; i < treasureList.size(); i++){
             int viewId = treasureList.get(i).getImageViewId();
             String cardName = treasureList.get(i).getCardName();
@@ -726,9 +727,10 @@ public class Turn {
             player.addCardToHand(cardName, layout, context, activity, handListener);
             numberOfTreasuresInHand +=1;
             coins -= treasureList.get(i).getCard().getValue();
-            TextView textView = ((Activity)activity).findViewById(COINS_COLLECTED_ID);
-            textView.setText(coins+"         saved");
         }
+        TextView textView = ((Activity)activity).findViewById(COINS_COLLECTED_ID);
+        textView.setText(coins+"         saved");
+        startBuyingPhase(listenerSwitches);
     }
 
     public void cleanUp(){
