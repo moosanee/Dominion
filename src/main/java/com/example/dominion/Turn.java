@@ -43,6 +43,7 @@ public class Turn {
     ArrayList<String> revealedCards = new ArrayList<>();
     ArrayList<String> postList = new ArrayList<>();
     ArrayList<BanditAttack> banditAttackResult = new ArrayList<>();
+    ArrayList<BureaucratAttack> bureaucratAttackResult = new ArrayList<>();
 
 
 
@@ -197,6 +198,8 @@ public class Turn {
                 int viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
                 player.addCardToHand(cardName, layout, context, activity, handListener);
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
             } else if (actions == 0){
                 String message = "You are out of actions.\nCount your coins and make a purchase.";
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -298,6 +301,37 @@ public class Turn {
                         activity.startActivity(intent);
                         postList.clear();
                         break;
+                    case "bureaucrat":
+                        player.addCardToDeck("silver", activity, context);
+                        ((GameBoardActivity)activity).removeCardFromBankPile("silver");
+                        ((GameBoardActivity)activity).undo = new Undo(player,
+                                "moved bureaucrat to inPlay", this,
+                                BUREAUCRAT, bankPiles, handListener, listenerSwitches);
+                        postList.add("You gained a silver to your deck");
+                        bureaucratAttackResult = ((GameBoardActivity)activity)
+                                .reactToBureaucratAttack(player.getName());
+                        for (int i = 0; i < bureaucratAttackResult.size(); i++) {
+                            if (bureaucratAttackResult.get(i).isBlocked()) {
+                                postList.add(bureaucratAttackResult.get(i).getPlayerName()
+                                        + " blocked the attack.");
+                            } else {
+                                String playerName = bureaucratAttackResult.get(i).getPlayerName();
+                                cardName = bureaucratAttackResult.get(i).getCardOnDeck();
+                                if (bureaucratAttackResult.get(i).isVictoryInHand()){
+                                    if (cardName.equals("estate"))
+                                    postList.add(playerName + " returned an estate to their deck.");
+                                    else postList.add(playerName + " returned a " + cardName
+                                            + " to their deck.");
+                                } else {
+                                    postList.add(playerName + " has no victory card in hand.");
+                                }
+                            }
+                        }
+                        intent = new Intent(context, NotificationActivity.class);
+                        intent.putExtra("postListKey", postList);
+                        activity.startActivity(intent);
+                        postList.clear();
+                        break;
                     case "chapel":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
@@ -345,6 +379,8 @@ public class Turn {
                 int viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
                 player.addCardToHand(cardName, layout, context, activity, handListener);
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
             } else {
                 treasuresPlayed.add(card);
                 if (card.getName().equals("silver") && firstSilverInPlayFlag){
@@ -482,6 +518,35 @@ public class Turn {
                 ((GameBoardActivity) activity).undoButton.setAlpha(0.5f);
                 startActionPhase(listenerSwitches);
                 break;
+            case BUREAUCRAT:
+                //put bureaucrat back in hand
+                viewId = player.inPlay.get(player.inPlay.size()-1).getImageViewId();
+                player.removeCardFromInPlay(viewId, activity, layout);
+                player.addCardToHand("bureaucrat", layout, context, activity, onTouchListener);
+                numberOfActionsInHand += 1;
+                actions += 1;
+                textView = ((Activity)activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions+" actions left");
+                //return silver to bank
+                player.removeCardFromDeck(player.deck.size()-1, activity);
+                ((GameBoardActivity)activity).addCardToBankPile("silver");
+                //return cards to other players
+                for (int i = 0; i < bureaucratAttackResult.size(); i++) {
+                    if (!bureaucratAttackResult.get(i).isBlocked()) {
+                        if (bureaucratAttackResult.get(i).isVictoryInHand()){
+                            Player player = ((GameBoardActivity)activity).playerList
+                                    .get(bureaucratAttackResult.get(i).getPlayerNumber());
+                            String cardName = bureaucratAttackResult.get(i).getCardOnDeck();
+                            int index = player.deck.size()-1;
+                            player.addOffTurnCard(cardName, "hand");
+                            player.removeOffTurnCard(index, "deck");
+                        }
+                    }
+                }
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity) activity).undoButton.setAlpha(0.5f);
+                startActionPhase(listenerSwitches);
+                break;
             default:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
@@ -489,6 +554,7 @@ public class Turn {
                         card.getType().equals("action - reaction")) {
                     numberOfActionsInHand += 1;
                     actions += 1;
+                    if (source.equals("merchant")) firstSilverInPlayFlag = false;
                 }
                 if (card.getType().equals("treasure"))numberOfTreasuresInHand += 1;
                 if (card.getActions() > 0) actions -= card.getActions();

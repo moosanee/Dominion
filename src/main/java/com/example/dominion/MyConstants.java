@@ -83,6 +83,7 @@ public final class MyConstants implements Serializable{
     public static final int ARTISAN2 = 13;
     public static final int ADVENTURER = 14;
     public static final int BANDIT = 15;
+    public static final int BUREAUCRAT = 16;
     //public static final int
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");

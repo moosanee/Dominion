@@ -1720,6 +1720,45 @@ public class GameBoardActivity extends AppCompatActivity {
         return banditAttackResults;
     }
 
+    public ArrayList<BureaucratAttack> reactToBureaucratAttack(String playerName){
+        ArrayList<BureaucratAttack> bureaucratAttackResults = new ArrayList<>();
+        for (int i = 0; i < playerList.size(); i++){
+            boolean vpCard = true;
+            if (!playerList.get(i).getName().equals(playerName)) {
+                BureaucratAttack bureaucratAttack = new BureaucratAttack(i, playerList.get(i).getName());
+                String reaction = playerList.get(i).checkForReaction("bureaucrat");
+                if (reaction.equals("moat")) {
+                    bureaucratAttack.setBlocked(true);
+                } else {
+                    int vpValue = 100;
+                    String replacedCard = "";
+                    int index = -1;
+                    for (int j = 0; j < playerList.get(i).hand.size(); j++) {
+                        Card card = playerList.get(i).hand.get(j).getCard();
+                        if (card.getType().equals("victory")) {
+                            vpCard = true;
+                            if (card.getVictoryPoints() < vpValue) {
+                                vpValue = card.getVictoryPoints();
+                                replacedCard = card.getName();
+                                index = j;
+                            }
+                        }
+                    }
+                    bureaucratAttack.setCardOnDeck(replacedCard);
+                    bureaucratAttack.setVictoryInHand(vpCard);
+                    if (index >= 0) {
+                        playerList.get(i).removeOffTurnCard(index, "hand");
+                        playerList.get(i).addOffTurnCard(replacedCard, "deck");
+                    }
+                }
+                bureaucratAttackResults.add(bureaucratAttack);
+                vpCard = false;
+            }
+        }
+        return bureaucratAttackResults;
+    }
+
+
     public void endGame(){
         ArrayList<String> postList = new ArrayList<>();
 
