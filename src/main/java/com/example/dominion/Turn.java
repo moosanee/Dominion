@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,8 @@ public class Turn {
     ArrayList<Card> cardsGained = new ArrayList<>();
     ArrayList<Card> cardsTrashed = new ArrayList<>();
     ArrayList<String> revealedCards = new ArrayList<>();
+    ArrayList<String> postList = new ArrayList<>();
+    ArrayList<BanditAttack> banditAttackResult = new ArrayList<>();
 
 
 
@@ -247,23 +250,53 @@ public class Turn {
                         break;
                     case "bandit":
                         player.addCardToDiscard("gold", activity, context);
-                        Toast.makeText(context, "You gained a gold", Toast.LENGTH_SHORT).show();
-                        ArrayList<BanditAttack> banditAttackResult = ((GameBoardActivity)activity)
+                        ((GameBoardActivity)activity).removeCardFromBankPile("gold");
+                        ((GameBoardActivity)activity).undo = new Undo(player, "moved bandit to inPlay",
+                                this, BANDIT, bankPiles, handListener, listenerSwitches);
+                        postList.add("You gained a gold");
+                        banditAttackResult = ((GameBoardActivity)activity)
                                 .reactToBanditAttack(player.getName());
                         for (int i = 0; i < banditAttackResult.size(); i++){
-                            String toast = banditAttackResult.get(i).getPlayerName() + " revealed "
-                                    + banditAttackResult.get(i).getCard1() + " and " +
-                                    banditAttackResult.get(i).getCard2() + ".";
-                            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                            if (banditAttackResult.get(i).getTrashed() == 1) {
-                                toast = banditAttackResult.get(i).getPlayerName() + " trashed "
-                                        + banditAttackResult.get(i).getCard2() + ".";
-                            } else if (banditAttackResult.get(i).getTrashed() == 0) {
-                                toast = banditAttackResult.get(i).getPlayerName() + " trashed "
-                                        + banditAttackResult.get(i).getCard1() + ".";
+                            if (banditAttackResult.get(i).isBlocked()){
+                                postList.add(banditAttackResult.get(i).getPlayerName()
+                                        + " blocked the attack.");
+                            } else {
+                                String card1 = banditAttackResult.get(i).getCard1();
+                                String card2 = banditAttackResult.get(i).getCard2();
+                                if (!(card1.equals("")) && !(card2.equals(""))) {
+                                    postList.add(banditAttackResult.get(i).getPlayerName()
+                                            + " revealed " + card1 + " and " + card2 + ".");
+                                    if (banditAttackResult.get(i).getTrashed() == 1) {
+                                        postList.add(banditAttackResult.get(i).getPlayerName()
+                                                + " trashed " + card2 + ".");
+                                    } else if (banditAttackResult.get(i).getTrashed() == 0) {
+                                        postList.add(banditAttackResult.get(i).getPlayerName()
+                                                + " trashed " + card1 + ".");
+                                    }
+                                } else if (!(card1.equals(""))){
+                                    postList.add(banditAttackResult.get(i).getPlayerName()
+                                            + " revealed " + card1 + ".");
+                                    if (banditAttackResult.get(i).getTrashed() == 0) {
+                                        postList.add(banditAttackResult.get(i).getPlayerName()
+                                                + " trashed " + card1 + ".");
+                                    }
+                                } else if(!(card2.equals(""))) {
+                                    postList.add(banditAttackResult.get(i).getPlayerName()
+                                            + " revealed " + card2 + ".");
+                                    if (banditAttackResult.get(i).getTrashed() == 1) {
+                                        postList.add(banditAttackResult.get(i).getPlayerName()
+                                                + " trashed " + card2 + ".");
+                                    }
+                                } else {
+                                    postList.add(banditAttackResult.get(i).getPlayerName()
+                                            + " had no cards to reveal.");
+                                }
                             }
-                            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                            }
+                        }
+                        Intent intent = new Intent(context, NotificationActivity.class);
+                        intent.putExtra("postListKey", postList);
+                        activity.startActivity(intent);
+                        postList.clear();
                         break;
                     case "chapel":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
@@ -369,7 +402,7 @@ public class Turn {
             Intent intent = new Intent(context, RevealDialogActivity.class);
             intent.putStringArrayListExtra("revealedCardsKey", revealedCards);
             intent.putExtra("phaseKey", phase);
-            activity.startActivityForResult(intent, REVEAL_DIALOG_KEY);
+            activity.startActivity(intent);
         }
         ((GameBoardActivity) activity).refreshInPlay();
     }
@@ -377,6 +410,7 @@ public class Turn {
 
     public void undoNewCardInPlay(String source, int undoPhase, View.OnTouchListener onTouchListener,
                                   ListenerSwitches listenerSwitches){
+        Card card = basicCardSet.getCard(source);
         switch (undoPhase){
             case ADVENTURER:
                 if (revealedCards.size() > player.deck.size()) adventurerShuffle = true;
@@ -390,6 +424,110 @@ public class Turn {
                 textView.setText(actions+" actions left");
                 startActionPhase(listenerSwitches);
                 break;
+            case ARTISAN1:
+                viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
+                player.removeCardFromInPlay(viewId, activity, layout);
+                player.addCardToHand(source, layout, context, activity, onTouchListener);
+                numberOfActionsInHand += 1;
+                actions += 1;
+                textView = ((Activity)activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions+" actions left");
+                startActionPhase(listenerSwitches);
+                break;
+            case BANDIT:
+                //put bandit back in hand
+                viewId = player.inPlay.get(player.inPlay.size()-1).getImageViewId();
+                player.removeCardFromInPlay(viewId, activity, layout);
+                player.addCardToHand("bandit", layout, context, activity, onTouchListener);
+                numberOfActionsInHand += 1;
+                actions += 1;
+                textView = ((Activity)activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions+" actions left");
+                //return gold to bank
+                player.removeCardFromDiscard(player.discard.size()-1, context, activity);
+                ((GameBoardActivity)activity).addCardToBankPile("gold");
+                //return cards to other players
+                for (int i = 0; i < banditAttackResult.size(); i++){
+                    if (!banditAttackResult.get(i).isBlocked()) {
+                        int playerIndex = banditAttackResult.get(i).getPlayerNumber();
+                        if (!banditAttackResult.get(i).getCard2().equals("")) {
+                            card = basicCardSet.getCard(banditAttackResult.get(i).getCard2());
+                            ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                    .addOffTurnCard(card.getName(), "deck");
+                            if (banditAttackResult.get(i).getTrashed() == 1) {
+                                ((GameBoardActivity) activity).removeCardFromTrashByName(card.getName());
+                            } else {
+                                int top = ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                        .discard.size() - 1;
+                                ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                        .removeOffTurnCard(top, "discard");
+                            }
+                        }
+                        if (!banditAttackResult.get(i).getCard1().equals("")) {
+                            card = basicCardSet.getCard(banditAttackResult.get(i).getCard1());
+                            ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                    .addOffTurnCard(card.getName(), "deck");
+                            if (banditAttackResult.get(i).getTrashed() == 0) {
+                                ((GameBoardActivity) activity).removeCardFromTrashByName(card.getName());
+                            } else {
+                                int top = ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                        .discard.size() - 1;
+                                ((GameBoardActivity) activity).playerList.get(playerIndex)
+                                        .removeOffTurnCard(top, "discard");
+                            }
+                        }
+                    }
+                }
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity) activity).undoButton.setAlpha(0.5f);
+                startActionPhase(listenerSwitches);
+                break;
+            default:
+                viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
+                player.removeCardFromInPlay(viewId, activity, layout);
+                if (card.getType().equals("action") || card.getType().equals("action - attack") ||
+                        card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand += 1;
+                    actions += 1;
+                }
+                if (card.getType().equals("treasure"))numberOfTreasuresInHand += 1;
+                if (card.getActions() > 0) actions -= card.getActions();
+                textView = ((Activity) activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions + " actions left");
+                if (card.getExtraBuys() > 0) {
+                    buys -= card.getExtraBuys();
+                    textView = ((Activity) activity).findViewById(BUYS_LEFT_ID);
+                    textView.setText(buys + " buys left");
+                }
+                if ((card.getExtraCoins() > 0) || (card.getValue() > 0)) {
+                    coins -= card.getExtraCoins();
+                    coins -= card.getValue();
+                    textView = ((Activity) activity).findViewById(COINS_COLLECTED_ID);
+                    textView.setText(coins + "         saved");
+                }
+                if (card.getDrawCards() > 0) {
+                    draws = card.getDrawCards();
+                    for (int i = draws; i > 0; i--) {
+                        CardData cardData = player.hand.get(player.hand.size()-1);
+                        viewId = cardData.getImageViewId();
+                        String cardName = cardData.getCardName();
+                        player.removeCardFromHand(viewId, activity, layout);
+                        if (cardData.getCard().getType().equals("treasure")) numberOfTreasuresInHand -= 1;
+                        if (cardData.getCard().getType().equals("action") ||
+                                cardData.getCard().getType().equals("action - attack") ||
+                                cardData.getCard().getType().equals("action - reaction"))
+                            numberOfActionsInHand -= 1;
+                        player.addCardToDeck(cardName, activity, context);
+                        draws -= 1;
+                    }
+                }
+                player.addCardToHand(source, layout, context, activity, onTouchListener);
+                if (card.getType().equals("action") || card.getType().equals("action - attack") ||
+                        card.getType().equals("action - reaction")) startActionPhase(listenerSwitches);
+                if (card.getType().equals("treasure")) startBuyingPhase(listenerSwitches);
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+                break;
         }
     }
 
@@ -397,7 +535,8 @@ public class Turn {
     public void reactToNewCardInTrash(String cardName, View.OnTouchListener handListener, ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
 
-        if (phase == CHAPEL){
+        switch (phase) {
+            case CHAPEL:
             if (trashed < 4){
                 trashed += 1;
                 cardsTrashed.add(card);
@@ -407,10 +546,33 @@ public class Turn {
                     numberOfActionsInHand -= 1;
             } else {
                 Toast.makeText(context, "You can only trash 4 cards", Toast.LENGTH_SHORT).show();
-                ((GameBoardActivity) activity).removeCardFromTrash(((GameBoardActivity) activity).trash.size()-1);
+                ((GameBoardActivity) activity).removeCardFromTrashByIndex(((GameBoardActivity) activity).trash.size()-1);
                 player.addCardToHand(cardName, layout, context, activity, handListener);
                 listenerSwitches.setAllFalse();
             }
+            break;
+        }
+    }
+
+    public void undoNewCardInTrash(String cardName, int undoPhase, View.OnTouchListener onTouchListener,
+            ListenerSwitches listenerSwitches){
+        switch (undoPhase){
+            case CHAPEL:
+                Card card = basicCardSet.getCard(cardName);
+                ((GameBoardActivity)activity).removeCardFromTrashByName(cardName);
+                player.addCardToHand(cardName, layout, context, activity, onTouchListener);
+                if (card.getType().equals("action") || card.getType().equals("action - attack") ||
+                        card.getType().equals("action - reaction")) numberOfActionsInHand += 1;
+                if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                trashed -= 1;
+                Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("finished\ntrashing");
+                button.setTag(CHAPEL);
+                setListeners(CHAPEL, listenerSwitches);
+                phase = CHAPEL;
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+                break;
         }
     }
 

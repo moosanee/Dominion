@@ -85,8 +85,8 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                 gameCardList.add("poacher");
                 gameCardList.add("smithy");
                 gameCardList.add("market");
-                gameCardList.add("witch");
-                gameCardList.add("adventurer");
+                gameCardList.add("bandit");
+                gameCardList.add("artisan");
                 gameCards.add(basicCardSet.getCard("chapel"));
                 gameCards.add(basicCardSet.getCard("moat"));
                 gameCards.add(basicCardSet.getCard("merchant"));
@@ -95,8 +95,8 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                 gameCards.add(basicCardSet.getCard("poacher"));
                 gameCards.add(basicCardSet.getCard("smithy"));
                 gameCards.add(basicCardSet.getCard("market"));
-                gameCards.add(basicCardSet.getCard("witch"));
-                gameCards.add(basicCardSet.getCard("adventurer"));
+                gameCards.add(basicCardSet.getCard("bandit"));
+                gameCards.add(basicCardSet.getCard("artisan"));
                 gameCardStats.calculateGameCardStats(gameCards);
                 setCountViews(gameCardStats, gameCardList);
 

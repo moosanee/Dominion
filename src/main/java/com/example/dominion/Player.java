@@ -386,6 +386,11 @@ public class Player implements Serializable{
         this.deckPile.getTextView().setText(String.valueOf(this.deck.size()));
     }
 
+    public void addCardToOffHandDeck(String cardName){
+        deck.add(new CardData(cardName, "deck", this.deck.size(), this.deckTally));
+        deckTally += 1;
+    }
+
     public void removeCardFromDeck(int index, Activity activity) {
         this.deck.remove(index);
         if (this.deckPile != null)

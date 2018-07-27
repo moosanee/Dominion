@@ -55,6 +55,16 @@ public class Undo {
         this.onTouchListener = onTouchListener;
         this.listenerSwitches = listenerSwitches;
     }
+    public Undo (Player player, String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
+                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+        this.player = player;
+        this.description = description;
+        this.turn = turn;
+        this.undoPhase = undoPhase;
+        this.cardDataList = cardDataList;
+        this.onTouchListener = onTouchListener;
+        this.listenerSwitches = listenerSwitches;
+    }
 
     public void undoAction(){
         String[] words = description.split("\\s+");
@@ -82,6 +92,9 @@ public class Undo {
                 break;
             case "moved to inPlay":
                 turn.undoNewCardInPlay(source, undoPhase, onTouchListener, listenerSwitches);
+                break;
+            case "moved to trash":
+                turn.undoNewCardInTrash(source, undoPhase, onTouchListener, listenerSwitches);
                 break;
         }
     }

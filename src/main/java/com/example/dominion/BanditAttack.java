@@ -2,12 +2,15 @@ package com.example.dominion;
 
 public class BanditAttack {
     private String playerName;
+    private int playerNumber;
     private String card1;
     private String card2;
     private int trashed = 2;
+    private boolean blocked = false;
 
-    BanditAttack(String playerName){
+    BanditAttack(int playerNumber, String playerName){
         this.playerName = playerName;
+        this.playerNumber = playerNumber;
     }
 
     public void setCard1(String card1) {
@@ -22,8 +25,16 @@ public class BanditAttack {
         this.trashed = trashed;
     }
 
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
     public String getPlayerName() {
         return playerName;
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
     }
 
     public String getCard1() {
@@ -36,5 +47,9 @@ public class BanditAttack {
 
     public int getTrashed() {
         return trashed;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
     }
 }
