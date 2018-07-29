@@ -129,7 +129,7 @@ public class BasicCards implements Serializable{
 
         instructions = "You may immediately put your deck into your discard pile.";
         chancellor = new Card("chancellor", "action", "basic-",
-                3, 0, 0, 1, 0, 2, instructions,
+                3, 0, 0, 0, 0, 2, instructions,
                 0, false);
         basicCardList.add(chancellor);
 

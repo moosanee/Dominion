@@ -83,22 +83,6 @@ public class OpponentPileBrowseActivity extends AppCompatActivity {
                 imageView.setLayoutParams(params);
                 imageView.setImageResource(drawableResourceId);
                 newCardLayout.addView(imageView);
-                //create take button
-                /*Button takeButton = new Button(this);
-                takeButton.setText("Take");
-                takeButton.setTextSize(textSize);
-                takeButton.setTextColor(BACKGROUND_COLOR_DARK);
-                takeButton.setBackgroundResource(R.drawable.text80);
-                ButtonInfo biTag = new ButtonInfo(i,pileCardData.get(i).getCardName());
-                takeButton.setTag(biTag);
-                takeButton.setTypeface(ResourcesCompat.getFont(context, R.font.alegreya_sc));
-                params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.gravity = Gravity.CENTER;
-                takeButton.setLayoutParams(params);
-                newCardLayout.addView(takeButton);
-                //add button to listener list
-                takeButtons.add(takeButton);*/
 
             }
         }
@@ -107,32 +91,6 @@ public class OpponentPileBrowseActivity extends AppCompatActivity {
 
     void setButtonListeners(){
 
-        /*for (int i = 0; i < takeButtons.size(); i++) {
-            final int FINALI = i;
-            final Button button = takeButtons.get(i);
-            button.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View view) {
-                    ButtonInfo biTag = (ButtonInfo) takeButtons.get(FINALI).getTag();
-                    int thisCardIndex = biTag.getListLocation();
-                    if (!cardChosen){
-                        cardChosen = true;
-                        chosenIndex = thisCardIndex;
-                        button.setAlpha(0.5f);
-                        findViewById(thisCardIndex).setAlpha(0.5f);
-                    } else if (cardChosen && (thisCardIndex == chosenIndex)){
-                        cardChosen = false;
-                        chosenIndex = -1;
-                        button.setAlpha(1f);
-                        findViewById(thisCardIndex).setAlpha(1f);
-                    } else {
-                        Toast toast = Toast.makeText
-                                (getApplicationContext(), "choose only one", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
-                }
-            });
-        }*/
         Button exitButton = findViewById(R.id.exit_pile_browse);
         exitButton.setOnClickListener(new Button.OnClickListener() {
             @Override

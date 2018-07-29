@@ -29,6 +29,7 @@ public class Turn {
     int numberOfTreasuresInHand = 0;
     int numberOfActionsInHand = 0;
     int trashed = 0;
+    int discarded = 0;
     boolean firstSilverInPlayFlag = false;
     int emptyBankPiles;
     int poacherCompliance = 0;
@@ -40,6 +41,7 @@ public class Turn {
     ArrayList<Card> treasuresPlayed = new ArrayList<>();
     ArrayList<Card> cardsGained = new ArrayList<>();
     ArrayList<Card> cardsTrashed = new ArrayList<>();
+    ArrayList<Card> cardsDiscarded = new ArrayList<>();
     ArrayList<String> revealedCards = new ArrayList<>();
     ArrayList<String> postList = new ArrayList<>();
     ArrayList<BanditAttack> banditAttackResult = new ArrayList<>();
@@ -97,6 +99,12 @@ public class Turn {
             case CHAPEL:
                 listenerSwitches.setAllFalse();
                 listenerSwitches.setTrashDragSwitch(true);
+                listenerSwitches.setHandListenerSwitch(true);
+                listenerSwitches.setHandDragSwitch(true);
+                break;
+            case CELLAR:
+                listenerSwitches.setAllFalse();
+                listenerSwitches.setDiscardDragSwitch(true);
                 listenerSwitches.setHandListenerSwitch(true);
                 listenerSwitches.setHandDragSwitch(true);
                 break;
@@ -254,7 +262,7 @@ public class Turn {
                     case "bandit":
                         player.addCardToDiscard("gold", activity, context);
                         ((GameBoardActivity)activity).removeCardFromBankPile("gold");
-                        ((GameBoardActivity)activity).undo = new Undo(player, "moved bandit to inPlay",
+                        ((GameBoardActivity)activity).undo = new Undo("moved bandit to inPlay",
                                 this, BANDIT, bankPiles, handListener, listenerSwitches);
                         postList.add("You gained a gold");
                         banditAttackResult = ((GameBoardActivity)activity)
@@ -304,7 +312,7 @@ public class Turn {
                     case "bureaucrat":
                         player.addCardToDeck("silver", activity, context);
                         ((GameBoardActivity)activity).removeCardFromBankPile("silver");
-                        ((GameBoardActivity)activity).undo = new Undo(player,
+                        ((GameBoardActivity)activity).undo = new Undo(
                                 "moved bureaucrat to inPlay", this,
                                 BUREAUCRAT, bankPiles, handListener, listenerSwitches);
                         postList.add("You gained a silver to your deck");
@@ -323,7 +331,7 @@ public class Turn {
                                     else postList.add(playerName + " returned a " + cardName
                                             + " to their deck.");
                                 } else {
-                                    postList.add(playerName + " has no victory card in hand.");
+                                    postList.add(playerName + " has no victory cards in hand.");
                                 }
                             }
                         }
@@ -332,6 +340,10 @@ public class Turn {
                         activity.startActivity(intent);
                         postList.clear();
                         break;
+                    case "chancellor":
+                        intent = new Intent(context, DecisionDialogActivity.class);
+                        activity.startActivityForResult(intent, CHANCELLOR_ANSWER_CODE);
+                        break;
                     case "chapel":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
@@ -339,6 +351,14 @@ public class Turn {
                         button.setTag(CHAPEL);
                         setListeners(CHAPEL, listenerSwitches);
                         phase = CHAPEL;
+                        break;
+                    case "cellar":
+                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
+                        button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                        button.setText("finished\ndiscarding");
+                        button.setTag(CELLAR);
+                        setListeners(CELLAR, listenerSwitches);
+                        phase = CELLAR;
                         break;
                     case "merchant":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
@@ -401,7 +421,7 @@ public class Turn {
             }
         }
         if (phase == ADVENTURER){
-            ((GameBoardActivity) activity).undo = new Undo(player, "moved adventurer to inPlay",
+            ((GameBoardActivity) activity).undo = new Undo("moved adventurer to inPlay",
                     this, phase, handListener, listenerSwitches);
             ((GameBoardActivity) activity).undoButton.setClickable(true);
             ((GameBoardActivity) activity).undoButton.setAlpha(1f);
@@ -550,13 +570,15 @@ public class Turn {
             default:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
-                if (card.getType().equals("action") || card.getType().equals("action - attack") ||
-                        card.getType().equals("action - reaction")) {
+                if (card.getType().equals("action") || card.getType().equals("action - attack")) {
                     numberOfActionsInHand += 1;
                     actions += 1;
                     if (source.equals("merchant")) firstSilverInPlayFlag = false;
-                }
-                if (card.getType().equals("treasure"))numberOfTreasuresInHand += 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand += 1;
+                    actions += 1;
+                    reactions.add(card.getName());
+                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
                 if (card.getActions() > 0) actions -= card.getActions();
                 textView = ((Activity) activity).findViewById(ACTIONS_LEFT_ID);
                 textView.setText(actions + " actions left");
@@ -580,9 +602,12 @@ public class Turn {
                         player.removeCardFromHand(viewId, activity, layout);
                         if (cardData.getCard().getType().equals("treasure")) numberOfTreasuresInHand -= 1;
                         if (cardData.getCard().getType().equals("action") ||
-                                cardData.getCard().getType().equals("action - attack") ||
-                                cardData.getCard().getType().equals("action - reaction"))
+                                cardData.getCard().getType().equals("action - attack")){
                             numberOfActionsInHand -= 1;
+                        } else if (cardData.getCard().getType().equals("action - reaction")) {
+                            reactions.remove(card.getName());
+                            numberOfActionsInHand -= 1;
+                        }
                         player.addCardToDeck(cardName, activity, context);
                         draws -= 1;
                     }
@@ -607,9 +632,12 @@ public class Turn {
                 trashed += 1;
                 cardsTrashed.add(card);
                 if (card.getType().equals("treasure")) numberOfTreasuresInHand -=1;
-                if (card.getType().equals("action") || card.getType().equals("action - attack")
-                        || card.getType().equals("action - reaction"))
+                if (card.getType().equals("action") || card.getType().equals("action - attack")){
                     numberOfActionsInHand -= 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand -= 1;
+                    reactions.remove(card.getName());
+                }
             } else {
                 Toast.makeText(context, "You can only trash 4 cards", Toast.LENGTH_SHORT).show();
                 ((GameBoardActivity) activity).removeCardFromTrashByIndex(((GameBoardActivity) activity).trash.size()-1);
@@ -627,9 +655,12 @@ public class Turn {
                 Card card = basicCardSet.getCard(cardName);
                 ((GameBoardActivity)activity).removeCardFromTrashByName(cardName);
                 player.addCardToHand(cardName, layout, context, activity, onTouchListener);
-                if (card.getType().equals("action") || card.getType().equals("action - attack") ||
-                        card.getType().equals("action - reaction")) numberOfActionsInHand += 1;
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                if (card.getType().equals("action") || card.getType().equals("action - attack")){
+                    numberOfActionsInHand += 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand += 1;
+                    reactions.add(card.getName());
+                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
                 trashed -= 1;
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("finished\ntrashing");
@@ -645,50 +676,68 @@ public class Turn {
     public void reactToNewCardInDiscard(String cardName, ArrayList<CardData> bankPiles,
                                         ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        if (phase == OPEN_BANK){
-            if (card.getCost()> coins){
-                Toast.makeText(context, "too expensive\ntry something cheaper", Toast.LENGTH_SHORT).show();
-                player.removeCardFromDiscard(player.discard.size()-1, context, activity);
-                int bankPileCounterId = findBankViewId(cardName, bankPiles);
-                TextView textView = ((Activity) activity).findViewById(bankPileCounterId);
-                int count = Integer.parseInt(textView.getText().toString()) + 1;
-                textView.setText(String.valueOf(count));
-            } else {
-                cardsGained.add(card);
-                coins -= card.getCost();
-                TextView textView = ((Activity)activity).findViewById(COINS_COLLECTED_ID);
-                textView.setText(coins+"         saved");
-                buys -= 1;
-                textView = ((Activity)activity).findViewById(BUYS_LEFT_ID);
-                textView.setText(buys+" buys left");
-                if (buys == 0) {
-                    Toast.makeText(context, "you are out of buys", Toast.LENGTH_SHORT).show();
-                    startCleanUpPhase(listenerSwitches);
-                }
-            }
-        }
-        if (phase == CLEAN_UP_PHASE){
-            //CardData cardData = player.discard.get(player.discard.size()-1);
-        }
-        if (phase == POACHER){
-            poacherCompliance +=1;
-            if (card.getType().equals("action") || card.getType().equals("action - attack")
-                    || card.getType().equals("action - reaction")) numberOfActionsInHand -= 1;
-            if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
-            if (poacherCompliance == emptyBankPiles){
-                previousPhase = POACHER;
-                if (numberOfActionsInHand > 0){
-                    startActionPhase(listenerSwitches);
-                } else if (numberOfTreasuresInHand > 0){
-                    Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
-                    startBuyingPhase(listenerSwitches);
+        switch (phase) {
+            case OPEN_BANK:
+                if (card.getCost() > coins) {
+                    Toast.makeText(context, "too expensive\ntry something cheaper", Toast.LENGTH_SHORT).show();
+                    player.removeCardFromDiscard(player.discard.size() - 1, context, activity);
+                    int bankPileCounterId = findBankViewId(cardName, bankPiles);
+                    TextView textView = ((Activity) activity).findViewById(bankPileCounterId);
+                    int count = Integer.parseInt(textView.getText().toString()) + 1;
+                    textView.setText(String.valueOf(count));
                 } else {
-                    Toast.makeText(context, "you are out of actions and treasures",
-                            Toast.LENGTH_SHORT).show();
-                    startOpenBankPhase(listenerSwitches);
+                    cardsGained.add(card);
+                    coins -= card.getCost();
+                    TextView textView = ((Activity) activity).findViewById(COINS_COLLECTED_ID);
+                    textView.setText(coins + "         saved");
+                    buys -= 1;
+                    textView = ((Activity) activity).findViewById(BUYS_LEFT_ID);
+                    textView.setText(buys + " buys left");
+                    if (buys == 0) {
+                        Toast.makeText(context, "you are out of buys", Toast.LENGTH_SHORT).show();
+                        startCleanUpPhase(listenerSwitches);
+                    }
                 }
-                poacherCompliance = 0;
-            }
+                break;
+            case CLEAN_UP_PHASE:
+                //CardData cardData = player.discard.get(player.discard.size()-1);
+                break;
+            case CELLAR:
+                discarded += 1;
+                cardsDiscarded.add(card);
+                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
+                else if (card.getType().equals("action") || card.getType().equals("action - attack")) {
+                    numberOfActionsInHand -= 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand -= 1;
+                    reactions.remove(card.getName());
+                }
+
+                break;
+            case POACHER:
+                poacherCompliance += 1;
+                if (card.getType().equals("action") || card.getType().equals("action - attack")){
+                    numberOfActionsInHand -= 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand -= 1;
+                    reactions.remove(card.getName());
+                }
+                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
+                if (poacherCompliance == emptyBankPiles) {
+                    previousPhase = POACHER;
+                    if (numberOfActionsInHand > 0) {
+                        startActionPhase(listenerSwitches);
+                    } else if (numberOfTreasuresInHand > 0) {
+                        Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
+                        startBuyingPhase(listenerSwitches);
+                    } else {
+                        Toast.makeText(context, "you are out of actions and treasures",
+                                Toast.LENGTH_SHORT).show();
+                        startOpenBankPhase(listenerSwitches);
+                    }
+                    poacherCompliance = 0;
+                }
+                break;
         }
         ((GameBoardActivity)activity).refreshDiscard();
     }
@@ -697,42 +746,67 @@ public class Turn {
     public void undoNewCardInDiscard(String cardName, int phaseOfUndo, View.OnTouchListener handListener,
                                      ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        if (phaseOfUndo == OPEN_BANK) {
-            player.removeCardFromDiscard(player.discard.size()-1, context, activity);
-            int bankPileCounterId = findBankViewId(cardName, bankPiles);
-            TextView textView = ((Activity) activity).findViewById(bankPileCounterId);
-            int count = Integer.parseInt(textView.getText().toString()) + 1;
-            textView.setText(String.valueOf(count));
-            cardsGained.remove(card);
-            coins += card.getCost();
-            textView = ((Activity) activity).findViewById(COINS_COLLECTED_ID);
-            textView.setText(coins + "         saved");
-            buys += 1;
-            textView = ((Activity) activity).findViewById(BUYS_LEFT_ID);
-            textView.setText(buys + " buys left");
-            if (phase == CLEAN_UP_PHASE) startOpenBankPhase(listenerSwitches);
-        }
-        if (phaseOfUndo == POACHER){
-            if (poacherCompliance > 0) poacherCompliance -=1;
-            if (card.getType().equals("action") || card.getType().equals("action - attack")
-                    || card.getType().equals("action - reaction")) numberOfActionsInHand += 1;
-            if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
-            player.removeCardFromDiscard(player.discard.size()-1, context, activity);
-            player.addCardToHand(cardName, layout, context, activity, handListener);
-            int discardsLeft = emptyBankPiles - poacherCompliance;
-            if (emptyBankPiles == 1) {
-                String toast = "there is 1 empty supply pile.\ndiscard 1 card";
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-            } else {
-                String toast = "there are " + emptyBankPiles + " empty supply piles."
-                        + "\ndiscard " + discardsLeft + " cards";
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-            }
-            Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
-            button.setText("discard\ncard");
-            button.setTag(POACHER);
-            setListeners(POACHER, listenerSwitches);
-            phase = POACHER;
+        switch (phaseOfUndo) {
+            case OPEN_BANK:
+                player.removeCardFromDiscard(player.discard.size() - 1, context, activity);
+                int bankPileCounterId = findBankViewId(cardName, bankPiles);
+                TextView textView = ((Activity) activity).findViewById(bankPileCounterId);
+                int count = Integer.parseInt(textView.getText().toString()) + 1;
+                textView.setText(String.valueOf(count));
+                cardsGained.remove(card);
+                coins += card.getCost();
+                textView = ((Activity) activity).findViewById(COINS_COLLECTED_ID);
+                textView.setText(coins + "         saved");
+                buys += 1;
+                textView = ((Activity) activity).findViewById(BUYS_LEFT_ID);
+                textView.setText(buys + " buys left");
+                if (phase == CLEAN_UP_PHASE) startOpenBankPhase(listenerSwitches);
+                break;
+            case CELLAR:
+                card = basicCardSet.getCard(cardName);
+                player.removeCardFromDiscard(player.discard.size()-1, context, activity);
+                player.addCardToHand(cardName, layout, context, activity, handListener);
+                if (card.getType().equals("action") || card.getType().equals("action - attack")){
+                    numberOfActionsInHand += 1;
+                } else if (card.getType().equals("action - reaction")){
+                    numberOfActionsInHand += 1;
+                    reactions.add(card.getName());
+                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                discarded -= 1;
+                Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("finished\ndiscarding");
+                button.setTag(CELLAR);
+                setListeners(CELLAR, listenerSwitches);
+                phase = CELLAR;
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+                break;
+            case POACHER:
+                if (poacherCompliance > 0) poacherCompliance -= 1;
+                if (card.getType().equals("action") || card.getType().equals("action - attack")){
+                    numberOfActionsInHand += 1;
+                } else if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand += 1;
+                    reactions.add(card.getName());
+                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                player.removeCardFromDiscard(player.discard.size() - 1, context, activity);
+                player.addCardToHand(cardName, layout, context, activity, handListener);
+                int discardsLeft = emptyBankPiles - poacherCompliance;
+                if (emptyBankPiles == 1) {
+                    String toast = "there is 1 empty supply pile.\ndiscard 1 card";
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                } else {
+                    String toast = "there are " + emptyBankPiles + " empty supply piles."
+                            + "\ndiscard " + discardsLeft + " cards";
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                }
+                button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("discard\ncard");
+                button.setTag(POACHER);
+                setListeners(POACHER, listenerSwitches);
+                phase = POACHER;
+                break;
+
 
         }
     }
@@ -744,6 +818,14 @@ public class Turn {
         Card card = basicCardSet.getCard(cardName);
         String cardType = card.getType();
         if (phase == ACTION_PHASE){
+            if (cardType.equals("action") || cardType.equals("action - attack")) numberOfActionsInHand += 1;
+            if (cardType.equals("action - reaction")){
+                numberOfActionsInHand += 1;
+                reactions.add(card.getName());
+            }
+            if (cardType.equals("treasure")) numberOfTreasuresInHand += 1;
+        }
+        if (phase == CELLAR){
             if (cardType.equals("action") || cardType.equals("action - attack")) numberOfActionsInHand += 1;
             if (cardType.equals("action - reaction")){
                 numberOfActionsInHand += 1;
@@ -780,32 +862,86 @@ public class Turn {
         }
     }
 
-    public void reactToNewCardOnDeck(String cardName, ListenerSwitches listenerSwitches){
+    public void reactToNewCardOnDeck(String cardName, View.OnTouchListener handListener,
+                                     ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        if (phase == ARTISAN2){
-            if (card.getType().equals("action") || card.getType().equals("action - attack"))
-                numberOfActionsInHand -= 1;
-            if (card.getType().equals("action - reaction")) {
-                numberOfActionsInHand -= 1;
-                reactions.remove(card.getName());
-            }
-            if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
-            if (actions > 0 && numberOfActionsInHand > 0) {
-                Toast.makeText(context, "take another action", Toast.LENGTH_SHORT).show();
-                startActionPhase(listenerSwitches);
-            }
-            else if (numberOfTreasuresInHand > 0) {
-                Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
-                startBuyingPhase(listenerSwitches);
-            }
-            else {
-                Toast.makeText(context, "you are out of actions\nyou have no treasures in hand",
-                                Toast.LENGTH_SHORT).show();
-                startOpenBankPhase(listenerSwitches);
-            }
+        switch (phase){
+            case ARTISAN2:
+                String description = "moved " + cardName + " to deck";
+                ((GameBoardActivity)activity).undo = new Undo(description, this, phase,
+                        handListener, listenerSwitches);
+                if (card.getType().equals("action") || card.getType().equals("action - attack"))
+                    numberOfActionsInHand -= 1;
+                if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand -= 1;
+                    reactions.remove(card.getName());
+                }
+                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
+                if (actions > 0 && numberOfActionsInHand > 0) {
+                    Toast.makeText(context, "take another action", Toast.LENGTH_SHORT).show();
+                    startActionPhase(listenerSwitches);
+                }
+                else if (numberOfTreasuresInHand > 0) {
+                    Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
+                    startBuyingPhase(listenerSwitches);
+                }
+                else {
+                    Toast.makeText(context, "you are out of actions\nyou have no treasures in hand",
+                                    Toast.LENGTH_SHORT).show();
+                    startOpenBankPhase(listenerSwitches);
+                }
+                ((GameBoardActivity)activity).undoButton.setClickable(true);
+                ((GameBoardActivity)activity).undoButton.setAlpha(1f);
+            break;
         }
         ((GameBoardActivity)activity).refreshDeck();
     }
+
+    public void undoNewCardOnDeck(String cardName, int undoPhase, View.OnTouchListener onTouchListener,
+                                  ListenerSwitches listenerSwitches){
+        Card card = basicCardSet.getCard(cardName);
+        switch (undoPhase){
+            case ARTISAN2:
+                //return card to hand
+                player.removeCardFromDeck(player.deck.size()-1, activity);
+                player.addCardToHand(cardName, layout, context, activity, onTouchListener);
+                //book-keeping
+                if (card.getType().equals("action") || card.getType().equals("action - attack"))
+                    numberOfActionsInHand += 1;
+                if (card.getType().equals("action - reaction")) {
+                    numberOfActionsInHand += 1;
+                    reactions.add(card.getName());
+                }
+                if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                //set phase
+                Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("card\nto deck");
+                button.setTag(ARTISAN2);
+                setListeners(ARTISAN2, listenerSwitches);
+                phase = ARTISAN2;
+                //disable undo
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+                break;
+        }
+    }
+
+    public void undoDeckToDiscard(int cardsMoved, ListenerSwitches listenerSwitches){
+        int index = player.discard.size()-cardsMoved;
+        for (int i = 0; i < cardsMoved; i++){
+            String cardName = player.discard.get(index).getCardName();
+            player.addCardToDeck(cardName, activity, context);
+            player.removeCardFromDiscard(index, context, activity);
+        }
+        ((GameBoardActivity)activity).undo = new Undo("moved chancellor to inPlay",
+                this, listenerSwitches);
+        startActionPhase(listenerSwitches);
+        ((GameBoardActivity)activity).undoButton.setClickable(true);
+        ((GameBoardActivity)activity).undoButton.setAlpha(1f);
+        Intent intent = new Intent(context, DecisionDialogActivity.class);
+        activity.startActivityForResult(intent, CHANCELLOR_ANSWER_CODE);
+    }
+
 
     public String drawCard(View.OnTouchListener handListener){
         String cardName = "null";
@@ -936,6 +1072,32 @@ public class Turn {
         setListeners(CHAPEL, listenerSwitches);
         phase = CHAPEL;
     }
+
+    public int finishCellar(View.OnTouchListener handListener, ListenerSwitches listenerSwitches){
+        int discardedSoFar = discarded;
+        discarded = 0;
+        for (int i = discardedSoFar; i > 0; i--) {
+            String cardName1 = drawCard(handListener);
+            if (!(cardName1.equals("null"))) {
+                reactToNewCardInHand(cardName1, listenerSwitches);
+            }
+        }
+        if (actions > 0 && numberOfActionsInHand > 0) {
+            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
+            startActionPhase(listenerSwitches);
+        }
+        else if (numberOfTreasuresInHand > 0){
+            String message = "You are out of actions.\nCount your coins and make a purchase.";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            startBuyingPhase(listenerSwitches);
+        } else {
+            String message = "You have no more treasures.";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            startOpenBankPhase(listenerSwitches);
+        }
+        return discardedSoFar;
+    }
+
 
     public int findBankViewId(String cardName, ArrayList<CardData> bankPiles){
         int textViewId = -1;

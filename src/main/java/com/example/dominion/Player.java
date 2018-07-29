@@ -626,6 +626,23 @@ public class Player implements Serializable{
         shufflePile("deck");
     }
 
+    public void putDeckInDiscard(Activity activity) {
+        if (discard.size() == 0) discardTally = 0;
+        for (int i = 0; i < deck.size(); i++) {
+            discard.add(deck.get(i));
+            discard.get(discard.size() - 1).setCardMultiTagOnMoveToNewPile(discard.get(discard.size() - 1),
+                    (discard.size() - 1), discardTally, "discard");
+            discardTally += 1;
+        }
+        deck.clear();
+        deckTally = 0;
+        String topCard = discard.get(discard.size()-1).getCardName();
+        ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
+        Drawable drawable = getImageDps(activity, topCard, cardWidth / 2);
+        imageView.setImageDrawable(drawable);
+        deckPile.getTextView().setText(String.valueOf(0));
+    }
+
     public void putOffTurnDiscardInDeck() {
         if (deck.size() == 0) deckTally = 0;
         for (int i = 0; i < discard.size(); i++) {

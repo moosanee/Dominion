@@ -259,23 +259,21 @@ public class GameBoardActivity extends AppCompatActivity {
                 switch (mode){
                     case ACTION_PHASE: //"finished actions"
                         turn.startBuyingPhase(listenerSwitches);
-                        undo = new Undo(playerList.get(turnMarker),"start buying phase",
-                                turn, listenerSwitches);
+                        undo = new Undo("start buying phase", turn, listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
                     case BUYING_PHASE: //"play all treasures"
                         ArrayList<CardData> treasureList =
                                 turn.playAllTreasures(inPlayListener, handListener, listenerSwitches);
-                        undo = new Undo(playerList.get(turnMarker), "play all treasures",
-                                turn, treasureList, handListener, listenerSwitches);
+                        undo = new Undo("play all treasures", turn, treasureList,
+                                handListener, listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
                     case OPEN_BANK://"finished buying"
                         turn.startCleanUpPhase(listenerSwitches);
-                        undo = new Undo(playerList.get(turnMarker),"start clean up phase",
-                                turn, listenerSwitches);
+                        undo = new Undo("start clean up phase", turn, listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
@@ -286,10 +284,15 @@ public class GameBoardActivity extends AppCompatActivity {
                         break;
                     case CHAPEL: // "finished trashing"
                         int trashed = turn.finishChapel(listenerSwitches);
-                        undo = new Undo(playerList.get(turnMarker),
-                                "finish chapel", turn, trashed, listenerSwitches);
+                        undo = new Undo("finish chapel", turn, trashed, listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
+                        break;
+                    case CELLAR: // "finished discarding"
+                        int discarded = turn.finishCellar(handListener, listenerSwitches);
+                        undo = new Undo("finish cellar", turn, discarded, listenerSwitches);
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
                         break;
                     case POACHER: // "discard card"
                         if (playerList.get(turnMarker).hand.size() == 0) {
@@ -301,7 +304,7 @@ public class GameBoardActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                         break;
                     case ARTISAN1: // "gain card"
-                        Toast.makeText(context,"gain a card costing less than 5 to your hand",
+                        Toast.makeText(context,"gain a card costing up to 5 to your hand",
                                 Toast.LENGTH_SHORT).show();
                         break;
                     case ARTISAN2: // "card to deck"
@@ -580,8 +583,7 @@ public class GameBoardActivity extends AppCompatActivity {
                                 if (cardsLeft) playerList.get(turnMarker)
                                         .addCardToDiscard(movingViewName, activity, context);
                                 String fromTo = "moved " + movingViewName + " to discard";
-                                undo = new Undo(playerList.get(turnMarker), fromTo, turn, turn.phase,
-                                        bankPiles, listenerSwitches);
+                                undo = new Undo(fromTo, turn, turn.phase, bankPiles, listenerSwitches);
                                 undoButton.setClickable(true);
                                 undoButton.setAlpha(1f);
                                 turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
@@ -625,8 +627,7 @@ public class GameBoardActivity extends AppCompatActivity {
                             playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
                             addCardToTrash(movingViewName);
                             String description = "moved " + movingViewName + " to trash";
-                            undo = new Undo(playerList.get(turnMarker), description, turn, turn.phase,
-                                    handListener, listenerSwitches);
+                            undo = new Undo( description, turn, turn.phase, handListener, listenerSwitches);
                             undoButton.setClickable(true);
                             undoButton.setAlpha(1f);
                             turn.reactToNewCardInTrash(movingViewName, handListener, listenerSwitches);
@@ -634,8 +635,7 @@ public class GameBoardActivity extends AppCompatActivity {
                             playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
                             playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
                             String fromTo = "moved " + movingViewName + " to discard";
-                            undo = new Undo(playerList.get(turnMarker), fromTo, turn, turn.phase,
-                                    handListener, listenerSwitches);
+                            undo = new Undo(fromTo, turn, turn.phase, handListener, listenerSwitches);
                             undoButton.setClickable(true);
                             undoButton.setAlpha(1f);
                             turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
@@ -644,14 +644,13 @@ public class GameBoardActivity extends AppCompatActivity {
                             playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
                             undoButton.setClickable(false);
                             undoButton.setAlpha(0.5f);
-                            turn.reactToNewCardOnDeck(movingViewName, listenerSwitches);
+                            turn.reactToNewCardOnDeck(movingViewName, handListener, listenerSwitches);
                         } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                             playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
                             playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
                                     activity, inPlayListener);
                             String fromTo = "moved " + movingViewName + " to inPlay";
-                            undo = new Undo(playerList.get(turnMarker), fromTo, turn, turn.phase,
-                                    handListener, listenerSwitches);
+                            undo = new Undo( fromTo, turn, turn.phase, handListener, listenerSwitches);
                             undoButton.setClickable(true);
                             undoButton.setAlpha(1f);
                             turn.reactToNewCardInPlay(movingViewName, handListener, listenerSwitches);
@@ -904,85 +903,109 @@ public class GameBoardActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (HAND_BROWSE_LISTENER == requestCode) {
-            int listSize = 0;
-            int[] chosenIndexList;
-            if (data == null) {
-                Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
-            } else {
-                listSize = data.getIntExtra("listSizeKey", listSize);
-                chosenIndexList = data.getIntArrayExtra("indexListKey");
-                for (int i = 0; i < listSize; i++) {
-                    int index = chosenIndexList[i];
-                    int viewId = playerList.get(turnMarker).hand.get(index).getImageViewId();
-                    String cardName = playerList.get(turnMarker).hand.get(index).getCardName();
-                    playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
-                    playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                            inPlayListener);
-                    undoButton.setClickable(false);
-                    undoButton.setAlpha(0.5f);
-                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+        switch (requestCode) {
+            case HAND_BROWSE_LISTENER:
+                int listSize = 0;
+                int[] chosenIndexList;
+                if (data == null) {
+                    Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
+                } else {
+                    listSize = data.getIntExtra("listSizeKey", listSize);
+                    chosenIndexList = data.getIntArrayExtra("indexListKey");
+                    for (int i = 0; i < listSize; i++) {
+                        int index = chosenIndexList[i];
+                        int viewId = playerList.get(turnMarker).hand.get(index).getImageViewId();
+                        String cardName = playerList.get(turnMarker).hand.get(index).getCardName();
+                        playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
+                                inPlayListener);
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
+                        turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                    }
                 }
-            }
-        }
-        if (requestCode == DISCARD_BROWSE_LISTENER) {
-            boolean cardChosen = false;
-            int chosenCardIndex;
-            if (data == null) {
-                Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
-            } else {
-                cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
-                chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
-                if (cardChosen) {
-                    String cardName = playerList.get(turnMarker).discard.get(chosenCardIndex).getCardName();
-                    playerList.get(turnMarker).removeCardFromDiscard(chosenCardIndex, context, activity);
-                    playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                            inPlayListener);
-                    undoButton.setClickable(false);
-                    undoButton.setAlpha(0.5f);
-                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                break;
+            case DISCARD_BROWSE_LISTENER:
+                boolean cardChosen = false;
+                int chosenCardIndex;
+                if (data == null) {
+                    Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
+                } else {
+                    cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
+                    chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
+                    if (cardChosen) {
+                        String cardName = playerList.get(turnMarker).discard.get(chosenCardIndex).getCardName();
+                        playerList.get(turnMarker).removeCardFromDiscard(chosenCardIndex, context, activity);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
+                                inPlayListener);
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
+                        turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                    }
                 }
-            }
+                break;
+
+            case DECK_BROWSE_LISTENER:
+                cardChosen = false;
+                if (data == null) {
+                    Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
+                } else {
+                    cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
+                    chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
+                    if (cardChosen) {
+                        String cardName = playerList.get(turnMarker).deck.get(chosenCardIndex).getCardName();
+                        playerList.get(turnMarker).removeCardFromDeck(chosenCardIndex, activity);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
+                                inPlayListener);
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
+                        turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                    }
+                }
+                break;
+            case TRASH_LISTENER:
+                cardChosen = false;
+                if (data == null) {
+                    Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
+                } else {
+                    cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
+                    chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
+                    if (cardChosen) {
+                        String cardName = trash.get(chosenCardIndex).getCardName();
+                        removeCardFromTrashByIndex(chosenCardIndex);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
+                                inPlayListener);
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
+                        turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                    }
+                }
+                break;
+            case CHANCELLOR_ANSWER_CODE:
+                if (resultCode == RESULT_OK) {
+                   boolean chancellorChoice = data.getBooleanExtra("chancellorKey", false);
+                   if (chancellorChoice){
+                       int deckSize = playerList.get(turnMarker).deck.size();
+                       undo = new Undo("put deck in discard", turn, deckSize, listenerSwitches);
+                       playerList.get(turnMarker).putDeckInDiscard(activity);
+                   }
+                   if ((turn.numberOfActionsInHand > 0) && (turn.actions >0)) {
+                        turn.startActionPhase(listenerSwitches);
+                   } else if (turn.numberOfTreasuresInHand > 0) {
+                        Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
+                        turn.startBuyingPhase(listenerSwitches);
+                   } else {
+                        Toast.makeText(context, "you are out of actions and treasures",
+                                Toast.LENGTH_SHORT).show();
+                        turn.startOpenBankPhase(listenerSwitches);
+                   }
+                   undoButton.setClickable(true);
+                   undoButton.setAlpha(1f);
+                }
+                break;
         }
 
-        if (requestCode == DECK_BROWSE_LISTENER) {
-            boolean cardChosen = false;
-            int chosenCardIndex;
-            if (data == null) {
-                Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
-            } else {
-                cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
-                chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
-                if (cardChosen) {
-                    String cardName = playerList.get(turnMarker).deck.get(chosenCardIndex).getCardName();
-                    playerList.get(turnMarker).removeCardFromDeck(chosenCardIndex, activity);
-                    playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                            inPlayListener);
-                    undoButton.setClickable(false);
-                    undoButton.setAlpha(0.5f);
-                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
-                }
-            }
-        }
-        if (requestCode == TRASH_LISTENER) {
-            boolean cardChosen = false;
-            int chosenCardIndex;
-            if (data == null) {
-                Toast.makeText(this, "Intent is Null", Toast.LENGTH_SHORT).show();
-            } else {
-                cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
-                chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
-                if (cardChosen) {
-                    String cardName = trash.get(chosenCardIndex).getCardName();
-                    removeCardFromTrashByIndex(chosenCardIndex);
-                    playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                            inPlayListener);
-                    undoButton.setClickable(false);
-                    undoButton.setAlpha(0.5f);
-                    turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
-                }
-            }
-        }
+
     }// onActivityResult
 
     public void addCardToBankPile(String cardName){
@@ -1723,7 +1746,7 @@ public class GameBoardActivity extends AppCompatActivity {
     public ArrayList<BureaucratAttack> reactToBureaucratAttack(String playerName){
         ArrayList<BureaucratAttack> bureaucratAttackResults = new ArrayList<>();
         for (int i = 0; i < playerList.size(); i++){
-            boolean vpCard = true;
+            boolean vpCard = false;
             if (!playerList.get(i).getName().equals(playerName)) {
                 BureaucratAttack bureaucratAttack = new BureaucratAttack(i, playerList.get(i).getName());
                 String reaction = playerList.get(i).checkForReaction("bureaucrat");
@@ -1752,7 +1775,6 @@ public class GameBoardActivity extends AppCompatActivity {
                     }
                 }
                 bureaucratAttackResults.add(bureaucratAttack);
-                vpCard = false;
             }
         }
         return bureaucratAttackResults;

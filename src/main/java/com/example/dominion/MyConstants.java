@@ -67,6 +67,7 @@ public final class MyConstants implements Serializable{
     public static final int BASIC_CARDS_ACTIVITY_CODE = 6;
     public static final int INTRIGUE_CARDS_ACTIVITY_CODE = 7;
     public static final int GAME_BOARD_ACTIVITY_CODE = 8;
+    public static final int CHANCELLOR_ANSWER_CODE = 123;
     public static final int TESTER_BUTTON_ID = 474747;
     public static final int NOTIFICATION_ACTIVITY_CODE = 9;
     public static final int CHOOSE_CARDS_ACTIVITY_CODE = 0;
@@ -84,6 +85,7 @@ public final class MyConstants implements Serializable{
     public static final int ADVENTURER = 14;
     public static final int BANDIT = 15;
     public static final int BUREAUCRAT = 16;
+    public static final int CELLAR = 17;
     //public static final int
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");

@@ -77,9 +77,9 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 gameCardList.clear();
                 gameCards.clear();
-                gameCardList.add("chapel");
+                gameCardList.add("cellar");
                 gameCardList.add("moat");
-                gameCardList.add("merchant");
+                gameCardList.add("chancellor");
                 gameCardList.add("village");
                 gameCardList.add("gardens");
                 gameCardList.add("bureaucrat");
@@ -87,9 +87,9 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                 gameCardList.add("market");
                 gameCardList.add("bandit");
                 gameCardList.add("artisan");
-                gameCards.add(basicCardSet.getCard("chapel"));
+                gameCards.add(basicCardSet.getCard("cellar"));
                 gameCards.add(basicCardSet.getCard("moat"));
-                gameCards.add(basicCardSet.getCard("merchant"));
+                gameCards.add(basicCardSet.getCard("chancellor"));
                 gameCards.add(basicCardSet.getCard("village"));
                 gameCards.add(basicCardSet.getCard("gardens"));
                 gameCards.add(basicCardSet.getCard("bureaucrat"));
@@ -135,8 +135,6 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //ConstraintLayout layout = findViewById(R.id.activity_game_board);
-        //ImageView curseView;
         if (requestCode == BASIC_CARDS_ACTIVITY_CODE) {
             if (resultCode == RESULT_OK) {
                 ArrayList<String> returnedCardList = data.getStringArrayListExtra("cardListKey");

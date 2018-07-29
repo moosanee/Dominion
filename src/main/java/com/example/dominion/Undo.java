@@ -7,57 +7,50 @@ import java.util.ArrayList;
 public class Undo {
 
     private String description;
-    private Player player;
     private Turn turn;
-    private int trashed;
+    private int cardsMoved;
     private int undoPhase;
     private ArrayList<CardData> cardDataList;
     private ListenerSwitches listenerSwitches;
     private View.OnTouchListener onTouchListener;
 
-    public Undo (Player player, String description, Turn turn, ListenerSwitches listenerSwitches){
-        this.player = player;
+    public Undo (String description, Turn turn, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.listenerSwitches = listenerSwitches;
     }
-    public Undo (Player player, String description, Turn turn, int trashed, ListenerSwitches listenerSwitches){
-        this.player = player;
+    public Undo (String description, Turn turn, int cardsMoved, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
-        this.trashed = trashed;
+        this.cardsMoved = cardsMoved;
         this.listenerSwitches = listenerSwitches;
     }
-    public Undo (Player player, String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
+    public Undo (String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
                  ListenerSwitches listenerSwitches){
-        this.player = player;
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.cardDataList = cardDataList;
         this.listenerSwitches = listenerSwitches;
     }
-    public Undo (Player player, String description, Turn turn, int undoPhase, View.OnTouchListener onTouchListener,
+    public Undo (String description, Turn turn, int undoPhase, View.OnTouchListener onTouchListener,
                  ListenerSwitches listenerSwitches){
-        this.player = player;
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.onTouchListener = onTouchListener;
         this.listenerSwitches = listenerSwitches;
     }
-    public Undo (Player player, String description, Turn turn, ArrayList<CardData> cardDataList,
+    public Undo (String description, Turn turn, ArrayList<CardData> cardDataList,
                  View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
-        this.player = player;
         this.description = description;
         this.turn = turn;
         this.cardDataList = cardDataList;
         this.onTouchListener = onTouchListener;
         this.listenerSwitches = listenerSwitches;
     }
-    public Undo (Player player, String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
+    public Undo (String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
                  View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
-        this.player = player;
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
@@ -85,7 +78,10 @@ public class Undo {
                 turn.startBuyingPhase(listenerSwitches);
                 break;
             case "finish chapel":
-                turn.returnToChapelTrashing(trashed, listenerSwitches);
+                turn.returnToChapelTrashing(cardsMoved, listenerSwitches);
+                break;
+            case "put deck in discard":
+                turn.undoDeckToDiscard(cardsMoved, listenerSwitches);
                 break;
             case "moved to discard":
                 turn.undoNewCardInDiscard(source, undoPhase, onTouchListener, listenerSwitches);
@@ -95,6 +91,9 @@ public class Undo {
                 break;
             case "moved to trash":
                 turn.undoNewCardInTrash(source, undoPhase, onTouchListener, listenerSwitches);
+                break;
+            case "moved to deck":
+                turn.undoNewCardOnDeck(source, undoPhase, onTouchListener, listenerSwitches);
                 break;
         }
     }
