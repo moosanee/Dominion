@@ -34,6 +34,7 @@ public class Turn {
     int emptyBankPiles;
     int poacherCompliance = 0;
     boolean adventurerShuffle = false;
+    int councilRoomDraws = 0;
     ArrayList<String> reactions = new ArrayList<>();
     BasicCards basicCardSet = new BasicCards();
     ArrayList<CardData> bankPiles; // = new ArrayList<>();
@@ -233,9 +234,11 @@ public class Turn {
                 if (card.getDrawCards() > 0) {
                     draws += card.getDrawCards();
                 }
+                councilRoomDraws = 0;
                 for (int i = draws; i > 0; i--) {
                     String cardName1 = drawCard(handListener);
                     if (!(cardName1.equals("null"))) {
+                        if (cardName.equals("councilRoom")) councilRoomDraws +=1;
                         reactToNewCardInHand(cardName1, listenerSwitches);
                     }
                     draws -= 1;
@@ -359,6 +362,11 @@ public class Turn {
                         button.setTag(CELLAR);
                         setListeners(CELLAR, listenerSwitches);
                         phase = CELLAR;
+                        break;
+                    case "councilRoom":
+                        ((GameBoardActivity)activity).reactToCouncilRoom(player.getName());
+                        Toast.makeText(context, "the other players drew a card",
+                                Toast.LENGTH_SHORT).show();
                         break;
                     case "merchant":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
@@ -1096,6 +1104,44 @@ public class Turn {
             startOpenBankPhase(listenerSwitches);
         }
         return discardedSoFar;
+    }
+
+    public void undoCouncilRoom(boolean[] playerToggles, View.OnTouchListener handListener,
+                                ListenerSwitches listenerSwitches){
+        //return drawn cards
+        for (int i = 0; i < councilRoomDraws; i++){
+            CardData cardData = player.hand.get(player.hand.size()-1);
+            int viewId = cardData.getImageViewId();
+            String cardName = cardData.getCardName();
+            String cardType = cardData.getCard().getType();
+            player.removeCardFromHand(viewId, activity, layout);
+            player.addCardToDeck(cardName, activity, context);
+            if (cardType.equals("action") || cardType.equals("action - attack"))
+                numberOfActionsInHand -= 1;
+            if (cardType.equals("action - reaction")) {
+                numberOfActionsInHand -= 1;
+                reactions.remove(cardName);
+            }
+            if (cardType.equals("treasure")) numberOfTreasuresInHand -= 1;
+        }
+        //return councilRoom
+        CardData cardData = player.inPlay.get(player.inPlay.size()-1);
+        int viewId = cardData.getImageViewId();
+        String cardName = cardData.getCardName();
+        player.removeCardFromInPlay(viewId, activity, layout);
+        player.addCardToHand(cardName, layout, context, activity, handListener);
+        numberOfActionsInHand +=1;
+        actions +=1;
+        TextView textView = ((Activity) activity).findViewById(ACTIONS_LEFT_ID);
+        textView.setText(actions + " actions left");
+        buys -=1;
+        textView = ((Activity) activity).findViewById(BUYS_LEFT_ID);
+        textView.setText(buys + " buys left");
+        //return cards drawn by other players
+        ((GameBoardActivity)activity).undoCouncilRoom(playerToggles);
+        //return to previous state
+        startActionPhase(listenerSwitches);
+
     }
 
 

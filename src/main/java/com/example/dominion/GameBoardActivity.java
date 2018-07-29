@@ -1743,6 +1743,49 @@ public class GameBoardActivity extends AppCompatActivity {
         return banditAttackResults;
     }
 
+    public void reactToCouncilRoom(String playerName){
+        int size = playerList.size();
+        boolean[] cardDrawn = new boolean[size];
+        for (int i = 0; i < playerList.size(); i ++){
+            if (playerName.equals(playerList.get(i).getName())) {
+                cardDrawn[i] = false;
+            } else {
+                Player player = playerList.get(i);
+                if (player.deck.size() == 0){
+                    player.putOffTurnDiscardInDeck();
+                }
+                if (player.deck.size()>0) {
+                    String cardName = player.deck.get(player.deck.size() - 1).getCardName();
+                    player.addOffTurnCard(cardName, "hand");
+                    player.removeOffTurnCard(player.deck.size()-1, "deck");
+                    cardDrawn[i] = true;
+                } else {
+                    String toast = player.getName() + " has no cards to draw";
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                    cardDrawn[i] = false;
+                }
+
+            }
+        }
+        undo = new Undo("other players drew a card", turn, cardDrawn, handListener,
+                listenerSwitches);
+        undoButton.setClickable(true);
+        undoButton.setAlpha(1f);
+    }
+
+    public void undoCouncilRoom(boolean[] playerToggles){
+        for (int i = 0; i < playerList.size(); i ++){
+            Player player = playerList.get(i);
+            if (playerToggles[i]) {
+                String cardName = player.hand.get(player.hand.size() - 1).getCardName();
+                player.addOffTurnCard(cardName, "deck");
+                player.removeOffTurnCard(player.hand.size()-1, "hand");
+            }
+        }
+        undoButton.setClickable(false);
+        undoButton.setAlpha(0.5f);
+    }
+
     public ArrayList<BureaucratAttack> reactToBureaucratAttack(String playerName){
         ArrayList<BureaucratAttack> bureaucratAttackResults = new ArrayList<>();
         for (int i = 0; i < playerList.size(); i++){

@@ -11,6 +11,7 @@ public class Undo {
     private int cardsMoved;
     private int undoPhase;
     private ArrayList<CardData> cardDataList;
+    boolean[] playerToggles;
     private ListenerSwitches listenerSwitches;
     private View.OnTouchListener onTouchListener;
 
@@ -31,6 +32,14 @@ public class Undo {
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.cardDataList = cardDataList;
+        this.listenerSwitches = listenerSwitches;
+    }
+    public Undo (String description, Turn turn, boolean[] playerToggles,
+                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+        this.description = description;
+        this.turn = turn;
+        this.playerToggles = playerToggles;
+        this.onTouchListener = onTouchListener;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, int undoPhase, View.OnTouchListener onTouchListener,
@@ -82,6 +91,9 @@ public class Undo {
                 break;
             case "put deck in discard":
                 turn.undoDeckToDiscard(cardsMoved, listenerSwitches);
+                break;
+            case "other players drew a card":
+                turn.undoCouncilRoom(playerToggles, onTouchListener, listenerSwitches);
                 break;
             case "moved to discard":
                 turn.undoNewCardInDiscard(source, undoPhase, onTouchListener, listenerSwitches);
