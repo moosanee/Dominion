@@ -100,6 +100,9 @@ public class Undo {
             case "played a feast":
                 turn.undoNewCardInPlay("feast", FEAST, onTouchListener, listenerSwitches);
                 break;
+            case "browsed discard":
+                turn.undoNewCardInPlay("harbinger", HARBINGER, onTouchListener, listenerSwitches);
+                break;
             case "moved to discard":
                 turn.undoNewCardInDiscard(source, undoPhase, onTouchListener, listenerSwitches);
                 break;

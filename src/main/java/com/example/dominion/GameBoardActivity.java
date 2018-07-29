@@ -313,6 +313,10 @@ public class GameBoardActivity extends AppCompatActivity {
                         Toast.makeText(context,"gain a card costing up to 5 coins",
                                 Toast.LENGTH_SHORT).show();
                         break;
+                    case HARBINGER:
+                        String toast = basicCardSet.getCard("harbinger").getInstructions();
+                        Toast.makeText(context, toast,Toast.LENGTH_SHORT).show();
+                        break;
                     case POACHER: // "discard card"
                         if (playerList.get(turnMarker).hand.size() == 0) {
                             Toast.makeText(context, "no cards in hand to discard",
@@ -939,14 +943,25 @@ public class GameBoardActivity extends AppCompatActivity {
                 } else {
                     cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
                     chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
-                    if (cardChosen) {
-                        String cardName = playerList.get(turnMarker).discard.get(chosenCardIndex).getCardName();
-                        playerList.get(turnMarker).removeCardFromDiscard(chosenCardIndex, context, activity);
-                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                                inPlayListener);
-                        undoButton.setClickable(false);
-                        undoButton.setAlpha(0.5f);
-                        turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
+                    if (turn.phase == HARBINGER) {
+                        if (cardChosen) {
+                            String cardName = playerList.get(turnMarker).discard.get(chosenCardIndex)
+                                    .getCardName();
+                            playerList.get(turnMarker).removeCardFromDiscard(chosenCardIndex, context,
+                                    activity);
+                            playerList.get(turnMarker).addCardToDeck(cardName, activity, context);
+                            undo = new Undo("moved " + cardName + " to deck", turn,
+                                    HARBINGER, handListener, listenerSwitches);
+                            undoButton.setClickable(true);
+                            undoButton.setAlpha(1f);
+                            turn.continueToTurnPhase(listenerSwitches);
+                        } else {
+                            undo = new Undo("browsed discard", turn, HARBINGER, handListener,
+                                    listenerSwitches);
+                            undoButton.setClickable(true);
+                            undoButton.setAlpha(1f);
+                            turn.continueToTurnPhase(listenerSwitches);
+                        }
                     }
                 }
                 break;

@@ -79,7 +79,7 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                 gameCards.clear();
                 gameCardList.add("chapel");
                 gameCardList.add("moat");
-                gameCardList.add("chancellor");
+                gameCardList.add("harbinger");
                 gameCardList.add("village");
                 gameCardList.add("feast");
                 gameCardList.add("bureaucrat");
@@ -89,7 +89,7 @@ public class ChooseGameCardsActivity extends AppCompatActivity {
                 gameCardList.add("artisan");
                 gameCards.add(basicCardSet.getCard("chapel"));
                 gameCards.add(basicCardSet.getCard("moat"));
-                gameCards.add(basicCardSet.getCard("chancellor"));
+                gameCards.add(basicCardSet.getCard("harbinger"));
                 gameCards.add(basicCardSet.getCard("village"));
                 gameCards.add(basicCardSet.getCard("feast"));
                 gameCards.add(basicCardSet.getCard("bureaucrat"));

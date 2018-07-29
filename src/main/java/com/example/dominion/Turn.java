@@ -137,6 +137,9 @@ public class Turn {
                 listenerSwitches.setDiscardDragSwitch(true);
                 listenerSwitches.setBankListenerSwitch(true);
                 break;
+            case HARBINGER:
+                listenerSwitches.setAllFalse();
+                break;
         }
     }
 
@@ -378,6 +381,14 @@ public class Turn {
                         button.setTag(FEAST);
                         setListeners(FEAST, listenerSwitches);
                         phase = FEAST;
+                        break;
+                    case "harbinger":
+                        Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
+                        button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                        button.setText("browse\ndiscard");
+                        button.setTag(HARBINGER);
+                        setListeners(HARBINGER, listenerSwitches);
+                        phase = HARBINGER;
                         break;
                     case "merchant":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
@@ -889,6 +900,21 @@ public class Turn {
                 ((GameBoardActivity)activity).undoButton.setClickable(false);
                 ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
                 break;
+            case HARBINGER:
+                //put card back in discard
+                cardName = player.deck.get(player.deck.size()-1).getCardName();
+                player.removeCardFromDeck(player.deck.size()-1, activity);
+                player.addCardToDiscard(cardName, activity, context);
+                //disable undo
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+                //reset phase
+                button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("card\nto deck");
+                button.setTag(HARBINGER);
+                setListeners(HARBINGER, listenerSwitches);
+                phase = HARBINGER;
+                break;
         }
     }
 
@@ -1124,10 +1150,10 @@ public class Turn {
                 reactToNewCardInPlay(cardName, handListener, listenerSwitches);
             }
         }
-        if (!treasureFlag){
-            Toast.makeText(context, "no treasures left.", Toast.LENGTH_SHORT).show();
+        //if (!treasureFlag){
+            //Toast.makeText(context, "no treasures left.", Toast.LENGTH_SHORT).show();
             startOpenBankPhase(listenerSwitches);
-        }
+        //}
         return treasureList;
     }
 
