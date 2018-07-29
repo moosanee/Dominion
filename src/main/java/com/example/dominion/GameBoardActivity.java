@@ -282,17 +282,36 @@ public class GameBoardActivity extends AppCompatActivity {
                         undoButton.setAlpha(0.5f);
                         turn.cleanUp();
                         break;
-                    case CHAPEL: // "finished trashing"
-                        int trashed = turn.finishChapel(listenerSwitches);
-                        undo = new Undo("finish chapel", turn, trashed, listenerSwitches);
-                        undoButton.setClickable(true);
-                        undoButton.setAlpha(1f);
+                    case ADVENTURER: //"apply adventurer"
+                        undoButton.setClickable(false);
+                        undoButton.setAlpha(0.5f);
+                        Toast.makeText(context, "putting revealed treasures in hand." +
+                                "\ndiscarding other revealed cards", Toast.LENGTH_SHORT).show();
+                        turn.finishAdventurer(listenerSwitches, handListener);
+                        break;
+                    case ARTISAN1: // "gain card"
+                        Toast.makeText(context,"gain a card costing up to 5 to your hand",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case ARTISAN2: // "card to deck"
+                        Toast.makeText(context,"put a card from your hand onto your deck",
+                                Toast.LENGTH_SHORT).show();
                         break;
                     case CELLAR: // "finished discarding"
                         int discarded = turn.finishCellar(handListener, listenerSwitches);
                         undo = new Undo("finish cellar", turn, discarded, listenerSwitches);
                         undoButton.setClickable(false);
                         undoButton.setAlpha(0.5f);
+                        break;
+                    case CHAPEL: // "finished trashing"
+                        int trashed = turn.finishChapel(listenerSwitches);
+                        undo = new Undo("finish chapel", turn, trashed, listenerSwitches);
+                        undoButton.setClickable(true);
+                        undoButton.setAlpha(1f);
+                        break;
+                    case FEAST: // "gain card"
+                        Toast.makeText(context,"gain a card costing up to 5 coins",
+                                Toast.LENGTH_SHORT).show();
                         break;
                     case POACHER: // "discard card"
                         if (playerList.get(turnMarker).hand.size() == 0) {
@@ -303,21 +322,8 @@ public class GameBoardActivity extends AppCompatActivity {
                         else Toast.makeText(context,"discard another card from your hand",
                                 Toast.LENGTH_SHORT).show();
                         break;
-                    case ARTISAN1: // "gain card"
-                        Toast.makeText(context,"gain a card costing up to 5 to your hand",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case ARTISAN2: // "card to deck"
-                        Toast.makeText(context,"put a card from your hand onto your deck",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case ADVENTURER: //"apply adventurer"
-                        undoButton.setClickable(false);
-                        undoButton.setAlpha(0.5f);
-                        Toast.makeText(context, "putting revealed treasures in hand." +
-                                "\ndiscarding other revealed cards", Toast.LENGTH_SHORT).show();
-                        turn.finishAdventurer(listenerSwitches, handListener);
-                        break;
+
+
                 }
             }
         });
@@ -1030,7 +1036,7 @@ public class GameBoardActivity extends AppCompatActivity {
     }
 
 
-    private void addCardToTrash(String cardName) {
+    public void addCardToTrash(String cardName) {
         trash.add(new CardData(cardName, "trash", trashTally, trash.size()));
         trash.get(trash.size()-1).setImageViewId(trashTally);
         trashTally +=1;

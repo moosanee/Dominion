@@ -4,6 +4,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import static com.example.dominion.MyConstants.*;
+
 public class Undo {
 
     private String description;
@@ -94,6 +96,9 @@ public class Undo {
                 break;
             case "other players drew a card":
                 turn.undoCouncilRoom(playerToggles, onTouchListener, listenerSwitches);
+                break;
+            case "played a feast":
+                turn.undoNewCardInPlay("feast", FEAST, onTouchListener, listenerSwitches);
                 break;
             case "moved to discard":
                 turn.undoNewCardInDiscard(source, undoPhase, onTouchListener, listenerSwitches);

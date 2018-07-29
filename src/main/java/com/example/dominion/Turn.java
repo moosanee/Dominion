@@ -132,6 +132,11 @@ public class Turn {
                 listenerSwitches.setInPlayDragSwitch(true);
                 listenerSwitches.setDeckDragSwitch(true);
                 break;
+            case FEAST:
+                listenerSwitches.setAllFalse();
+                listenerSwitches.setDiscardDragSwitch(true);
+                listenerSwitches.setBankListenerSwitch(true);
+                break;
         }
     }
 
@@ -142,15 +147,7 @@ public class Turn {
         reactions.clear();
         for (int i=0; i < player.hand.size(); i++){
             Card card = player.hand.get(i).getCard();
-            if (card.getType().equals("action")) numberOfActionsInHand += 1;
-            else if (card.getType().equals("action - attack"))
-                numberOfActionsInHand += 1;
-            else if (card.getType().equals("action - reaction")) {
-                numberOfActionsInHand += 1;
-                reactions.add(card.getName());
-            }
-            else if (player.hand.get(i).getCard().getType().equals("treasure"))
-                numberOfTreasuresInHand += 1;
+            updateHandData(card, true);
         }
         if (numberOfActionsInHand > 0) {
             String message = player.getName() + ", it's your turn.\nTake an action";
@@ -368,6 +365,20 @@ public class Turn {
                         Toast.makeText(context, "the other players drew a card",
                                 Toast.LENGTH_SHORT).show();
                         break;
+                    case "feast":
+                        int viewId = player.inPlay.get(player.inPlay.size()-1).getImageViewId();
+                        player.removeCardFromInPlay(viewId, activity, layout);
+                        ((GameBoardActivity)activity).addCardToTrash("feast");
+                        ((GameBoardActivity)activity).undo = new Undo("played a feast",
+                                this, FEAST, handListener, listenerSwitches);
+                        Toast.makeText(context, "gain a card to your hand costing up to 5 coins",
+                                Toast.LENGTH_SHORT).show();
+                        button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                        button.setText("gain\ncard");
+                        button.setTag(FEAST);
+                        setListeners(FEAST, listenerSwitches);
+                        phase = FEAST;
+                        break;
                     case "merchant":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         firstSilverInPlayFlag = true;
@@ -575,18 +586,26 @@ public class Turn {
                 ((GameBoardActivity) activity).undoButton.setAlpha(0.5f);
                 startActionPhase(listenerSwitches);
                 break;
+            case FEAST:
+                //return feast to hand
+                player.addCardToHand("feast", layout, context, activity, onTouchListener);
+                ((GameBoardActivity)activity).removeCardFromTrashByName("feast");
+                //hand book keeping
+                actions +=1;
+                textView = ((Activity) activity).findViewById(ACTIONS_LEFT_ID);
+                textView.setText(actions + " actions left");
+                numberOfActionsInHand +=1;
+                //deactivate undo
+                ((GameBoardActivity)activity).undoButton.setClickable(false);
+                ((GameBoardActivity) activity).undoButton.setAlpha(0.5f);
+                //return to turn
+                startActionPhase(listenerSwitches);
+                break;
             default:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
-                if (card.getType().equals("action") || card.getType().equals("action - attack")) {
-                    numberOfActionsInHand += 1;
-                    actions += 1;
-                    if (source.equals("merchant")) firstSilverInPlayFlag = false;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand += 1;
-                    actions += 1;
-                    reactions.add(card.getName());
-                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                updateHandData(card, true);
+                actions +=1;
                 if (card.getActions() > 0) actions -= card.getActions();
                 textView = ((Activity) activity).findViewById(ACTIONS_LEFT_ID);
                 textView.setText(actions + " actions left");
@@ -608,14 +627,7 @@ public class Turn {
                         viewId = cardData.getImageViewId();
                         String cardName = cardData.getCardName();
                         player.removeCardFromHand(viewId, activity, layout);
-                        if (cardData.getCard().getType().equals("treasure")) numberOfTreasuresInHand -= 1;
-                        if (cardData.getCard().getType().equals("action") ||
-                                cardData.getCard().getType().equals("action - attack")){
-                            numberOfActionsInHand -= 1;
-                        } else if (cardData.getCard().getType().equals("action - reaction")) {
-                            reactions.remove(card.getName());
-                            numberOfActionsInHand -= 1;
-                        }
+                        updateHandData(card, false);
                         player.addCardToDeck(cardName, activity, context);
                         draws -= 1;
                     }
@@ -639,13 +651,7 @@ public class Turn {
             if (trashed < 4){
                 trashed += 1;
                 cardsTrashed.add(card);
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand -=1;
-                if (card.getType().equals("action") || card.getType().equals("action - attack")){
-                    numberOfActionsInHand -= 1;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand -= 1;
-                    reactions.remove(card.getName());
-                }
+                updateHandData(card, false);
             } else {
                 Toast.makeText(context, "You can only trash 4 cards", Toast.LENGTH_SHORT).show();
                 ((GameBoardActivity) activity).removeCardFromTrashByIndex(((GameBoardActivity) activity).trash.size()-1);
@@ -663,12 +669,7 @@ public class Turn {
                 Card card = basicCardSet.getCard(cardName);
                 ((GameBoardActivity)activity).removeCardFromTrashByName(cardName);
                 player.addCardToHand(cardName, layout, context, activity, onTouchListener);
-                if (card.getType().equals("action") || card.getType().equals("action - attack")){
-                    numberOfActionsInHand += 1;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand += 1;
-                    reactions.add(card.getName());
-                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                updateHandData(card, true);
                 trashed -= 1;
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("finished\ntrashing");
@@ -713,36 +714,34 @@ public class Turn {
             case CELLAR:
                 discarded += 1;
                 cardsDiscarded.add(card);
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
-                else if (card.getType().equals("action") || card.getType().equals("action - attack")) {
-                    numberOfActionsInHand -= 1;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand -= 1;
-                    reactions.remove(card.getName());
-                }
+                updateHandData(card, false);
+                break;
+            case FEAST:
+                if (card.getCost() > 5){
+                    Toast.makeText(context, "too expensive\ntry something cheaper",
+                            Toast.LENGTH_SHORT).show();
+                    int index = player.discard.size()-1;
+                    player.removeCardFromDiscard(index, context, activity);
+                    int bankPileCounterId = findBankViewId(cardName, bankPiles);
+                    TextView textView = ((Activity) activity).findViewById(bankPileCounterId);
+                    int count = Integer.parseInt(textView.getText().toString()) + 1;
+                    textView.setText(String.valueOf(count));
 
+                } else {
+                    String description = "moved " + cardName + " to discard";
+                    ((GameBoardActivity)activity).undo = new Undo(description, this, FEAST,
+                            bankPiles, listenerSwitches);
+                    ((GameBoardActivity)activity).undoButton.setClickable(true);
+                    ((GameBoardActivity)activity).undoButton.setAlpha(1f);
+                    continueToTurnPhase(listenerSwitches);
+                }
                 break;
             case POACHER:
                 poacherCompliance += 1;
-                if (card.getType().equals("action") || card.getType().equals("action - attack")){
-                    numberOfActionsInHand -= 1;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand -= 1;
-                    reactions.remove(card.getName());
-                }
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
+                updateHandData(card, false);
                 if (poacherCompliance == emptyBankPiles) {
-                    previousPhase = POACHER;
-                    if (numberOfActionsInHand > 0) {
-                        startActionPhase(listenerSwitches);
-                    } else if (numberOfTreasuresInHand > 0) {
-                        Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
-                        startBuyingPhase(listenerSwitches);
-                    } else {
-                        Toast.makeText(context, "you are out of actions and treasures",
-                                Toast.LENGTH_SHORT).show();
-                        startOpenBankPhase(listenerSwitches);
-                    }
+                    //previousPhase = POACHER;
+                    continueToTurnPhase(listenerSwitches);
                     poacherCompliance = 0;
                 }
                 break;
@@ -774,12 +773,7 @@ public class Turn {
                 card = basicCardSet.getCard(cardName);
                 player.removeCardFromDiscard(player.discard.size()-1, context, activity);
                 player.addCardToHand(cardName, layout, context, activity, handListener);
-                if (card.getType().equals("action") || card.getType().equals("action - attack")){
-                    numberOfActionsInHand += 1;
-                } else if (card.getType().equals("action - reaction")){
-                    numberOfActionsInHand += 1;
-                    reactions.add(card.getName());
-                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                updateHandData(card, true);
                 discarded -= 1;
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("finished\ndiscarding");
@@ -789,14 +783,22 @@ public class Turn {
                 ((GameBoardActivity)activity).undoButton.setClickable(false);
                 ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
                 break;
+            case FEAST:
+                // return gained card
+                player.removeCardFromDiscard(player.discard.size()-1, context, activity);
+                ((GameBoardActivity)activity).addCardToBankPile(cardName);
+                // gain card prompt
+                Toast.makeText(context, "gain a card to your hand costing up to 5 coins",
+                        Toast.LENGTH_SHORT).show();
+                button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
+                button.setText("gain\ncard");
+                button.setTag(FEAST);
+                setListeners(FEAST, listenerSwitches);
+                phase = FEAST;
+                break;
             case POACHER:
                 if (poacherCompliance > 0) poacherCompliance -= 1;
-                if (card.getType().equals("action") || card.getType().equals("action - attack")){
-                    numberOfActionsInHand += 1;
-                } else if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand += 1;
-                    reactions.add(card.getName());
-                } else if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+                updateHandData(card, true);
                 player.removeCardFromDiscard(player.discard.size() - 1, context, activity);
                 player.addCardToHand(cardName, layout, context, activity, handListener);
                 int discardsLeft = emptyBankPiles - poacherCompliance;
@@ -814,32 +816,18 @@ public class Turn {
                 setListeners(POACHER, listenerSwitches);
                 phase = POACHER;
                 break;
-
-
         }
     }
-
-
 
 
     public void reactToNewCardInHand(String cardName, ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
         String cardType = card.getType();
         if (phase == ACTION_PHASE){
-            if (cardType.equals("action") || cardType.equals("action - attack")) numberOfActionsInHand += 1;
-            if (cardType.equals("action - reaction")){
-                numberOfActionsInHand += 1;
-                reactions.add(card.getName());
-            }
-            if (cardType.equals("treasure")) numberOfTreasuresInHand += 1;
+            updateHandData(card, true);
         }
         if (phase == CELLAR){
-            if (cardType.equals("action") || cardType.equals("action - attack")) numberOfActionsInHand += 1;
-            if (cardType.equals("action - reaction")){
-                numberOfActionsInHand += 1;
-                reactions.add(card.getName());
-            }
-            if (cardType.equals("treasure")) numberOfTreasuresInHand += 1;
+            updateHandData(card,true);
         }
         if (phase == ARTISAN1){
             if (card.getCost() > 5){
@@ -852,13 +840,7 @@ public class Turn {
                 textView.setText(String.valueOf(count));
 
             } else {
-                if (cardType.equals("action") || cardType.equals("action - attack"))
-                    numberOfActionsInHand += 1;
-                if (cardType.equals("action - reaction")) {
-                    numberOfActionsInHand += 1;
-                    reactions.add(card.getName());
-                }
-                if (cardType.equals("treasure")) numberOfTreasuresInHand += 1;
+               updateHandData(card,true);
                 Toast.makeText(context, "put a card from your hand into your deck.",
                         Toast.LENGTH_SHORT).show();
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
@@ -878,26 +860,8 @@ public class Turn {
                 String description = "moved " + cardName + " to deck";
                 ((GameBoardActivity)activity).undo = new Undo(description, this, phase,
                         handListener, listenerSwitches);
-                if (card.getType().equals("action") || card.getType().equals("action - attack"))
-                    numberOfActionsInHand -= 1;
-                if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand -= 1;
-                    reactions.remove(card.getName());
-                }
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand -= 1;
-                if (actions > 0 && numberOfActionsInHand > 0) {
-                    Toast.makeText(context, "take another action", Toast.LENGTH_SHORT).show();
-                    startActionPhase(listenerSwitches);
-                }
-                else if (numberOfTreasuresInHand > 0) {
-                    Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
-                    startBuyingPhase(listenerSwitches);
-                }
-                else {
-                    Toast.makeText(context, "you are out of actions\nyou have no treasures in hand",
-                                    Toast.LENGTH_SHORT).show();
-                    startOpenBankPhase(listenerSwitches);
-                }
+                updateHandData(card,false);
+                continueToTurnPhase(listenerSwitches);
                 ((GameBoardActivity)activity).undoButton.setClickable(true);
                 ((GameBoardActivity)activity).undoButton.setAlpha(1f);
             break;
@@ -914,13 +878,7 @@ public class Turn {
                 player.removeCardFromDeck(player.deck.size()-1, activity);
                 player.addCardToHand(cardName, layout, context, activity, onTouchListener);
                 //book-keeping
-                if (card.getType().equals("action") || card.getType().equals("action - attack"))
-                    numberOfActionsInHand += 1;
-                if (card.getType().equals("action - reaction")) {
-                    numberOfActionsInHand += 1;
-                    reactions.add(card.getName());
-                }
-                if (card.getType().equals("treasure")) numberOfTreasuresInHand += 1;
+               updateHandData(card, true);
                 //set phase
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("card\nto deck");
@@ -948,6 +906,41 @@ public class Turn {
         ((GameBoardActivity)activity).undoButton.setAlpha(1f);
         Intent intent = new Intent(context, DecisionDialogActivity.class);
         activity.startActivityForResult(intent, CHANCELLOR_ANSWER_CODE);
+    }
+
+    public void continueToTurnPhase(ListenerSwitches listenerSwitches){
+        if (numberOfActionsInHand > 0 && actions > 0) {
+            startActionPhase(listenerSwitches);
+        } else if (numberOfTreasuresInHand > 0) {
+            Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
+            startBuyingPhase(listenerSwitches);
+        } else {
+            Toast.makeText(context, "you are out of actions and treasures",
+                    Toast.LENGTH_SHORT).show();
+            startOpenBankPhase(listenerSwitches);
+        }
+    }
+
+    public void updateHandData(Card card, boolean add) {
+        String cardType = card.getType();
+        String cardName = card.getName();
+        if (add){
+            if (cardType.equals("action") || cardType.equals("action - attack"))
+                numberOfActionsInHand += 1;
+            if (cardType.equals("action - reaction")) {
+                numberOfActionsInHand += 1;
+                reactions.add(cardName);
+            }
+            if (cardType.equals("treasure")) numberOfTreasuresInHand += 1;
+        } else {
+            if (cardType.equals("action") || cardType.equals("action - attack"))
+                numberOfActionsInHand -= 1;
+            if (cardType.equals("action - reaction")) {
+                numberOfActionsInHand -= 1;
+                reactions.remove(cardName);
+            }
+            if (cardType.equals("treasure")) numberOfTreasuresInHand -= 1;
+        }
     }
 
 
@@ -1035,38 +1028,14 @@ public class Turn {
                 }
             }
         }
-        if (actions > 0 && numberOfActionsInHand > 0) {
-            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
-            startActionPhase(listenerSwitches);
-        }
-        else if (numberOfTreasuresInHand > 0){
-            String message = "You are out of actions.\nCount your coins and make a purchase.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startBuyingPhase(listenerSwitches);
-        } else {
-            String message = "You have no more treasures.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startOpenBankPhase(listenerSwitches);
-        }
+        continueToTurnPhase(listenerSwitches);
     }
 
 
     public int finishChapel(ListenerSwitches listenerSwitches){
         int trashedSoFar = trashed;
         trashed = 0;
-        if (actions > 0 && numberOfActionsInHand > 0) {
-            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
-            startActionPhase(listenerSwitches);
-        }
-        else if (numberOfTreasuresInHand > 0){
-            String message = "You are out of actions.\nCount your coins and make a purchase.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startBuyingPhase(listenerSwitches);
-        } else {
-            String message = "You have no more treasures.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startOpenBankPhase(listenerSwitches);
-        }
+        continueToTurnPhase(listenerSwitches);
         return trashedSoFar;
     }
 
@@ -1090,19 +1059,7 @@ public class Turn {
                 reactToNewCardInHand(cardName1, listenerSwitches);
             }
         }
-        if (actions > 0 && numberOfActionsInHand > 0) {
-            Toast.makeText(context, "Take an action", Toast.LENGTH_SHORT).show();
-            startActionPhase(listenerSwitches);
-        }
-        else if (numberOfTreasuresInHand > 0){
-            String message = "You are out of actions.\nCount your coins and make a purchase.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startBuyingPhase(listenerSwitches);
-        } else {
-            String message = "You have no more treasures.";
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            startOpenBankPhase(listenerSwitches);
-        }
+        continueToTurnPhase(listenerSwitches);
         return discardedSoFar;
     }
 
@@ -1116,13 +1073,7 @@ public class Turn {
             String cardType = cardData.getCard().getType();
             player.removeCardFromHand(viewId, activity, layout);
             player.addCardToDeck(cardName, activity, context);
-            if (cardType.equals("action") || cardType.equals("action - attack"))
-                numberOfActionsInHand -= 1;
-            if (cardType.equals("action - reaction")) {
-                numberOfActionsInHand -= 1;
-                reactions.remove(cardName);
-            }
-            if (cardType.equals("treasure")) numberOfTreasuresInHand -= 1;
+            updateHandData(cardData.getCard(), false);
         }
         //return councilRoom
         CardData cardData = player.inPlay.get(player.inPlay.size()-1);
