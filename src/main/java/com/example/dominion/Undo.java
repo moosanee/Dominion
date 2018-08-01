@@ -19,13 +19,15 @@ public class Undo {
     private View.OnTouchListener onTouchListener;
     private BasicCards basicCardSet;
 
-    public Undo (String description, Turn turn, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+    public Undo (String description, Turn turn, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.listenerSwitches = listenerSwitches;
         this.basicCardSet = basicCardSet;
     }
-    public Undo (String description, Turn turn, int cardsMoved, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+    public Undo (String description, Turn turn, int cardsMoved, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.cardsMoved = cardsMoved;
@@ -42,7 +44,8 @@ public class Undo {
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, boolean[] playerToggles,
-                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.playerToggles = playerToggles;
@@ -60,7 +63,8 @@ public class Undo {
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, ArrayList<CardData> cardDataList,
-                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.cardDataList = cardDataList;
@@ -69,7 +73,8 @@ public class Undo {
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
-                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
@@ -79,7 +84,8 @@ public class Undo {
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, int undoPhase, Turn turn, ArrayList<ArrayList<String>> pileLists,
-                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet,
+                 ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;

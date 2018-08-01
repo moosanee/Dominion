@@ -330,14 +330,16 @@ public class BasicCards implements Serializable{
         Player player = turn.player;
         switch (cardName) {
             case "adventurer":
-                Toast.makeText(turn.context, "Reveal cards from your deck until you reveal 2 treasure cards.",
+                Toast.makeText(turn.context,
+                        "Reveal cards from your deck until you reveal 2 treasure cards.",
                         Toast.LENGTH_SHORT).show();
                 Button button = ((Activity) turn.activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("apply\nadventurer");
                 button.setTag(ADVENTURER);
                 turn.setListeners(ALL_OFF, listenerSwitches);
                 turn.phase = ADVENTURER;
-                ((GameBoardActivity) turn.activity).undo = new Undo("moved adventurer to inPlay",
+                ((GameBoardActivity) turn.activity).undo
+                        = new Undo("moved adventurer to inPlay",
                         turn, turn.phase, handListener, this, listenerSwitches);
                 ((GameBoardActivity) turn.activity).undoButton.setClickable(true);
                 ((GameBoardActivity) turn.activity).undoButton.setAlpha(1f);
@@ -441,8 +443,10 @@ public class BasicCards implements Serializable{
             case "bureaucrat":
                 player.addCardToDeck("silver", turn.activity, turn.context);
                 ((GameBoardActivity)turn.activity).removeCardFromBankPile("silver");
-                ((GameBoardActivity)turn.activity).undo = new Undo("moved bureaucrat to inPlay",
-                        turn, BUREAUCRAT, turn.bankPiles, handListener, this, listenerSwitches);
+                ((GameBoardActivity)turn.activity).undo
+                        = new Undo("moved bureaucrat to inPlay",
+                        turn, BUREAUCRAT, turn.bankPiles, handListener, this,
+                        listenerSwitches);
                 postList.add("You gained a silver to your deck");
                 bureaucratAttackResult = reactToBureaucratAttack(player.getName(),
                         ((GameBoardActivity)turn.activity).playerList, turn);
@@ -583,7 +587,8 @@ public class BasicCards implements Serializable{
         }
     }
 
-    public void undoNewCardInPlay(Card card, int undoPhase, Turn turn, View.OnTouchListener onTouchListener,
+    public void undoNewCardInPlay(Card card, int undoPhase, Turn turn, View.OnTouchListener
+            onTouchListener,
                                     ListenerSwitches listenerSwitches) {
         Player player = turn.player;
         String source = card.getName();
@@ -593,7 +598,8 @@ public class BasicCards implements Serializable{
                 revealedCards.clear();
                 int viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, turn.activity, turn.layout);
-                player.addCardToHand(source, turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand(source, turn.layout, turn.context, turn.activity,
+                        onTouchListener);
                 turn.numberOfActionsInHand += 1;
                 turn.actions += 1;
                 TextView textView = ((Activity)turn.activity).findViewById(ACTIONS_LEFT_ID);
@@ -603,7 +609,8 @@ public class BasicCards implements Serializable{
             case ARTISAN1:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, turn.activity, turn.layout);
-                player.addCardToHand(source, turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand(source, turn.layout, turn.context, turn.activity,
+                        onTouchListener);
                 turn.numberOfActionsInHand += 1;
                 turn.actions += 1;
                 textView = ((Activity)turn.activity).findViewById(ACTIONS_LEFT_ID);
@@ -621,7 +628,8 @@ public class BasicCards implements Serializable{
                 textView = ((Activity)turn.activity).findViewById(ACTIONS_LEFT_ID);
                 textView.setText(turn.actions+" actions left");
                 //return gold to bank
-                player.removeCardFromDiscard(player.discard.size()-1, turn.context, turn.activity);
+                player.removeCardFromDiscard(player.discard.size()-1, turn.context,
+                        turn.activity);
                 ((GameBoardActivity)turn.activity).addCardToBankPile("gold");
                 //return cards to other players
                 for (int i = 0; i < banditAttackResult.size(); i++){
@@ -632,9 +640,11 @@ public class BasicCards implements Serializable{
                             ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
                                     .addOffTurnCard(card.getName(), "deck");
                             if (banditAttackResult.get(i).getTrashed() == 1) {
-                                ((GameBoardActivity) turn.activity).removeCardFromTrashByName(card.getName());
+                                ((GameBoardActivity) turn.activity)
+                                        .removeCardFromTrashByName(card.getName());
                             } else {
-                                int top = ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
+                                int top = ((GameBoardActivity) turn.activity)
+                                        .playerList.get(playerIndex)
                                         .discard.size() - 1;
                                 ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
                                         .removeOffTurnCard(top, "discard");
@@ -645,9 +655,11 @@ public class BasicCards implements Serializable{
                             ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
                                     .addOffTurnCard(card.getName(), "deck");
                             if (banditAttackResult.get(i).getTrashed() == 0) {
-                                ((GameBoardActivity) turn.activity).removeCardFromTrashByName(card.getName());
+                                ((GameBoardActivity) turn.activity)
+                                        .removeCardFromTrashByName(card.getName());
                             } else {
-                                int top = ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
+                                int top = ((GameBoardActivity) turn.activity).playerList
+                                        .get(playerIndex)
                                         .discard.size() - 1;
                                 ((GameBoardActivity) turn.activity).playerList.get(playerIndex)
                                         .removeOffTurnCard(top, "discard");
@@ -663,7 +675,8 @@ public class BasicCards implements Serializable{
                 //put bureaucrat back in hand
                 viewId = player.inPlay.get(player.inPlay.size()-1).getImageViewId();
                 player.removeCardFromInPlay(viewId, turn.activity, turn.layout);
-                player.addCardToHand("bureaucrat", turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand("bureaucrat", turn.layout, turn.context,
+                        turn.activity, onTouchListener);
                 turn.numberOfActionsInHand += 1;
                 turn.actions += 1;
                 textView = ((Activity)turn.activity).findViewById(ACTIONS_LEFT_ID);
@@ -707,7 +720,8 @@ public class BasicCards implements Serializable{
             default:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, turn.activity, turn.layout);
-                player.addCardToHand(source, turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand(source, turn.layout, turn.context, turn.activity,
+                        onTouchListener);
                 turn.updateHandData(card, true);
                 turn.actions +=1;
                 if (card.getActions() > 0) turn.actions -= card.getActions();
@@ -754,10 +768,12 @@ public class BasicCards implements Serializable{
                     cardsTrashed.add(card);
                     turn.updateHandData(card, false);
                 } else {
-                    Toast.makeText(turn.context, "You can only trash 4 cards", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(turn.context, "You can only trash 4 cards",
+                            Toast.LENGTH_SHORT).show();
                     ((GameBoardActivity) turn.activity).removeCardFromTrashByIndex(
                             ((GameBoardActivity) turn.activity).trash.size()-1);
-                    player.addCardToHand(cardName, turn.layout, turn.context, turn.activity, handListener);
+                    player.addCardToHand(cardName, turn.layout, turn.context, turn.activity,
+                            handListener);
                     listenerSwitches.setAllFalse();
                 }
                 break;
@@ -772,7 +788,8 @@ public class BasicCards implements Serializable{
         switch (undoPhase){
             case CHAPEL:
                 ((GameBoardActivity)turn.activity).removeCardFromTrashByName(cardName);
-                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity,
+                        onTouchListener);
                 turn.updateHandData(card, true);
                 trashed -= 1;
                 Button button = ((Activity) turn.activity).findViewById(PHASE_BUTTON_ID);
@@ -834,7 +851,8 @@ public class BasicCards implements Serializable{
         Player player = turn.player;
         switch (undoPhase) {
             case OPEN_BANK:
-                player.removeCardFromDiscard(player.discard.size() - 1, turn.context, turn.activity);
+                player.removeCardFromDiscard(player.discard.size() - 1, turn.context,
+                        turn.activity);
                 int bankPileCounterId = turn.findBankViewId(cardName, turn.bankPiles);
                 TextView textView = ((Activity) turn.activity).findViewById(bankPileCounterId);
                 int count = Integer.parseInt(textView.getText().toString()) + 1;
@@ -849,8 +867,10 @@ public class BasicCards implements Serializable{
                 if (turn.phase == CLEAN_UP_PHASE) turn.startOpenBankPhase(listenerSwitches);
                 break;
             case CELLAR:
-                player.removeCardFromDiscard(player.discard.size()-1, turn.context, turn.activity);
-                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity, handListener);
+                player.removeCardFromDiscard(player.discard.size()-1, turn.context,
+                        turn.activity);
+                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity,
+                        handListener);
                 turn.updateHandData(card, true);
                 discarded -= 1;
                 Button button = ((Activity) turn.activity).findViewById(PHASE_BUTTON_ID);
@@ -863,7 +883,8 @@ public class BasicCards implements Serializable{
                 break;
             case FEAST:
                 // return gained card
-                player.removeCardFromDiscard(player.discard.size()-1, turn.context, turn.activity);
+                player.removeCardFromDiscard(player.discard.size()-1, turn.context,
+                        turn.activity);
                 ((GameBoardActivity)turn.activity).addCardToBankPile(cardName);
                 // gain card prompt
                 Toast.makeText(turn.context, "gain a card to your hand costing up to 5 coins",
@@ -877,8 +898,10 @@ public class BasicCards implements Serializable{
             case POACHER:
                 if (poacherCompliance > 0) poacherCompliance -= 1;
                 turn.updateHandData(card, true);
-                player.removeCardFromDiscard(player.discard.size() - 1, turn.context, turn.activity);
-                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity, handListener);
+                player.removeCardFromDiscard(player.discard.size() - 1, turn.context,
+                        turn.activity);
+                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity,
+                        handListener);
                 int discardsLeft = turn.emptyBankPiles - poacherCompliance;
                 if (turn.emptyBankPiles == 1) {
                     String toast = "there is 1 empty supply pile.\ndiscard 1 card";
@@ -953,7 +976,8 @@ public class BasicCards implements Serializable{
             case ARTISAN2:
                 //return card to hand
                 player.removeCardFromDeck(player.deck.size()-1, turn.activity);
-                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity, onTouchListener);
+                player.addCardToHand(cardName, turn.layout, turn.context, turn.activity,
+                        onTouchListener);
                 //book-keeping
                 turn.updateHandData(card, true);
                 //set phase
@@ -1013,7 +1037,8 @@ public class BasicCards implements Serializable{
                 Card card = getCard(revealedCards.get(i));
                 if (card.getType().equals("treasure")) {
                     player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
-                    player.addCardToHand(revealedCards.get(i), turn.layout, turn.context, turn.activity,
+                    player.addCardToHand(revealedCards.get(i), turn.layout, turn.context,
+                            turn.activity,
                             handListener);
                     turn.numberOfTreasuresInHand += 1;
                 } else {
@@ -1027,7 +1052,8 @@ public class BasicCards implements Serializable{
                 Card card = getCard(revealedCards.get(i));
                 if (card.getType().equals("treasure")) {
                     player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
-                    player.addCardToHand(revealedCards.get(i), turn.layout, turn.context, turn.activity, handListener);
+                    player.addCardToHand(revealedCards.get(i), turn.layout, turn.context,
+                            turn.activity, handListener);
                     turn.numberOfTreasuresInHand += 1;
                 } else {
                     player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
@@ -1039,7 +1065,8 @@ public class BasicCards implements Serializable{
             int newDiscardSize = player.discard.size();
             for (int i = 0; i < newDiscardSize-movedToDiscard; i++) {
                 player.deck.add(player.discard.get(0));
-                player.deck.get(player.deck.size() - 1).setCardMultiTagOnMoveToNewPile(player.deck.get(player.deck.size() - 1),
+                player.deck.get(player.deck.size() - 1).setCardMultiTagOnMoveToNewPile
+                        (player.deck.get(player.deck.size() - 1),
                         (player.deck.size() - 1), player.deckTally, "deck");
                 player.deckTally += 1;
                 player.removeCardFromDiscard(0, turn.context, turn.activity);
@@ -1050,7 +1077,8 @@ public class BasicCards implements Serializable{
                     Card card = getCard(revealedCards.get(i));
                     if (card.getType().equals("treasure")) {
                         player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
-                        player.addCardToHand(revealedCards.get(i), turn.layout, turn.context, turn.activity, handListener);
+                        player.addCardToHand(revealedCards.get(i), turn.layout, turn.context,
+                                turn.activity, handListener);
                         turn.numberOfTreasuresInHand +=1;
                     } else {
                         player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
@@ -1062,7 +1090,8 @@ public class BasicCards implements Serializable{
                     Card card = getCard(revealedCards.get(i));
                     if (card.getType().equals("treasure")) {
                         player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
-                        player.addCardToHand(revealedCards.get(i), turn.layout, turn.context, turn.activity, handListener);
+                        player.addCardToHand(revealedCards.get(i), turn.layout, turn.context,
+                                turn.activity, handListener);
                         turn.numberOfTreasuresInHand += 1;
                     } else {
                         player.removeCardFromDeck(player.deck.size() - 1, turn.activity);
@@ -1092,7 +1121,8 @@ public class BasicCards implements Serializable{
         turn.phase = CHAPEL;
     }
 
-    public int finishCellar(Turn turn, View.OnTouchListener handListener, ListenerSwitches listenerSwitches){
+    public int finishCellar(Turn turn, View.OnTouchListener handListener,
+                            ListenerSwitches listenerSwitches){
         int discardedSoFar = discarded;
         discarded = 0;
         for (int i = discardedSoFar; i > 0; i--) {
@@ -1175,12 +1205,14 @@ public class BasicCards implements Serializable{
                 int index = player.deck.size()-1;
                 if (drawnCards.get(0).equals(player.deck.get(index).getCardName())) { //when found
                     player.removeCardFromDeck(index, turn.activity); // remove from deck
-                    player.addCardToHand(drawnCards.get(0), turn.layout, turn.context, turn.activity, handListener); // add to hand
+                    player.addCardToHand(drawnCards.get(0), turn.layout, turn.context, turn.activity,
+                            handListener); // add to hand
                     Card card = turn.basicCardSet.getCard(drawnCards.get(0));
                     turn.updateHandData(card, true);
                     drawnCards.remove(0);
                 } else {
-                    Toast.makeText(turn.context, "the cards don't match", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(turn.context, "the cards don't match",
+                            Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -1190,7 +1222,8 @@ public class BasicCards implements Serializable{
             String discardedCardName;
             int discardedIndex = 0;
             for (int i = deckSize-1; i >= 0; i--){
-                if (discardedCards.size() > discardedIndex) discardedCardName = discardedCards.get(discardedIndex);
+                if (discardedCards.size() > discardedIndex) discardedCardName
+                        = discardedCards.get(discardedIndex);
                 else discardedCardName = "";
                 if (discardedCardName.equals(player.deck.get(i).getCardName())) {
                     player.removeCardFromDeck(i, turn.activity);
@@ -1199,21 +1232,25 @@ public class BasicCards implements Serializable{
                 } else if (drawnCards.get(0).equals(player.deck.get(i).getCardName())){
                     Card card = getCard(drawnCards.get(0));
                     player.removeCardFromDeck(i, turn.activity);
-                    player.addCardToHand(card.getName(), turn.layout, turn.context, turn.activity, handListener);
+                    player.addCardToHand(card.getName(), turn.layout, turn.context, turn.activity,
+                            handListener);
                     turn.updateHandData(card, true);
                     drawnCards.remove(0);
                 } else {
-                    Toast.makeText(turn.context, "the cards don't match", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(turn.context, "the cards don't match",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
             for (int i = discardSize-1; i > minIndex; i--){ //discard or draw remaining cards
-                if (discardedCards.size() > discardedIndex) discardedCardName = discardedCards.get(discardedIndex);
+                if (discardedCards.size() > discardedIndex) discardedCardName
+                        = discardedCards.get(discardedIndex);
                 else discardedCardName = "";
                 if (discardedCardName.equals(player.discard.get(i).getCardName())) {
                     discardedCards.remove(discardedIndex);
                 } else if (drawnCards.get(0).equals(player.discard.get(i).getCardName())){
                     player.removeCardFromDiscard(i, turn.context, turn.activity);
-                    player.addCardToHand(drawnCards.get(0), turn.layout, turn.context, turn.activity, handListener);
+                    player.addCardToHand(drawnCards.get(0), turn.layout, turn.context, turn.activity,
+                            handListener);
                     Card card = getCard(drawnCards.get(0));
                     turn.updateHandData(card, true);
                     drawnCards.remove(0);
@@ -1249,7 +1286,8 @@ public class BasicCards implements Serializable{
             turn.updateHandData(card, false);
         }
         for (int i = 0; i < handList.size(); i++){
-            player.addCardToHand(handList.get(i), turn.layout, turn.context, turn.activity, handListener);
+            player.addCardToHand(handList.get(i), turn.layout, turn.context, turn.activity,
+                    handListener);
             Card card = getCard(handList.get(i));
             turn.updateHandData(card, true);
         }
@@ -1263,7 +1301,8 @@ public class BasicCards implements Serializable{
         turn.actions +=1;
         String cardName = player.discard.get(player.discard.size()-1).getCardName();
         Drawable drawable = player.getImageDps(turn.activity, cardName, (cardWidth / 2));
-        ImageView imageView1 = ((Activity) turn.activity).findViewById(player.discardPile.getImageViewId());
+        ImageView imageView1 = ((Activity) turn.activity)
+                .findViewById(player.discardPile.getImageViewId());
         imageView1.setImageDrawable(drawable);
         TextView textView = ((GameBoardActivity)turn.activity).findViewById(ACTIONS_LEFT_ID);
         textView.setText(turn.actions + " actions left");
@@ -1280,8 +1319,10 @@ public class BasicCards implements Serializable{
                 String reaction = playerList.get(i).checkForReaction("witch");
                 if (!reaction.equals("moat")) {
                     postList.add(playerList.get(i).getName() + " gained a curse.");
-                    cardsLeft = ((GameBoardActivity)turn.activity).removeCardFromBankPile("curse");
-                    if (cardsLeft) playerList.get(i).addOffTurnCard("curse", "discard");
+                    cardsLeft = ((GameBoardActivity)turn.activity)
+                            .removeCardFromBankPile("curse");
+                    if (cardsLeft) playerList.get(i).addOffTurnCard("curse",
+                            "discard");
                 } else {
                     postList.add(playerList.get(i).getName() + " has a moat.");
                 }
@@ -1318,7 +1359,8 @@ public class BasicCards implements Serializable{
                         topCard[0] = playerList.get(i).deck.get(index).getCard();
                         banditAttack.setCard1(topCard[0].getName());
                         playerList.get(i).removeOffTurnCard(index, "deck");
-                        if (!topCard[0].getType().equals("treasure") || topCard[0].getName().equals("copper")) {
+                        if (!topCard[0].getType().equals("treasure") || topCard[0].getName()
+                                .equals("copper")) {
                             playerList.get(i).addOffTurnCard(topCard[0].getName(), "discard");
                             treasures[0] = false;
                         }
@@ -1327,8 +1369,10 @@ public class BasicCards implements Serializable{
                             topCard[1] = playerList.get(i).deck.get(index).getCard();
                             banditAttack.setCard2(topCard[1].getName());
                             playerList.get(i).removeOffTurnCard(index, "deck");
-                            if (!topCard[1].getType().equals("treasure") || topCard[1].getName().equals("copper")) {
-                                playerList.get(i).addOffTurnCard(topCard[1].getName(), "discard");
+                            if (!topCard[1].getType().equals("treasure") || topCard[1].getName()
+                                    .equals("copper")) {
+                                playerList.get(i).addOffTurnCard(topCard[1].getName(),
+                                        "discard");
                                 treasures[1] = false;
                             }
                         } else {

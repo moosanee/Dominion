@@ -261,7 +261,8 @@ public class GameBoardActivity extends AppCompatActivity {
                 switch (mode){
                     case ACTION_PHASE: //"finished actions"
                         turn.startBuyingPhase(listenerSwitches);
-                        undo = new Undo("start buying phase", turn, basicCardSet, listenerSwitches);
+                        undo = new Undo("start buying phase", turn, basicCardSet,
+                                listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
@@ -275,7 +276,8 @@ public class GameBoardActivity extends AppCompatActivity {
                         break;
                     case OPEN_BANK://"finished buying"
                         turn.startCleanUpPhase(listenerSwitches);
-                        undo = new Undo("start clean up phase", turn, basicCardSet, listenerSwitches);
+                        undo = new Undo("start clean up phase", turn, basicCardSet,
+                                listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
@@ -301,13 +303,15 @@ public class GameBoardActivity extends AppCompatActivity {
                         break;
                     case CELLAR: // "finished discarding"
                         int discarded = basicCardSet.finishCellar(turn, handListener, listenerSwitches);
-                        undo = new Undo("finish cellar", turn, discarded, basicCardSet, listenerSwitches);
+                        undo = new Undo("finish cellar", turn, discarded, basicCardSet,
+                                listenerSwitches);
                         undoButton.setClickable(false);
                         undoButton.setAlpha(0.5f);
                         break;
                     case CHAPEL: // "finished trashing"
                         int trashed = basicCardSet.finishChapel(turn, listenerSwitches);
-                        undo = new Undo("finish chapel", turn, trashed, basicCardSet, listenerSwitches);
+                        undo = new Undo("finish chapel", turn, trashed, basicCardSet,
+                                listenerSwitches);
                         undoButton.setClickable(true);
                         undoButton.setAlpha(1f);
                         break;
@@ -422,14 +426,6 @@ public class GameBoardActivity extends AppCompatActivity {
                     view.setVisibility(View.INVISIBLE);
                 }
             }
-           /* if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                if (doubleTap) {
-                    doubleTap = false;
-                    Intent intent = new Intent(view.getContext(), HandBrowseActivity.class);
-                    intent.putExtra("inPlayPileListKey", playerList.get(turnMarker).inPlay);
-                    startActivityForResult(intent, INPLAY_BROWSE_LISTENER);
-                }
-            }*/
             return detected;
         }
     }; // in play onTouch listener
@@ -532,12 +528,14 @@ public class GameBoardActivity extends AppCompatActivity {
                     String targetType = cmt.getCardType();
                     if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).hand.size(); i++) {
-                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId()).setAlpha(0.5f);
+                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId())
+                                    .setAlpha(0.5f);
                         }
                     }
                     if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).inPlay.size(); i++) {
-                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId()).setAlpha(0.5f);
+                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId())
+                                    .setAlpha(0.5f);
                         }
                         v.setBackgroundColor(BACKGROUND_COLOR);
                     }
@@ -556,12 +554,14 @@ public class GameBoardActivity extends AppCompatActivity {
                     targetType = cmt.getCardType();
                     if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).hand.size(); i++) {
-                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId()).setAlpha(1f);
+                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId())
+                                    .setAlpha(1f);
                         }
                     }
                     if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).inPlay.size(); i++) {
-                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId()).setAlpha(1f);
+                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId())
+                                    .setAlpha(1f);
                         }
                         v.setBackgroundColor(BACKGROUND_COLOR_DARK);
                     }
@@ -595,7 +595,8 @@ public class GameBoardActivity extends AppCompatActivity {
                                 if (cardsLeft) playerList.get(turnMarker)
                                         .addCardToDiscard(movingViewName, activity, context);
                                 String fromTo = "moved " + movingViewName + " to discard";
-                                undo = new Undo(fromTo, turn, turn.phase, bankPiles, basicCardSet, listenerSwitches);
+                                undo = new Undo(fromTo, turn, turn.phase, bankPiles, basicCardSet,
+                                        listenerSwitches);
                                 undoButton.setClickable(true);
                                 undoButton.setAlpha(1f);
                                 turn.reactToNewCardInDiscard(movingViewName, bankPiles, listenerSwitches);
@@ -786,7 +787,8 @@ public class GameBoardActivity extends AppCompatActivity {
                                 undoButton.setAlpha(0.5f);
                             } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                                 playerList.get(turnMarker).removeCardFromDiscard(top, context, activity);
-                                playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
+                                playerList.get(turnMarker).addCardToDeck(movingViewName, activity,
+                                        context);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
                             } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
@@ -797,8 +799,8 @@ public class GameBoardActivity extends AppCompatActivity {
                                 undoButton.setAlpha(0.5f);
                             } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                                 playerList.get(turnMarker).removeCardFromDiscard(top, context, activity);
-                                playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
-                                        activity, inPlayListener);
+                                playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout,
+                                        context, activity, inPlayListener);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
                                 turn.reactToNewCardInPlay(movingViewName, handListener, listenerSwitches);
@@ -827,24 +829,27 @@ public class GameBoardActivity extends AppCompatActivity {
                             int deckId = playerList.get(turnMarker).deckPile.getImageViewId();
                             if (targetId == discardId && listenerSwitches.isDiscardDragSwitch()) {
                                 removeCardFromTrashByIndex(top);
-                                playerList.get(turnMarker).addCardToDiscard(movingViewName, activity, context);
+                                playerList.get(turnMarker).addCardToDiscard(movingViewName, activity,
+                                        context);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
                             } else if (targetId == deckId && listenerSwitches.isDeckDragSwitch()) {
                                 removeCardFromTrashByIndex(top);
-                                playerList.get(turnMarker).addCardToDeck(movingViewName, activity, context);
+                                playerList.get(turnMarker).addCardToDeck(movingViewName, activity,
+                                        context);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
                             } else if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                                 removeCardFromTrashByIndex(top);
-                                playerList.get(turnMarker).addCardToHand(movingViewName, layout, context,
-                                        activity, handListener);
+                                playerList.get(turnMarker).addCardToHand(movingViewName, layout,
+                                        context, activity, handListener);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
-                            } else if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
+                            } else if (targetType.equals("inPlay")
+                                    && listenerSwitches.isInPlayDragSwitch()) {
                                 removeCardFromTrashByIndex(top);
-                                playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout, context,
-                                        activity, inPlayListener);
+                                playerList.get(turnMarker).addCardToPlayArea(movingViewName, layout,
+                                        context, activity, inPlayListener);
                                 undoButton.setClickable(false);
                                 undoButton.setAlpha(0.5f);
                                 turn.reactToNewCardInPlay(movingViewName, handListener, listenerSwitches);
@@ -863,13 +868,15 @@ public class GameBoardActivity extends AppCompatActivity {
                     targetType = cmt.getCardType();
                     if (targetType.equals("inPlay") && listenerSwitches.isInPlayDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).inPlay.size(); i++) {
-                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId()).setAlpha(1f);
+                            findViewById(playerList.get(turnMarker).inPlay.get(i).getImageViewId())
+                                    .setAlpha(1f);
                         }
                         findViewById(INPLAY_VIEW_ID).setBackgroundColor(BACKGROUND_COLOR_DARK);
                     }
                     if (targetType.equals("hand") && listenerSwitches.isHandDragSwitch()) {
                         for (int i = 0; i < playerList.get(turnMarker).hand.size(); i++) {
-                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId()).setAlpha(1f);
+                            findViewById(playerList.get(turnMarker).hand.get(i).getImageViewId())
+                                    .setAlpha(1f);
                         }
                     }
                     if (targetType.equals("deck") && listenerSwitches.isDeckDragSwitch()) {
@@ -932,8 +939,8 @@ public class GameBoardActivity extends AppCompatActivity {
                         int viewId = playerList.get(turnMarker).hand.get(index).getImageViewId();
                         String cardName = playerList.get(turnMarker).hand.get(index).getCardName();
                         playerList.get(turnMarker).removeCardFromHand(viewId, activity, layout);
-                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                                inPlayListener);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context,
+                                activity, inPlayListener);
                         undoButton.setClickable(false);
                         undoButton.setAlpha(0.5f);
                         turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
@@ -961,8 +968,8 @@ public class GameBoardActivity extends AppCompatActivity {
                             undoButton.setAlpha(1f);
                             turn.continueToTurnPhase(listenerSwitches);
                         } else {
-                            undo = new Undo("browsed discard", turn, HARBINGER, handListener,
-                                    basicCardSet, listenerSwitches);
+                            undo = new Undo("browsed discard", turn, HARBINGER,
+                                    handListener, basicCardSet, listenerSwitches);
                             undoButton.setClickable(true);
                             undoButton.setAlpha(1f);
                             turn.continueToTurnPhase(listenerSwitches);
@@ -979,10 +986,11 @@ public class GameBoardActivity extends AppCompatActivity {
                     cardChosen = data.getBooleanExtra("cardChosenKey", cardChosen);
                     chosenCardIndex = data.getIntExtra("chosenCardIndexKey", -1);
                     if (cardChosen) {
-                        String cardName = playerList.get(turnMarker).deck.get(chosenCardIndex).getCardName();
+                        String cardName = playerList.get(turnMarker).deck.get(chosenCardIndex)
+                                .getCardName();
                         playerList.get(turnMarker).removeCardFromDeck(chosenCardIndex, activity);
-                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                                inPlayListener);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context,
+                                activity, inPlayListener);
                         undoButton.setClickable(false);
                         undoButton.setAlpha(0.5f);
                         turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
@@ -999,8 +1007,8 @@ public class GameBoardActivity extends AppCompatActivity {
                     if (cardChosen) {
                         String cardName = trash.get(chosenCardIndex).getCardName();
                         removeCardFromTrashByIndex(chosenCardIndex);
-                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context, activity,
-                                inPlayListener);
+                        playerList.get(turnMarker).addCardToPlayArea(cardName, layout, context,
+                                activity, inPlayListener);
                         undoButton.setClickable(false);
                         undoButton.setAlpha(0.5f);
                         turn.reactToNewCardInPlay(cardName, handListener, listenerSwitches);
@@ -1009,24 +1017,18 @@ public class GameBoardActivity extends AppCompatActivity {
                 break;
             case CHANCELLOR_ANSWER_CODE:
                 if (resultCode == RESULT_OK) {
-                   boolean chancellorChoice = data.getBooleanExtra("chancellorKey", false);
+                   boolean chancellorChoice = data.getBooleanExtra("chancellorKey",
+                           false);
                    basicCardSet.finishChancellor(chancellorChoice, turn, listenerSwitches);
-                   /*if (chancellorChoice){
-                       int deckSize = playerList.get(turnMarker).deck.size();
-                       undo = new Undo("put deck in discard", turn, deckSize, basicCardSet,
-                               listenerSwitches);
-                       playerList.get(turnMarker).putDeckInDiscard(activity);
-                   }
-                   turn.continueToTurnPhase(listenerSwitches);
-                   undoButton.setClickable(true);
-                   undoButton.setAlpha(1f);*/
                 }
                 break;
             case LIBRARY_REVEAL_CODE:
                 if (resultCode == RESULT_OK) {
                     ArrayList<String> drawnCards = data.getStringArrayListExtra("drawnCardsKey");
-                    ArrayList<String> discardedCards =data.getStringArrayListExtra("discardedCardsKey");
-                    basicCardSet.finishLibrary(drawnCards, discardedCards, turn, handListener, listenerSwitches);
+                    ArrayList<String> discardedCards
+                            = data.getStringArrayListExtra("discardedCardsKey");
+                    basicCardSet.finishLibrary(drawnCards, discardedCards, turn, handListener,
+                            listenerSwitches);
                 }
                 break;
         }
@@ -1318,16 +1320,19 @@ public class GameBoardActivity extends AppCompatActivity {
                     } else {
                         int totalDispX = cost2CardLocStart + (displacement * (i));
                         cardName = gameCards.get(gameCardIndex - 1).getName();
-                        bankPiles.add(new CardData(cardName, "bank", 0,0, basicCardSet));
+                        bankPiles.add(new CardData(cardName, "bank", 0,0,
+                                basicCardSet));
                         viewTag = bankPiles.get(bankPiles.size()-1).getCardMultiTag();
                         Drawable drawable = getImageDps(this, cardName, smallCardWidth/2);
-                        ImageView newView = makeNewImageView(totalDispX, cost2CardLocTop, viewTag, drawable);
+                        ImageView newView = makeNewImageView(totalDispX, cost2CardLocTop, viewTag,
+                                drawable);
                         newView.setId(BANK_VIEW_ID + bankPileTally);
                         bankPiles.get(bankPiles.size()-1).setImageViewId(BANK_VIEW_ID + bankPileTally);
                         bankPileTally += 1;
                         pileName = String.valueOf(bankPiles.size()-1);
                         layout.addView(newView);
-                        counterView = makePileSizeCounter(totalDispX, cost2CardLocTop, pileName, "10");
+                        counterView = makePileSizeCounter(totalDispX, cost2CardLocTop, pileName,
+                                "10");
                         counterView.setId(BANK_COUNTER_VIEW_ID+bankPileTally-1);
                         bankPiles.get(bankPiles.size()-1).setTextView(counterView);
                         layout.addView(counterView);
@@ -1370,7 +1375,8 @@ public class GameBoardActivity extends AppCompatActivity {
                 } else {
                     int totalDispX = cost3CardLocStart + (displacement * (i));
                     cardName = gameCards.get(gameCardIndex - 1).getName();
-                    bankPiles.add(new CardData(cardName, "bank", 0,0, basicCardSet));
+                    bankPiles.add(new CardData(cardName, "bank", 0,0,
+                            basicCardSet));
                     viewTag = bankPiles.get(bankPiles.size()-1).getCardMultiTag();
                     Drawable drawable = getImageDps(this, cardName, smallCardWidth/2);
                     ImageView newView = makeNewImageView(totalDispX, cost3CardLocTop, viewTag, drawable);
@@ -1422,7 +1428,8 @@ public class GameBoardActivity extends AppCompatActivity {
                 } else {
                     int totalDispX = cost4CardLocStart + (displacement * (i));
                     cardName = gameCards.get(gameCardIndex - 1).getName();
-                    bankPiles.add(new CardData(cardName, "bank", 0,0, basicCardSet));
+                    bankPiles.add(new CardData(cardName, "bank", 0,0,
+                            basicCardSet));
                     viewTag = bankPiles.get(bankPiles.size()-1).getCardMultiTag();
                     Drawable drawable = getImageDps(this, cardName, smallCardWidth/2);
                     ImageView newView = makeNewImageView(totalDispX, cost4CardLocTop, viewTag, drawable);
@@ -1475,10 +1482,12 @@ public class GameBoardActivity extends AppCompatActivity {
                     } else {
                         int totalDispX = cost5CardLocStart + (displacement * (cost567Index - 1));
                         cardName = gameCards.get(gameCardIndex - 1).getName();
-                        bankPiles.add(new CardData(cardName, "bank", 0,0, basicCardSet));
+                        bankPiles.add(new CardData(cardName, "bank", 0,0,
+                                basicCardSet));
                         viewTag = bankPiles.get(bankPiles.size()-1).getCardMultiTag();
                         Drawable drawable = getImageDps(this, cardName, smallCardWidth/2);
-                        ImageView newView = makeNewImageView(totalDispX, cost5CardLocTop, viewTag, drawable);
+                        ImageView newView = makeNewImageView(totalDispX, cost5CardLocTop, viewTag,
+                                drawable);
                         newView.setId(BANK_VIEW_ID + bankPileTally);
                         bankPiles.get(bankPiles.size()-1).setImageViewId(BANK_VIEW_ID + bankPileTally);
                         bankPileTally += 1;
@@ -1535,7 +1544,8 @@ public class GameBoardActivity extends AppCompatActivity {
         String drawableString = "";
         String[] parsedName = imageName.split("(?=\\p{Upper})");
         if (parsedName.length == 2){
-                parsedName[1] = Character.toLowerCase(parsedName[1].charAt(0)) + parsedName[1].substring(1);
+                parsedName[1] = Character.toLowerCase(parsedName[1].charAt(0))
+                        + parsedName[1].substring(1);
                 drawableString = parsedName[0] + "_" + parsedName[1] + Integer.toString(size);
         } else if (parsedName.length == 1) {
                 drawableString = parsedName[0] + Integer.toString(size);
@@ -1672,185 +1682,6 @@ public class GameBoardActivity extends AppCompatActivity {
     }
 
 
-    /*public void reactToWitch(String playerName){
-        boolean cardsLeft = true;
-        ArrayList<String> postList = new ArrayList<>();
-        for (int i = 0; i < playerList.size(); i++){
-            if (!playerList.get(i).getName().equals(playerName)){
-                String reaction = playerList.get(i).checkForReaction("witch");
-                if (!reaction.equals("moat")) {
-                    postList.add(playerList.get(i).getName() + " gained a curse.");
-                    cardsLeft = removeCardFromBankPile("curse");
-                    if (cardsLeft) playerList.get(i).addOffTurnCard("curse", "discard");
-                } else {
-                    postList.add(playerList.get(i).getName() + " has a moat.");
-                }
-            }
-        }
-        Intent intent = new Intent(context, NotificationActivity.class);
-        intent.putStringArrayListExtra("postListKey", postList);
-        startActivity(intent);
-    }*/
-
-   /* public ArrayList<BanditAttack> reactToBanditAttack(String playerName){
-        ArrayList<BanditAttack> banditAttackResults = new ArrayList<>();
-        Card[] topCard = new Card[2];
-        for (int i = 0; i < playerList.size(); i++){
-            boolean[] treasures = {true, true};
-            if (!playerList.get(i).getName().equals(playerName)) {
-                BanditAttack banditAttack = new BanditAttack(i, playerList.get(i).getName());
-                String reaction = playerList.get(i).checkForReaction("bandit");
-                if (reaction.equals("moat")) {
-                    banditAttack.setBlocked(true);
-                } else {
-                    int index;
-                    if (playerList.get(i).deck.size() > 1)
-                        index = playerList.get(i).deck.size() - 1;
-                    else if (playerList.get(i).deck.size() == 1) {
-                        index = 0;
-                        playerList.get(i).putDiscardInDeck(activity);
-                    } else {
-                        playerList.get(i).putDiscardInDeck(activity);
-                        index = playerList.get(i).deck.size() - 1;
-                    }
-                    if (index >= 0) {
-                        topCard[0] = playerList.get(i).deck.get(index).getCard();
-                        banditAttack.setCard1(topCard[0].getName());
-                        playerList.get(i).removeOffTurnCard(index, "deck");
-                        if (!topCard[0].getType().equals("treasure") || topCard[0].getName().equals("copper")) {
-                            playerList.get(i).addOffTurnCard(topCard[0].getName(), "discard");
-                            treasures[0] = false;
-                        }
-                        if (playerList.get(i).deck.size() > 0) {
-                            index = playerList.get(i).deck.size() - 1;
-                            topCard[1] = playerList.get(i).deck.get(index).getCard();
-                            banditAttack.setCard2(topCard[1].getName());
-                            playerList.get(i).removeOffTurnCard(index, "deck");
-                            if (!topCard[1].getType().equals("treasure") || topCard[1].getName().equals("copper")) {
-                                playerList.get(i).addOffTurnCard(topCard[1].getName(), "discard");
-                                treasures[1] = false;
-                            }
-                        } else {
-                            treasures[1] = false;
-                            String toast = "no more cards to reveal";
-                            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                            banditAttack.setCard2("");
-                        }
-                    } else {
-                        String toast = "no more cards to reveal";
-                        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                        banditAttack.setCard1("");
-                        banditAttack.setCard2("");
-                        treasures[1] = false;
-                        treasures[0] = false;
-                    }
-                    if (treasures[0] && treasures[1]) {
-                        int value1 = topCard[0].getValue();
-                        int value2 = topCard[1].getValue();
-                        if (value1 < value2) {
-                            banditAttack.setTrashed(0);
-                            addCardToTrash(topCard[0].getName());
-                            playerList.get(i).addOffTurnCard(topCard[1].getName(), "discard");
-                        } else {
-                            banditAttack.setTrashed(1);
-                            addCardToTrash(topCard[1].getName());
-                            playerList.get(i).addOffTurnCard(topCard[0].getName(), "discard");
-                        }
-                    } else if (treasures[0]) {
-                        banditAttack.setTrashed(0);
-                        addCardToTrash(topCard[0].getName());
-                    } else if (treasures[1]) {
-                        banditAttack.setTrashed(1);
-                        addCardToTrash(topCard[1].getName());
-                    }
-                }
-                banditAttackResults.add(banditAttack);
-            }
-        }
-        return banditAttackResults;
-    }
-*/
-   /* public void reactToCouncilRoom(String playerName){
-        int size = playerList.size();
-        boolean[] cardDrawn = new boolean[size];
-        for (int i = 0; i < playerList.size(); i ++){
-            if (playerName.equals(playerList.get(i).getName())) {
-                cardDrawn[i] = false;
-            } else {
-                Player player = playerList.get(i);
-                if (player.deck.size() == 0){
-                    player.putOffTurnDiscardInDeck();
-                }
-                if (player.deck.size()>0) {
-                    String cardName = player.deck.get(player.deck.size() - 1).getCardName();
-                    player.addOffTurnCard(cardName, "hand");
-                    player.removeOffTurnCard(player.deck.size()-1, "deck");
-                    cardDrawn[i] = true;
-                } else {
-                    String toast = player.getName() + " has no cards to draw";
-                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-                    cardDrawn[i] = false;
-                }
-
-            }
-        }
-        undo = new Undo("other players drew a card", turn, cardDrawn, handListener,
-                basicCardSet, listenerSwitches);
-        undoButton.setClickable(true);
-        undoButton.setAlpha(1f);
-    }*/
-
-   /* public void undoCouncilRoom(boolean[] playerToggles){
-        for (int i = 0; i < playerList.size(); i ++){
-            Player player = playerList.get(i);
-            if (playerToggles[i]) {
-                String cardName = player.hand.get(player.hand.size() - 1).getCardName();
-                player.addOffTurnCard(cardName, "deck");
-                player.removeOffTurnCard(player.hand.size()-1, "hand");
-            }
-        }
-        undoButton.setClickable(false);
-        undoButton.setAlpha(0.5f);
-    }*/
-
-   /* public ArrayList<BureaucratAttack> reactToBureaucratAttack(String playerName){
-        ArrayList<BureaucratAttack> bureaucratAttackResults = new ArrayList<>();
-        for (int i = 0; i < playerList.size(); i++){
-            boolean vpCard = false;
-            if (!playerList.get(i).getName().equals(playerName)) {
-                BureaucratAttack bureaucratAttack = new BureaucratAttack(i, playerList.get(i).getName());
-                String reaction = playerList.get(i).checkForReaction("bureaucrat");
-                if (reaction.equals("moat")) {
-                    bureaucratAttack.setBlocked(true);
-                } else {
-                    int vpValue = 100;
-                    String replacedCard = "";
-                    int index = -1;
-                    for (int j = 0; j < playerList.get(i).hand.size(); j++) {
-                        Card card = playerList.get(i).hand.get(j).getCard();
-                        if (card.getType().equals("victory")) {
-                            vpCard = true;
-                            if (card.getVictoryPoints() < vpValue) {
-                                vpValue = card.getVictoryPoints();
-                                replacedCard = card.getName();
-                                index = j;
-                            }
-                        }
-                    }
-                    bureaucratAttack.setCardOnDeck(replacedCard);
-                    bureaucratAttack.setVictoryInHand(vpCard);
-                    if (index >= 0) {
-                        playerList.get(i).removeOffTurnCard(index, "hand");
-                        playerList.get(i).addOffTurnCard(replacedCard, "deck");
-                    }
-                }
-                bureaucratAttackResults.add(bureaucratAttack);
-            }
-        }
-        return bureaucratAttackResults;
-    }*/
-
-
     public void endGame(){
         ArrayList<String> postList = new ArrayList<>();
 
@@ -1936,7 +1767,8 @@ public class GameBoardActivity extends AppCompatActivity {
         postList.add(post);
         postList.add("");
         for (int i = 0; i < playerList.size(); i++){
-            post = playerList.get(i).getName() + " scored " + playerList.get(i).getScore() + " victory points.";
+            post = playerList.get(i).getName() + " scored " + playerList.get(i).getScore()
+                    + " victory points.";
             postList.add(post);
         }
 
