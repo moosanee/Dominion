@@ -33,19 +33,21 @@ public class Player implements Serializable{
     int inPlayTally = 0;
     CardData deckPile;
     CardData discardPile;
+    BasicCards basicCardSet;
     private static final long serialVersionUID = 1L;
 
-    Player(PlayerInfo playerInfo) {
+    Player(PlayerInfo playerInfo, BasicCards basicCardSet) {
         this.Name = playerInfo.getName();
         this.number = playerInfo.getNumber();
         this.human = playerInfo.getHuman();
+        this.basicCardSet = basicCardSet;
         this.deck = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            deck.add(new CardData("estate", "deck", deckTally, deckTally)); // add 3 estates to the deck
+            deck.add(new CardData("estate", "deck", deckTally, deckTally, basicCardSet)); // add 3 estates to the deck
             deckTally +=1;
         }
         for (int i = 0; i < 7; i++) {
-            deck.add(new CardData("copper", "deck", deckTally, deckTally)); // add 7 coppers to the deck
+            deck.add(new CardData("copper", "deck", deckTally, deckTally, basicCardSet)); // add 7 coppers to the deck
             deckTally += 1;
         }
         this.hand = new ArrayList<>();
@@ -98,7 +100,7 @@ public class Player implements Serializable{
 
 //initialize deck
     public void initializeDeck(ConstraintLayout layout, Context context, Activity activity){
-        deckPile = new CardData("back", "deck", 0,0);
+        deckPile = new CardData("back", "deck", 0,0, basicCardSet);
         deckPile.setImageViewId(DECK_PILE_ID);
         ImageView imageView = new ImageView(context);
         imageView.setId(DECK_PILE_ID);
@@ -155,7 +157,8 @@ public class Player implements Serializable{
 
 //initialize discard
     public void initializeDiscard(ConstraintLayout layout, Context context, Activity activity){
-        discardPile = new CardData("back", "discard", 0,0);
+        discardPile = new CardData("back", "discard", 0,0,
+                basicCardSet);
         ImageView imageView = new ImageView(context);
         discardPile.setImageViewId(DISCARD_PILE_ID);
         imageView.setId(DISCARD_PILE_ID);
@@ -221,7 +224,7 @@ public class Player implements Serializable{
         }
         //add new card to hand
         int i = hand.size();
-        CardData cardData = new CardData(cardName, "hand", i, handTally);
+        CardData cardData = new CardData(cardName, "hand", i, handTally, basicCardSet);
         ImageView imageView = new ImageView(context);
         final int FINAL_ID = handTally;
         handTally += 1;
@@ -313,7 +316,7 @@ public class Player implements Serializable{
         //add new card to area
         int i = inPlay.size();
         final int FINAL_ID = inPlayTally;
-        CardData cardData = new CardData(cardName, "inPlay", i, inPlayTally);
+        CardData cardData = new CardData(cardName, "inPlay", i, inPlayTally, basicCardSet);
         ImageView imageView = new ImageView(context);
         inPlayTally += 1;
         cardData.setImageViewId(PLAY_AREA_VIEWS_ID + FINAL_ID);
@@ -376,7 +379,7 @@ public class Player implements Serializable{
 
 
     public void addCardToDeck(String cardName, Activity activity, Context context) {
-        deck.add(new CardData(cardName, "deck", this.deck.size(), this.deckTally));
+        deck.add(new CardData(cardName, "deck", this.deck.size(), this.deckTally, basicCardSet));
         ImageView imageView = new ImageView(context);
         deckTally +=1;
         final int NUMBER = deck.get(deck.size()-1).getNumber();
@@ -387,7 +390,7 @@ public class Player implements Serializable{
     }
 
     public void addCardToOffHandDeck(String cardName){
-        deck.add(new CardData(cardName, "deck", this.deck.size(), this.deckTally));
+        deck.add(new CardData(cardName, "deck", this.deck.size(), this.deckTally, basicCardSet));
         deckTally += 1;
     }
 
@@ -405,7 +408,8 @@ public class Player implements Serializable{
 
 
     public void addCardToDiscard(String cardName, Activity  activity, Context context) {
-        discard.add(new CardData(cardName, "discard", this.discard.size(), this.discardTally));
+        discard.add(new CardData(cardName, "discard", this.discard.size(), this.discardTally,
+                basicCardSet));
         ImageView imageView = new ImageView(context);
         discardTally +=1;
         final int NUMBER = discard.get(discard.size()-1).getNumber();
@@ -503,7 +507,8 @@ public class Player implements Serializable{
         }
     }
 
-    public void drawHand(ConstraintLayout layout, Context context, Activity activity, View.OnTouchListener handListener) {
+    public void drawHand(ConstraintLayout layout, Context context, Activity activity,
+                         View.OnTouchListener handListener) {
         int deckSize = deck.size();
         int discardSize = discard.size();
         int cardsStillNeeded;
@@ -716,21 +721,21 @@ public class Player implements Serializable{
                 itemNumber = handTally;
                 handTally +=1;
                 position = hand.size();
-                CardData cardData = new CardData(cardName, "hand", position, itemNumber);
+                CardData cardData = new CardData(cardName, "hand", position, itemNumber, basicCardSet);
                 hand.add(cardData);
                 break;
             case "deck":
                 itemNumber = deckTally;
                 deckTally += 1;
                 position = deck.size();
-                cardData = new CardData(cardName, "hand", position, itemNumber);
+                cardData = new CardData(cardName, "hand", position, itemNumber, basicCardSet);
                 deck.add(cardData);
                 break;
             case "discard":
                 itemNumber = discardTally;
                 discardTally += 1;
                 position = discard.size();
-                cardData = new CardData(cardName, "hand", position, itemNumber);
+                cardData = new CardData(cardName, "hand", position, itemNumber, basicCardSet);
                 discard.add(cardData);
                 break;
         }

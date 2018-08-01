@@ -17,66 +17,75 @@ public class Undo {
     boolean[] playerToggles;
     private ListenerSwitches listenerSwitches;
     private View.OnTouchListener onTouchListener;
+    private BasicCards basicCardSet;
 
-    public Undo (String description, Turn turn, ListenerSwitches listenerSwitches){
+    public Undo (String description, Turn turn, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.listenerSwitches = listenerSwitches;
+        this.basicCardSet = basicCardSet;
     }
-    public Undo (String description, Turn turn, int cardsMoved, ListenerSwitches listenerSwitches){
+    public Undo (String description, Turn turn, int cardsMoved, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.cardsMoved = cardsMoved;
         this.listenerSwitches = listenerSwitches;
+        this.basicCardSet = basicCardSet;
     }
     public Undo (String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
-                 ListenerSwitches listenerSwitches){
+                 BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.cardDataList = cardDataList;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, boolean[] playerToggles,
-                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.playerToggles = playerToggles;
         this.onTouchListener = onTouchListener;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, int undoPhase, View.OnTouchListener onTouchListener,
-                 ListenerSwitches listenerSwitches){
+                 BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.onTouchListener = onTouchListener;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, ArrayList<CardData> cardDataList,
-                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.cardDataList = cardDataList;
         this.onTouchListener = onTouchListener;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, Turn turn, int undoPhase, ArrayList<CardData> cardDataList,
-                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.cardDataList = cardDataList;
         this.onTouchListener = onTouchListener;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
     public Undo (String description, int undoPhase, Turn turn, ArrayList<ArrayList<String>> pileLists,
-                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+                 View.OnTouchListener onTouchListener, BasicCards basicCardSet, ListenerSwitches listenerSwitches){
         this.description = description;
         this.turn = turn;
         this.undoPhase = undoPhase;
         this.pileLists = pileLists;
         this.onTouchListener = onTouchListener;
+        this.basicCardSet = basicCardSet;
         this.listenerSwitches = listenerSwitches;
     }
 
@@ -99,19 +108,19 @@ public class Undo {
                 turn.startBuyingPhase(listenerSwitches);
                 break;
             case "finish chapel":
-                turn.returnToChapelTrashing(cardsMoved, listenerSwitches);
+                basicCardSet.returnToChapelTrashing(cardsMoved, turn, listenerSwitches);
                 break;
             case "put deck in discard":
-                turn.undoDeckToDiscard(cardsMoved, listenerSwitches);
+                basicCardSet.undoDeckToDiscard(cardsMoved, turn, listenerSwitches);
                 break;
             case "other players drew a card":
-                turn.undoCouncilRoom(playerToggles, onTouchListener, listenerSwitches);
+                basicCardSet.undoCouncilRoom(playerToggles, turn, onTouchListener, listenerSwitches);
                 break;
             case "played a feast":
                 turn.undoNewCardInPlay("feast", FEAST, onTouchListener, listenerSwitches);
                 break;
             case "played a library":
-                turn.undoLibrary(pileLists, onTouchListener, listenerSwitches);
+                basicCardSet.undoLibrary(pileLists, turn, onTouchListener, listenerSwitches);
                 break;
             case "browsed discard":
                 turn.undoNewCardInPlay("harbinger", HARBINGER, onTouchListener, listenerSwitches);

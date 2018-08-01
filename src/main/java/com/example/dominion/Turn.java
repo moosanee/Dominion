@@ -23,43 +23,44 @@ public class Turn {
     ConstraintLayout layout;
     Player player;
     int phase = 0;
-    int previousPhase;
+    //int previousPhase;
     int actions = 1;
     int buys = 1;
     int coins = 0;
     int draws = 0;
     int numberOfTreasuresInHand = 0;
     int numberOfActionsInHand = 0;
-    int trashed = 0;
-    int discarded = 0;
+    //int trashed = 0;
+    //int discarded = 0;
     boolean firstSilverInPlayFlag = false;
     int emptyBankPiles;
-    int poacherCompliance = 0;
-    boolean adventurerShuffle = false;
+    //int poacherCompliance = 0;
+    //boolean adventurerShuffle = false;
     int councilRoomDraws = 0;
     ArrayList<String> reactions = new ArrayList<>();
-    BasicCards basicCardSet = new BasicCards();
-    ArrayList<CardData> bankPiles; // = new ArrayList<>();
+    BasicCards basicCardSet;
+    ArrayList<CardData> bankPiles;
     ArrayList<Card> actionsPlayed = new ArrayList<>();
     ArrayList<Card> treasuresPlayed = new ArrayList<>();
     ArrayList<Card> cardsGained = new ArrayList<>();
-    ArrayList<Card> cardsTrashed = new ArrayList<>();
-    ArrayList<Card> cardsDiscarded = new ArrayList<>();
-    ArrayList<String> revealedCards = new ArrayList<>();
-    ArrayList<String> postList = new ArrayList<>();
-    ArrayList<BanditAttack> banditAttackResult = new ArrayList<>();
-    ArrayList<BureaucratAttack> bureaucratAttackResult = new ArrayList<>();
+    //ArrayList<Card> cardsTrashed = new ArrayList<>();
+    //ArrayList<Card> cardsDiscarded = new ArrayList<>();
+    //ArrayList<String> revealedCards = new ArrayList<>();
+    //ArrayList<String> postList = new ArrayList<>();
+    //ArrayList<BanditAttack> banditAttackResult = new ArrayList<>();
+    //ArrayList<BureaucratAttack> bureaucratAttackResult = new ArrayList<>();
 
 
 
     Turn(Player player, int emptyBankPiles, ArrayList<CardData> bankPiles, GameBoardActivity activity,
-            Context context, ConstraintLayout layout){
+            Context context, ConstraintLayout layout, BasicCards basicCardSet){
         this.player = player;
         this.emptyBankPiles = emptyBankPiles;
         this.bankPiles = bankPiles;
         this.activity = activity;
         this.context = context;
         this.layout = layout;
+        this.basicCardSet = basicCardSet;
     }
 
     public void startTurn(ListenerSwitches listenerSwitches){
@@ -99,50 +100,41 @@ public class Turn {
                 listenerSwitches.setHandListenerSwitch(true);
                 listenerSwitches.setDiscardDragSwitch(true);
                 break;
-            case CHAPEL:
+            case HAND_TO_TRASH:
                 listenerSwitches.setAllFalse();
                 listenerSwitches.setTrashDragSwitch(true);
                 listenerSwitches.setHandListenerSwitch(true);
                 listenerSwitches.setHandDragSwitch(true);
                 break;
-            case CELLAR:
+            case HAND_TO_DISCARD:
                 listenerSwitches.setAllFalse();
                 listenerSwitches.setDiscardDragSwitch(true);
                 listenerSwitches.setHandListenerSwitch(true);
                 listenerSwitches.setHandDragSwitch(true);
                 break;
-            case POACHER:
-                listenerSwitches.setAllFalse();
-                listenerSwitches.setHandListenerSwitch(true);
-                listenerSwitches.setHandDragSwitch(true);
-                listenerSwitches.setDiscardDragSwitch(true);
-                break;
-            case ARTISAN1:
-                listenerSwitches.setAllFalse();
-                listenerSwitches.setHandDragSwitch(true);
-                listenerSwitches.setBankListenerSwitch(true);
-                break;
-            case ARTISAN2:
+            case HAND_TO_DECK:
                 listenerSwitches.setAllFalse();
                 listenerSwitches.setHandListenerSwitch(true);
                 listenerSwitches.setHandDragSwitch(true);
                 listenerSwitches.setDeckDragSwitch(true);
                 break;
-            case ADVENTURER:
+            case BANK_TO_HAND:
+                listenerSwitches.setAllFalse();
+                listenerSwitches.setHandDragSwitch(true);
+                listenerSwitches.setBankListenerSwitch(true);
+                break;
+            case BANK_TO_DISCARD:
+                listenerSwitches.setAllFalse();
+                listenerSwitches.setDiscardDragSwitch(true);
+                listenerSwitches.setBankListenerSwitch(true);
+                break;
+            case DECK_TO_INPLAY:
                 listenerSwitches.setAllFalse();
                 listenerSwitches.setDeckListenerSwitch(true);
                 listenerSwitches.setInPlayDragSwitch(true);
                 listenerSwitches.setDeckDragSwitch(true);
                 break;
-            case FEAST:
-                listenerSwitches.setAllFalse();
-                listenerSwitches.setDiscardDragSwitch(true);
-                listenerSwitches.setBankListenerSwitch(true);
-                break;
-            case HARBINGER:
-                listenerSwitches.setAllFalse();
-                break;
-            case LIBRARY:
+            case ALL_OFF:
                 listenerSwitches.setAllFalse();
                 break;
         }
@@ -248,14 +240,24 @@ public class Turn {
                     }
                     draws -= 1;
                 }
-                switch (cardName) {
+                String expansion = card.getExpansionName();
+                if (expansion.equals("basic+")) expansion = "basic";
+                if (expansion.equals("basic-")) expansion = "basic";
+                switch (expansion){
+                    case "basic":
+                        if (cardName.equals("merchant")) firstSilverInPlayFlag = true;
+                        basicCardSet.reactToNewCardInPlay(cardName, this, handListener,
+                                listenerSwitches);
+                        break;
+                }
+                /*switch (cardName) {
                     case "adventurer":
                         Toast.makeText(context, "Reveal cards from your deck until you reveal 2 treasure cards.",
                                 Toast.LENGTH_SHORT).show();
                         Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("apply\nadventurer");
                         button.setTag(ADVENTURER);
-                        setListeners(ADVENTURER, listenerSwitches);
+                        setListeners(ALL_OFF, listenerSwitches);
                         phase = ADVENTURER;
                         break;
                     case "artisan":
@@ -264,7 +266,7 @@ public class Turn {
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("gain\ncard");
                         button.setTag(ARTISAN1);
-                        setListeners(ARTISAN1, listenerSwitches);
+                        setListeners(BANK_TO_HAND, listenerSwitches);
                         phase = ARTISAN1;
                         break;
                     case "bandit":
@@ -357,7 +359,7 @@ public class Turn {
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("finished\ntrashing");
                         button.setTag(CHAPEL);
-                        setListeners(CHAPEL, listenerSwitches);
+                        setListeners(HAND_TO_TRASH, listenerSwitches);
                         phase = CHAPEL;
                         break;
                     case "cellar":
@@ -365,7 +367,7 @@ public class Turn {
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("finished\ndiscarding");
                         button.setTag(CELLAR);
-                        setListeners(CELLAR, listenerSwitches);
+                        setListeners(HAND_TO_DISCARD, listenerSwitches);
                         phase = CELLAR;
                         break;
                     case "councilRoom":
@@ -384,7 +386,7 @@ public class Turn {
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("gain\ncard");
                         button.setTag(FEAST);
-                        setListeners(FEAST, listenerSwitches);
+                        setListeners(BANK_TO_DISCARD, listenerSwitches);
                         phase = FEAST;
                         break;
                     case "harbinger":
@@ -392,13 +394,13 @@ public class Turn {
                         button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                         button.setText("browse\ndiscard");
                         button.setTag(HARBINGER);
-                        setListeners(HARBINGER, listenerSwitches);
+                        setListeners(ALL_OFF, listenerSwitches);
                         phase = HARBINGER;
                         break;
                     case "library":
                         Toast.makeText(context, basicCardSet.getCard("library").getInstructions(),
                                 Toast.LENGTH_SHORT).show();
-                        setListeners(LIBRARY, listenerSwitches);
+                        setListeners(ALL_OFF, listenerSwitches);
                         phase = LIBRARY;
                         break;
                     case "merchant":
@@ -419,7 +421,7 @@ public class Turn {
                                 button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                                 button.setText("discard\ncard");
                                 button.setTag(POACHER);
-                                setListeners(POACHER, listenerSwitches);
+                                setListeners(HAND_TO_DISCARD, listenerSwitches);
                                 phase = POACHER;
                             } else {
                                 Toast.makeText(context, "no cards in hand to discard",
@@ -431,7 +433,7 @@ public class Turn {
                     case "witch":
                         ((GameBoardActivity)activity).reactToWitch(player.getName());
                         break;
-                }
+                }*/
             }
         }
         if (phase == BUYING_PHASE) {
@@ -461,7 +463,7 @@ public class Turn {
                 startOpenBankPhase(listenerSwitches);
             }
         }
-        if (phase == ADVENTURER){
+        /*if (phase == ADVENTURER){
             ((GameBoardActivity) activity).undo = new Undo("moved adventurer to inPlay",
                     this, phase, handListener, listenerSwitches);
             ((GameBoardActivity) activity).undoButton.setClickable(true);
@@ -503,8 +505,8 @@ public class Turn {
             intent.putExtra("phaseKey", phase);
             intent.putExtra("cardsToDrawKey", 0);
             activity.startActivity(intent);
-        }
-        if (phase == LIBRARY){
+        }*/
+        /*if (phase == LIBRARY){
             ArrayList<String> discardCards = new ArrayList<>();
             player.shufflePile("discard");
             for (int i = 0; i < player.discard.size(); i++){
@@ -534,7 +536,7 @@ public class Turn {
             intent.putExtra("phaseKey", phase);
             intent.putExtra("cardsToDrawKey", cardsToDraw);
             activity.startActivityForResult(intent, LIBRARY_REVEAL_CODE);
-        }
+        }*/
         ((GameBoardActivity) activity).refreshInPlay();
     }
 
@@ -542,7 +544,15 @@ public class Turn {
     public void undoNewCardInPlay(String source, int undoPhase, View.OnTouchListener onTouchListener,
                                   ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(source);
-        switch (undoPhase){
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.undoNewCardInPlay(card, undoPhase,this, onTouchListener, listenerSwitches);
+                break;
+        }
+        /*switch (undoPhase){
             case ADVENTURER:
                 if (revealedCards.size() > player.deck.size()) adventurerShuffle = true;
                 revealedCards.clear();
@@ -695,14 +705,22 @@ public class Turn {
                 ((GameBoardActivity)activity).undoButton.setClickable(false);
                 ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
                 break;
-        }
+        }*/
     }
 
 
-    public void reactToNewCardInTrash(String cardName, View.OnTouchListener handListener, ListenerSwitches listenerSwitches){
+    public void reactToNewCardInTrash(String cardName, View.OnTouchListener handListener,
+                                      ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-
-        switch (phase) {
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.reactToNewCardInTrash(cardName, this, handListener, listenerSwitches);
+                break;
+        }
+        /*switch (phase) {
             case CHAPEL:
             if (trashed < 4){
                 trashed += 1;
@@ -715,12 +733,21 @@ public class Turn {
                 listenerSwitches.setAllFalse();
             }
             break;
-        }
+        }*/
     }
 
     public void undoNewCardInTrash(String cardName, int undoPhase, View.OnTouchListener onTouchListener,
             ListenerSwitches listenerSwitches){
-        switch (undoPhase){
+        Card card = basicCardSet.getCard(cardName);
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.undoNewCardInTrash(cardName, undoPhase,  this, onTouchListener, listenerSwitches);
+                break;
+        }
+       /* switch (undoPhase){
             case CHAPEL:
                 Card card = basicCardSet.getCard(cardName);
                 ((GameBoardActivity)activity).removeCardFromTrashByName(cardName);
@@ -730,12 +757,12 @@ public class Turn {
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("finished\ntrashing");
                 button.setTag(CHAPEL);
-                setListeners(CHAPEL, listenerSwitches);
+                setListeners(HAND_TO_TRASH, listenerSwitches);
                 phase = CHAPEL;
                 ((GameBoardActivity)activity).undoButton.setClickable(false);
                 ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
                 break;
-        }
+        }*/
     }
 
     public void reactToNewCardInDiscard(String cardName, ArrayList<CardData> bankPiles,
@@ -764,10 +791,17 @@ public class Turn {
                     }
                 }
                 break;
-            case CLEAN_UP_PHASE:
-                //CardData cardData = player.discard.get(player.discard.size()-1);
+            default:
+                String expansion = card.getExpansionName();
+                if (expansion.equals("basic+")) expansion = "basic";
+                if (expansion.equals("basic-")) expansion = "basic";
+                switch (expansion) {
+                    case "basic":
+                        basicCardSet.reactToNewCardInDiscard(cardName, this, listenerSwitches);
+                        break;
+                }
                 break;
-            case CELLAR:
+            /*case CELLAR:
                 discarded += 1;
                 cardsDiscarded.add(card);
                 updateHandData(card, false);
@@ -800,16 +834,25 @@ public class Turn {
                     continueToTurnPhase(listenerSwitches);
                     poacherCompliance = 0;
                 }
-                break;
+                break;*/
         }
         ((GameBoardActivity)activity).refreshDiscard();
     }
 
 
-    public void undoNewCardInDiscard(String cardName, int phaseOfUndo, View.OnTouchListener handListener,
+    public void undoNewCardInDiscard(String cardName, int undoPhase, View.OnTouchListener handListener,
                                      ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        switch (phaseOfUndo) {
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.undoNewCardInDiscard(cardName, undoPhase,this, handListener,
+                        listenerSwitches);
+                break;
+        }
+        /*switch (phaseOfUndo) {
             case OPEN_BANK:
                 player.removeCardFromDiscard(player.discard.size() - 1, context, activity);
                 int bankPileCounterId = findBankViewId(cardName, bankPiles);
@@ -834,7 +877,7 @@ public class Turn {
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("finished\ndiscarding");
                 button.setTag(CELLAR);
-                setListeners(CELLAR, listenerSwitches);
+                setListeners(HAND_TO_DISCARD, listenerSwitches);
                 phase = CELLAR;
                 ((GameBoardActivity)activity).undoButton.setClickable(false);
                 ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
@@ -849,7 +892,7 @@ public class Turn {
                 button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("gain\ncard");
                 button.setTag(FEAST);
-                setListeners(FEAST, listenerSwitches);
+                setListeners(BANK_TO_DISCARD, listenerSwitches);
                 phase = FEAST;
                 break;
             case POACHER:
@@ -872,17 +915,28 @@ public class Turn {
                 setListeners(POACHER, listenerSwitches);
                 phase = POACHER;
                 break;
-        }
+        }*/
     }
 
 
     public void reactToNewCardInHand(String cardName, ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        String cardType = card.getType();
-        if (phase == ACTION_PHASE){
-            updateHandData(card, true);
+        switch (phase){
+            case ACTION_PHASE:
+                updateHandData(card, true);
+                break;
+            default:
+                String expansion = card.getExpansionName();
+                if (expansion.equals("basic+")) expansion = "basic";
+                if (expansion.equals("basic-")) expansion = "basic";
+                switch (expansion) {
+                    case "basic":
+                        basicCardSet.reactToNewCardInHand(cardName, this, listenerSwitches);
+                        break;
+                }
+                break;
         }
-        if (phase == CELLAR){
+       /* if (phase == CELLAR){
             updateHandData(card,true);
         }
         if (phase == ARTISAN1){
@@ -902,16 +956,24 @@ public class Turn {
                 Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("card\nto deck");
                 button.setTag(ARTISAN2);
-                setListeners(ARTISAN2, listenerSwitches);
+                setListeners(HAND_TO_DECK, listenerSwitches);
                 phase = ARTISAN2;
             }
-        }
+        }*/
     }
 
     public void reactToNewCardOnDeck(String cardName, View.OnTouchListener handListener,
                                      ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        switch (phase){
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.reactToNewCardOnDeck(cardName, this, handListener, listenerSwitches);
+                break;
+        }
+/*        switch (phase){
             case ARTISAN2:
                 String description = "moved " + cardName + " to deck";
                 ((GameBoardActivity)activity).undo = new Undo(description, this, phase,
@@ -921,14 +983,22 @@ public class Turn {
                 ((GameBoardActivity)activity).undoButton.setClickable(true);
                 ((GameBoardActivity)activity).undoButton.setAlpha(1f);
             break;
-        }
+        }*/
         ((GameBoardActivity)activity).refreshDeck();
     }
 
     public void undoNewCardOnDeck(String cardName, int undoPhase, View.OnTouchListener onTouchListener,
                                   ListenerSwitches listenerSwitches){
         Card card = basicCardSet.getCard(cardName);
-        switch (undoPhase){
+        String expansion = card.getExpansionName();
+        if (expansion.equals("basic+")) expansion = "basic";
+        if (expansion.equals("basic-")) expansion = "basic";
+        switch (expansion) {
+            case "basic":
+                basicCardSet.undoNewCardOnDeck(cardName, undoPhase, this, onTouchListener, listenerSwitches);
+                break;
+        }
+       /* switch (undoPhase){
             case ARTISAN2:
                 //return card to hand
                 player.removeCardFromDeck(player.deck.size()-1, activity);
@@ -957,13 +1027,13 @@ public class Turn {
                 button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
                 button.setText("card\nto deck");
                 button.setTag(HARBINGER);
-                setListeners(HARBINGER, listenerSwitches);
+                setListeners(ALL_OFF, listenerSwitches);
                 phase = HARBINGER;
                 break;
-        }
+        }*/
     }
 
-    public void undoDeckToDiscard(int cardsMoved, ListenerSwitches listenerSwitches){
+    /*public void undoDeckToDiscard(int cardsMoved, ListenerSwitches listenerSwitches){
         int index = player.discard.size()-cardsMoved;
         for (int i = 0; i < cardsMoved; i++){
             String cardName = player.discard.get(index).getCardName();
@@ -977,7 +1047,7 @@ public class Turn {
         ((GameBoardActivity)activity).undoButton.setAlpha(1f);
         Intent intent = new Intent(context, DecisionDialogActivity.class);
         activity.startActivityForResult(intent, CHANCELLOR_ANSWER_CODE);
-    }
+    }*/
 
     public void continueToTurnPhase(ListenerSwitches listenerSwitches){
         if (numberOfActionsInHand > 0 && actions > 0) {
@@ -1032,7 +1102,7 @@ public class Turn {
         return cardName;
     }
 
-    public void finishAdventurer(ListenerSwitches listenerSwitches, View.OnTouchListener handListener) {
+   /* public void finishAdventurer(ListenerSwitches listenerSwitches, View.OnTouchListener handListener) {
         int deckSize = player.deck.size();
         int discardSize = player.discard.size();
         int movedToDiscard = 0;
@@ -1100,10 +1170,10 @@ public class Turn {
             }
         }
         continueToTurnPhase(listenerSwitches);
-    }
+    }*/
 
 
-    public int finishChapel(ListenerSwitches listenerSwitches){
+   /* public int finishChapel(ListenerSwitches listenerSwitches){
         int trashedSoFar = trashed;
         trashed = 0;
         continueToTurnPhase(listenerSwitches);
@@ -1117,7 +1187,7 @@ public class Turn {
         Button button = ((Activity) activity).findViewById(PHASE_BUTTON_ID);
         button.setText("finished\ntrashing");
         button.setTag(CHAPEL);
-        setListeners(CHAPEL, listenerSwitches);
+        setListeners(HAND_TO_TRASH, listenerSwitches);
         phase = CHAPEL;
     }
 
@@ -1284,7 +1354,7 @@ public class Turn {
         ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
         continueToTurnPhase(listenerSwitches);
     }
-
+*/
 
     public int findBankViewId(String cardName, ArrayList<CardData> bankPiles){
         int textViewId = -1;
@@ -1314,10 +1384,7 @@ public class Turn {
                 reactToNewCardInPlay(cardName, handListener, listenerSwitches);
             }
         }
-        //if (!treasureFlag){
-            //Toast.makeText(context, "no treasures left.", Toast.LENGTH_SHORT).show();
-            startOpenBankPhase(listenerSwitches);
-        //}
+        startOpenBankPhase(listenerSwitches);
         return treasureList;
     }
 

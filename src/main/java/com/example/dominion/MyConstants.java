@@ -72,7 +72,7 @@ public final class MyConstants implements Serializable{
     public static final int CHANCELLOR_ANSWER_CODE = 123;
     public static final int LIBRARY_REVEAL_CODE = 132;
     public static final int TESTER_BUTTON_ID = 474747;
-    public static final int NOTIFICATION_ACTIVITY_CODE = 9;
+
     public static final int CHOOSE_CARDS_ACTIVITY_CODE = 0;
     public static final int START_GAME_ACTIVITY_CODE = 1;
 
@@ -81,6 +81,13 @@ public final class MyConstants implements Serializable{
     public static final int BUYING_PHASE = 2;
     public static final int CLEAN_UP_PHASE = 3;
     public static final int OPEN_BANK = 4;
+    public static final int HAND_TO_TRASH = 700;
+    public static final int HAND_TO_DISCARD = 701;
+    public static final int HAND_TO_DECK = 702;
+    public static final int BANK_TO_HAND = 703;
+    public static final int BANK_TO_DISCARD = 704;
+    public static final int DECK_TO_INPLAY = 705;
+    public static final int ALL_OFF = 706;
     public static final int CHAPEL = 10;
     public static final int POACHER = 11;
     public static final int ARTISAN1 = 12;

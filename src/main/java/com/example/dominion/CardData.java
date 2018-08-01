@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class CardData implements Serializable{
 
     private Card card;
-    private BasicCards basicCardSet = new BasicCards();
+    private BasicCards basicCardSet;
     private CardMultiTag cardMultiTag;
     private int imageViewId;
     private GameBoardActivity.MyDragListener dragListener;
@@ -26,7 +26,7 @@ public class CardData implements Serializable{
     private int textViewLeftMargin;
     private static final long serialVersionUID = 100L;
 
-    public CardData(String imageName, String group, int position, int number){
+    public CardData(String imageName, String group, int position, int number, BasicCards basicCardSet){
         this.position = position;
         this.number = number;
         this.cardName = imageName;

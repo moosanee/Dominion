@@ -36,7 +36,7 @@ public class NotificationActivity extends AppCompatActivity {
                 textView.setText(postList.get(i));
             }else{
                 TextView textView = new TextView(this);
-                textView.setTextSize(textSize);
+                textView.setTextSize(20);
                 textView.setTextColor(ACCENT_COLOR);
                 textView.setIncludeFontPadding(false);
                 textView.setTypeface(ResourcesCompat.getFont(this, R.font.alegreya_sc));
