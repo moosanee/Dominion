@@ -173,7 +173,7 @@ public class BasicCards implements Serializable{
                 0, false);
         basicCardList.add(laboratory);
 
-        instructions = "Draw until you have cards in hand. You may set aside any ction cards " +
+        instructions = "Draw until you have 7 cards in hand. You may set aside any action cards " +
                 "drawn in this way, as you draw them; discard the set aside cards after you " +
                 "finish drawing.";
         library = new Card("library", "action", "basic", 5,

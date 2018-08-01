@@ -13,6 +13,7 @@ public class Undo {
     private int cardsMoved;
     private int undoPhase;
     private ArrayList<CardData> cardDataList;
+    private ArrayList<ArrayList<String>> pileLists;
     boolean[] playerToggles;
     private ListenerSwitches listenerSwitches;
     private View.OnTouchListener onTouchListener;
@@ -69,6 +70,15 @@ public class Undo {
         this.onTouchListener = onTouchListener;
         this.listenerSwitches = listenerSwitches;
     }
+    public Undo (String description, int undoPhase, Turn turn, ArrayList<ArrayList<String>> pileLists,
+                 View.OnTouchListener onTouchListener, ListenerSwitches listenerSwitches){
+        this.description = description;
+        this.turn = turn;
+        this.undoPhase = undoPhase;
+        this.pileLists = pileLists;
+        this.onTouchListener = onTouchListener;
+        this.listenerSwitches = listenerSwitches;
+    }
 
     public void undoAction(){
         String[] words = description.split("\\s+");
@@ -99,6 +109,9 @@ public class Undo {
                 break;
             case "played a feast":
                 turn.undoNewCardInPlay("feast", FEAST, onTouchListener, listenerSwitches);
+                break;
+            case "played a library":
+                turn.undoLibrary(pileLists, onTouchListener, listenerSwitches);
                 break;
             case "browsed discard":
                 turn.undoNewCardInPlay("harbinger", HARBINGER, onTouchListener, listenerSwitches);

@@ -397,8 +397,8 @@ public class Player implements Serializable{
             this.deckPile.getTextView().setText(String.valueOf(this.deck.size()));
         for (int i = index; i < this.deck.size(); i++) {
             this.deck.get(i).decreasePosition(1);
-            ImageView imageView1 = ((Activity) activity).findViewById(deck.get(i).getImageViewId());
-            imageView1.setTag(deck.get(i).getCardMultiTag());
+            //ImageView imageView1 = ((Activity) activity).findViewById(deck.get(i).getImageViewId());
+            //imageView1.setTag(deck.get(i).getCardMultiTag());
         }
         if (deck.size() <= 0) deckTally = 0;
     }
@@ -412,7 +412,6 @@ public class Player implements Serializable{
         discard.get(discard.size()-1).setImageViewId(DISCARD_CARD_ID + NUMBER);
         imageView.setId(DISCARD_CARD_ID + NUMBER);
         Drawable drawable = getImageDps(activity, cardName, (cardWidth / 2));
-        //imageView.setImageDrawable(drawable);
         ImageView imageView1 = ((Activity) activity).findViewById(discardPile.getImageViewId());
         imageView1.setImageDrawable(drawable);
     }
@@ -623,6 +622,7 @@ public class Player implements Serializable{
         ImageView imageView = ((Activity) activity).findViewById(discardPile.getImageViewId());
         Drawable drawable = getImageDps(activity, "back", cardWidth / 2);
         imageView.setImageDrawable(drawable);
+        deckPile.getTextView().setText(String.valueOf(deck.size()));
         shufflePile("deck");
     }
 

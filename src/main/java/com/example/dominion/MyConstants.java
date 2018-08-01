@@ -24,7 +24,7 @@ public final class MyConstants implements Serializable{
     public final static int inPlayZoneWidth = screenWidth - 2 * inPlayMargin - 2 * buffer - cardWidth; // adjustment to screen width for unknown reason
     public final static int browseSideMargin = 20; // pixels
     public final static int browseBottomMargin = 40; // pixels
-    public final static int textSize = 20; //sp units
+    public final static int textSize = 16; // = 20sp units
     public final static int emptyPileTextSize = 40; //sp units
     public final static int counterTextSize = 50; //sp units
 
@@ -55,6 +55,8 @@ public final class MyConstants implements Serializable{
     public static final int INPLAY_BROWSE_LISTENER = 500;
     public static final int REVEAL_DIALOG_KEY = 300;
     public static final int REVEAL_LAYOUT_ID = 305;
+    public static final int BUTTON_LAYOUT_ID = 306;
+    public static final int DISCARD_BUTTON = 350;
     public static final int REVEALED_CARD_ID = 310;
     public static final int DRAW_BUTTON_ID = 330;
     public static final int PHASE_BUTTON_ID = 604;
@@ -68,6 +70,7 @@ public final class MyConstants implements Serializable{
     public static final int INTRIGUE_CARDS_ACTIVITY_CODE = 7;
     public static final int GAME_BOARD_ACTIVITY_CODE = 8;
     public static final int CHANCELLOR_ANSWER_CODE = 123;
+    public static final int LIBRARY_REVEAL_CODE = 132;
     public static final int TESTER_BUTTON_ID = 474747;
     public static final int NOTIFICATION_ACTIVITY_CODE = 9;
     public static final int CHOOSE_CARDS_ACTIVITY_CODE = 0;
@@ -88,6 +91,7 @@ public final class MyConstants implements Serializable{
     public static final int CELLAR = 17;
     public static final int FEAST = 18;
     public static final int HARBINGER = 19;
+    public static final int LIBRARY = 20;
     //public static final int
 
     public final static int BACKGROUND_COLOR_DARK = Color.parseColor("#363c61");

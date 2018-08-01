@@ -1010,18 +1010,16 @@ public class GameBoardActivity extends AppCompatActivity {
                        undo = new Undo("put deck in discard", turn, deckSize, listenerSwitches);
                        playerList.get(turnMarker).putDeckInDiscard(activity);
                    }
-                   if ((turn.numberOfActionsInHand > 0) && (turn.actions >0)) {
-                        turn.startActionPhase(listenerSwitches);
-                   } else if (turn.numberOfTreasuresInHand > 0) {
-                        Toast.makeText(context, "you are out of actions", Toast.LENGTH_SHORT).show();
-                        turn.startBuyingPhase(listenerSwitches);
-                   } else {
-                        Toast.makeText(context, "you are out of actions and treasures",
-                                Toast.LENGTH_SHORT).show();
-                        turn.startOpenBankPhase(listenerSwitches);
-                   }
+                   turn.continueToTurnPhase(listenerSwitches);
                    undoButton.setClickable(true);
                    undoButton.setAlpha(1f);
+                }
+                break;
+            case LIBRARY_REVEAL_CODE:
+                if (resultCode == RESULT_OK) {
+                    ArrayList<String> drawnCards = data.getStringArrayListExtra("drawnCardsKey");
+                    ArrayList<String> discardedCards =data.getStringArrayListExtra("discardedCardsKey");
+                    turn.finishLibrary(drawnCards, discardedCards, handListener, listenerSwitches);
                 }
                 break;
         }

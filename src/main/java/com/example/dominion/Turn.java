@@ -3,10 +3,12 @@ package com.example.dominion;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -138,6 +140,9 @@ public class Turn {
                 listenerSwitches.setBankListenerSwitch(true);
                 break;
             case HARBINGER:
+                listenerSwitches.setAllFalse();
+                break;
+            case LIBRARY:
                 listenerSwitches.setAllFalse();
                 break;
         }
@@ -390,6 +395,12 @@ public class Turn {
                         setListeners(HARBINGER, listenerSwitches);
                         phase = HARBINGER;
                         break;
+                    case "library":
+                        Toast.makeText(context, basicCardSet.getCard("library").getInstructions(),
+                                Toast.LENGTH_SHORT).show();
+                        setListeners(LIBRARY, listenerSwitches);
+                        phase = LIBRARY;
+                        break;
                     case "merchant":
                         Toast.makeText(context, card.getInstructions(), Toast.LENGTH_SHORT).show();
                         firstSilverInPlayFlag = true;
@@ -485,10 +496,44 @@ public class Turn {
                     break;
             }
             //popup reveal of cards with buttons
+            ArrayList<String> discardCards = new ArrayList<>();
             Intent intent = new Intent(context, RevealDialogActivity.class);
             intent.putStringArrayListExtra("revealedCardsKey", revealedCards);
+            intent.putStringArrayListExtra("discardCardsKey", discardCards);
             intent.putExtra("phaseKey", phase);
+            intent.putExtra("cardsToDrawKey", 0);
             activity.startActivity(intent);
+        }
+        if (phase == LIBRARY){
+            ArrayList<String> discardCards = new ArrayList<>();
+            player.shufflePile("discard");
+            for (int i = 0; i < player.discard.size(); i++){
+                discardCards.add(player.discard.get(i).getCardName());
+            }
+            ArrayList<String> deckCards = new ArrayList<>();
+            for (int i = 0; i < player.deck.size(); i++){
+                deckCards.add(player.deck.get(i).getCardName());
+            }
+            ArrayList<String> handCards = new ArrayList<>();
+            for (int i = 0; i < player.hand.size(); i++){
+                handCards.add(player.hand.get(i).getCardName());
+            }
+            handCards.add("library");
+            ArrayList<ArrayList<String>> pileLists = new ArrayList<>();
+            pileLists.add(deckCards);
+            pileLists.add(handCards);
+            pileLists.add(discardCards);
+            ((GameBoardActivity)activity).undo = new Undo("played a library",
+                    LIBRARY, this, pileLists, handListener, listenerSwitches);
+            ((GameBoardActivity)activity).undoButton.setClickable(true);
+            ((GameBoardActivity)activity).undoButton.setAlpha(1f);
+            int cardsToDraw = 7 - player.hand.size();
+            Intent intent = new Intent(context, RevealDialogActivity.class);
+            intent.putStringArrayListExtra("revealedCardsKey", deckCards);
+            intent.putStringArrayListExtra("discardCardsKey", discardCards);
+            intent.putExtra("phaseKey", phase);
+            intent.putExtra("cardsToDrawKey", cardsToDraw);
+            activity.startActivityForResult(intent, LIBRARY_REVEAL_CODE);
         }
         ((GameBoardActivity) activity).refreshInPlay();
     }
@@ -615,6 +660,7 @@ public class Turn {
             default:
                 viewId = player.inPlay.get(player.inPlay.size() - 1).getImageViewId();
                 player.removeCardFromInPlay(viewId, activity, layout);
+                player.addCardToHand(source, layout, context, activity, onTouchListener);
                 updateHandData(card, true);
                 actions +=1;
                 if (card.getActions() > 0) actions -= card.getActions();
@@ -643,7 +689,6 @@ public class Turn {
                         draws -= 1;
                     }
                 }
-                player.addCardToHand(source, layout, context, activity, onTouchListener);
                 if (card.getType().equals("action") || card.getType().equals("action - attack") ||
                         card.getType().equals("action - reaction")) startActionPhase(listenerSwitches);
                 if (card.getType().equals("treasure")) startBuyingPhase(listenerSwitches);
@@ -1119,6 +1164,125 @@ public class Turn {
         //return to previous state
         startActionPhase(listenerSwitches);
 
+    }
+
+    public void finishLibrary(ArrayList<String> drawnCards, ArrayList<String> discardedCards,
+                              View.OnTouchListener handListener, ListenerSwitches listenerSwitches){
+        int drawnCardsSize = drawnCards.size();
+        int discardedCardsSize = discardedCards.size();
+        int totalDrawn = drawnCardsSize + discardedCardsSize;
+        int deckSize = player.deck.size();
+        int discardSize = player.discard.size();
+        if ((totalDrawn) <= player.deck.size()) { //check if they are all in the deck
+            for (int j = 0; j < discardedCardsSize; j++){ //go through the discarded list
+                int minIndex = deckSize - totalDrawn;
+                for (int i = player.deck.size()-1; i >= minIndex; i--) { //search for the card in the deck, starting at last drawn card
+                    if (discardedCards.get(0).equals(player.deck.get(i).getCardName())) { //when found
+                        player.removeCardFromDeck(i, activity); // remove from deck
+                        player.addCardToDiscard(discardedCards.get(0), activity, context); //add to discard
+                        discardedCards.remove(0); // remove from discarded list
+                        break;
+                    }
+                }
+            }
+            for (int j = 0; j < drawnCardsSize; j++){
+                int index = player.deck.size()-1;
+                if (drawnCards.get(0).equals(player.deck.get(index).getCardName())) { //when found
+                    player.removeCardFromDeck(index, activity); // remove from deck
+                    player.addCardToHand(drawnCards.get(0), layout, context, activity, handListener); // add to hand
+                    Card card = basicCardSet.getCard(drawnCards.get(0));
+                    updateHandData(card, true);
+                    drawnCards.remove(0);
+                } else {
+                    Toast.makeText(context, "the cards don't match", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        } else { // some of the cards come from the discard pile
+            int cardsFromDiscard = discardedCardsSize + drawnCardsSize - player.deck.size();
+            int minIndex = player.discard.size() - cardsFromDiscard -1;
+            String discardedCardName;
+            int discardedIndex = 0;
+            for (int i = deckSize-1; i >= 0; i--){
+                if (discardedCards.size() > discardedIndex) discardedCardName = discardedCards.get(discardedIndex);
+                else discardedCardName = "";
+                if (discardedCardName.equals(player.deck.get(i).getCardName())) {
+                    player.removeCardFromDeck(i, activity);
+                    //player.addCardToDiscard(discardedCardName, activity, context);
+                    discardedIndex += 1;
+                } else if (drawnCards.get(0).equals(player.deck.get(i).getCardName())){
+                    Card card = basicCardSet.getCard(drawnCards.get(0));
+                    player.removeCardFromDeck(i, activity);
+                    player.addCardToHand(card.getName(), layout, context, activity, handListener);
+                    updateHandData(card, true);
+                    drawnCards.remove(0);
+                } else {
+                        Toast.makeText(context, "the cards don't match", Toast.LENGTH_SHORT).show();
+                }
+            }
+            for (int i = discardSize-1; i > minIndex; i--){ //discard or draw remaining cards
+                if (discardedCards.size() > discardedIndex) discardedCardName = discardedCards.get(discardedIndex);
+                else discardedCardName = "";
+                if (discardedCardName.equals(player.discard.get(i).getCardName())) {
+                    discardedCards.remove(discardedIndex);
+                } else if (drawnCards.get(0).equals(player.discard.get(i).getCardName())){
+                    player.removeCardFromDiscard(i, context, activity);
+                    player.addCardToHand(drawnCards.get(0), layout, context, activity, handListener);
+                    Card card = basicCardSet.getCard(drawnCards.get(0));
+                    updateHandData(card, true);
+                    drawnCards.remove(0);
+                }
+            }
+            player.putDiscardInDeck(activity);
+            if (discardedCards.size() > 0) {
+                for (int i = 0; i < discardedCards.size(); i++) {
+                    player.addCardToDiscard(discardedCards.get(i), activity, context);
+                }
+            }
+        }
+        continueToTurnPhase(listenerSwitches);
+    }
+
+    public void undoLibrary(ArrayList<ArrayList<String>> pileLists, View.OnTouchListener handListener,
+                            ListenerSwitches listenerSwitches){
+        ArrayList<String> deckList = pileLists.get(0);
+        ArrayList<String> handList = pileLists.get(1);
+        ArrayList<String> discardList = pileLists.get(2);
+        player.deck.clear();
+        player.deckTally = 0;
+        for (int i = 0; i < deckList.size(); i++){
+            player.addCardToDeck(deckList.get(i), activity, context);
+        }
+        player.deckPile.getTextView().setText(String.valueOf(player.deck.size()));
+        int handSize = player.hand.size();
+        for (int i = 0; i < handSize; i++) {
+            int viewId = player.hand.get(player.hand.size()-1).getImageViewId();
+            Card card = basicCardSet.getCard(player.hand.get(player.hand.size()-1).getCardName());
+            player.removeCardFromHand(viewId, activity, layout);
+            updateHandData(card, false);
+        }
+        for (int i = 0; i < handList.size(); i++){
+            player.addCardToHand(handList.get(i), layout, context, activity, handListener);
+            Card card = basicCardSet.getCard(handList.get(i));
+            updateHandData(card, true);
+        }
+        player.discard.clear();
+        player.discardTally = 0;
+        for (int i = 0; i < discardList.size(); i++){
+            player.addCardToDiscard(discardList.get(i), activity, context);
+        }
+        int viewId = player.inPlay.get(player.inPlay.size()-1).getImageViewId();
+        player.removeCardFromInPlay(viewId, activity, layout);
+        actions +=1;
+        String cardName = player.discard.get(player.discard.size()-1).getCardName();
+        Drawable drawable = player.getImageDps(activity, cardName, (cardWidth / 2));
+        ImageView imageView1 = ((Activity) activity).findViewById(player.discardPile.getImageViewId());
+        imageView1.setImageDrawable(drawable);
+        TextView textView = ((GameBoardActivity)activity).findViewById(ACTIONS_LEFT_ID);
+        textView.setText(actions + " actions left");
+        ((GameBoardActivity)activity).undoButton.setClickable(false);
+        ((GameBoardActivity)activity).undoButton.setAlpha(0.5f);
+        continueToTurnPhase(listenerSwitches);
     }
 
 
